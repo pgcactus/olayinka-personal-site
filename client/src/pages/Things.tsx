@@ -11,7 +11,7 @@
  */
 
 import { motion } from "framer-motion";
-import { Link, useLocation } from "wouter";
+import { Link, useSearch } from "wouter";
 
 type Tab = "books" | "vinyls" | "places";
 
@@ -94,12 +94,16 @@ function parseTab(search: string): Tab {
 }
 
 export default function Things() {
-  const [location, navigate] = useLocation();
-  const search = typeof window !== "undefined" ? window.location.search : "";
-  const activeTab = parseTab(search);
+  // useSearch() from wouter returns the live query string and re-renders on
+  // every navigation, so activeTab is always in sync with the URL.
+  const search = useSearch();
+  const activeTab = parseTab(search ? `?${search}` : "");
 
   function setTab(tab: Tab) {
-    navigate(`/things?tab=${tab}`);
+    // replace so tab clicks don't stack up in browser history
+    window.history.replaceState(null, "", `/things?tab=${tab}`);
+    // Trigger a wouter re-render by dispatching a popstate event
+    window.dispatchEvent(new PopStateEvent("popstate"));
   }
 
   const visible = items.filter((item) => item.category === activeTab);
