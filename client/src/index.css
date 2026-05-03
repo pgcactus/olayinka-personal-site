@@ -59,19 +59,18 @@
 }
 
 @layer components {
-  /* Full-viewport centred wrapper */
+  /* Page wrapper: centred column, upper-third anchored */
   .page-wrapper {
     min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
+    padding: 120px 48px 96px;
   }
 
   /* Content column */
   .content {
+    position: relative;
     width: 100%;
-    max-width: var(--content-max-width);
+    max-width: 720px;
+    margin: 0 auto;
   }
 
   /* Base paragraph */
@@ -120,8 +119,7 @@
   /* Mobile layout overrides */
   @media (max-width: 639px) {
     .page-wrapper {
-      align-items: flex-start;
-      padding-top: 80px;
+      padding: 80px 24px 96px;
     }
 
     .para {
@@ -133,11 +131,11 @@
     }
   }
 
-  /* LinkedIn utility link — fixed bottom-right */
+  /* LinkedIn utility link — anchored to bottom-right of content block */
   .linkedin-link {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
+    display: block;
+    text-align: right;
+    margin-top: 40px;
     font-family: var(--font-mono);
     font-size: 13px;
     line-height: var(--line-height-base);
@@ -155,13 +153,6 @@
   .linkedin-link:hover {
     color: var(--color-near-black);
     text-decoration-color: var(--color-near-black);
-  }
-
-  @media (max-width: 639px) {
-    .linkedin-link {
-      bottom: 16px;
-      right: 16px;
-    }
   }
 
   /* ------------------------------------------------------------------ */
