@@ -254,6 +254,15 @@
     color: var(--color-body);
   }
 
+  @media (max-width: 639px) {
+    .nato-heading,
+    .nato-input,
+    .nato-output,
+    .nato-cell {
+      font-size: 13px;
+    }
+  }
+
   /* ------------------------------------------------------------------ */
   /* /things page                                                         */
   /* ------------------------------------------------------------------ */
@@ -328,6 +337,13 @@
   .things-tab--inactive:hover {
     background-color: transparent;
     color: #9ca3af;
+  }
+
+  @media (max-width: 639px) {
+    .things-heading,
+    .things-tab {
+      font-size: 13px;
+    }
   }
 
   /* Grid */
