@@ -5,41 +5,140 @@
  * - Three tabs: books, vinyls, places — driven by ?tab= query param
  * - Active tab: yellow highlight #FEF08A, darkens to #FDE047 on hover
  * - Inactive tabs: muted #9CA3AF, no background
- * - Grid: 3 cols desktop / 2 tablet / 1 mobile, 32px gap, square cells #F5F5F5
+ * - Books: real data with Open Library covers, hover tooltip, category labels
+ * - Vinyls / Places: placeholder SVG grid (unchanged)
  * - Page-level fade-in on mount (300ms, no stagger)
  * - Back link top-left, 13px, #5A5A5A, fades to 60% on hover
  */
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useSearch } from "wouter";
 
 type Tab = "books" | "vinyls" | "places";
 
 // ---------------------------------------------------------------------------
-// Placeholder image generators (inline SVG data URIs)
+// Books data
 // ---------------------------------------------------------------------------
 
-function bookSvg(fill: string): string {
-  // Portrait rectangle
-  return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='84' viewBox='0 0 60 84'%3E%3Crect width='60' height='84' rx='2' fill='${encodeURIComponent(fill)}'/%3E%3C/svg%3E`;
+type BookCategory =
+  | "business"
+  | "product"
+  | "classics"
+  | "thrillers"
+  | "nonfiction";
+
+interface Book {
+  id: string;
+  title: string;
+  author: string;
+  isbn: string;
+  category: BookCategory;
+  caption?: string;
 }
 
+const BOOKS: Book[] = [
+  { id: "playing-to-win", title: "Playing to Win", author: "A.G. Lafley & Roger Martin", isbn: "9781422187395", category: "business" },
+  { id: "the-score-takes-care-of-itself", title: "The Score Takes Care of Itself", author: "Bill Walsh", isbn: "9781591843474", category: "business" },
+  { id: "how-to-measure-anything", title: "How to Measure Anything", author: "Douglas Hubbard", isbn: "9781118539279", category: "product" },
+  { id: "thinking-in-systems", title: "Thinking in Systems", author: "Donella H. Meadows", isbn: "9781603580557", category: "product" },
+  { id: "human-powered", title: "Human Powered", author: "Trenton Moss", isbn: "9781781337691", category: "product" },
+  { id: "inspired", title: "Inspired", author: "Marty Cagan", isbn: "9781119387503", category: "product" },
+  { id: "burmese-days", title: "Burmese Days", author: "George Orwell", isbn: "9780141185378", category: "classics" },
+  { id: "nineteen-eighty-four", title: "Nineteen Eighty-Four", author: "George Orwell", isbn: "9780451524935", category: "classics" },
+  { id: "to-kill-a-mockingbird", title: "To Kill a Mockingbird", author: "Harper Lee", isbn: "9780446310789", category: "classics" },
+  { id: "the-odyssey", title: "The Odyssey", author: "Homer", isbn: "9780140268867", category: "classics" },
+  { id: "dr-jekyll-and-mr-hyde", title: "Dr Jekyll and Mr Hyde and Other Strange Tales", author: "Robert Louis Stevenson", isbn: "9780141439730", category: "classics" },
+  { id: "the-raven", title: "The Raven and Other Tales of Horror", author: "Edgar Allan Poe", isbn: "9780140437546", category: "classics" },
+  { id: "simply-lies", title: "Simply Lies", author: "David Baldacci", isbn: "9781538719893", category: "thrillers" },
+  { id: "the-24th-hour", title: "The 24th Hour", author: "James Patterson", isbn: "9780316404815", category: "thrillers" },
+  { id: "the-exchange", title: "The Exchange", author: "John Grisham", isbn: "9780385549325", category: "thrillers" },
+  { id: "how-to-kill-your-family", title: "How to Kill Your Family", author: "Bella Mackie", isbn: "9780008365974", category: "thrillers" },
+  { id: "vera-wong", title: "Vera Wong's Unsolicited Advice for Murderers", author: "Jesse Q. Sutanto", isbn: "9780593546192", category: "thrillers" },
+  { id: "the-satsuma-complex", title: "The Satsuma Complex", author: "Bob Mortimer", isbn: "9781398519312", category: "thrillers" },
+  { id: "outliers", title: "Outliers", author: "Malcolm Gladwell", isbn: "9780316017930", category: "nonfiction" },
+];
+
+const BOOK_CATEGORY_LABELS: Record<BookCategory, string> = {
+  business: "Business and Strategy",
+  product: "Product and Design",
+  classics: "Classics",
+  thrillers: "Thrillers and Crime Fiction",
+  nonfiction: "Non-Fiction",
+};
+
+const BOOK_CATEGORY_ORDER: BookCategory[] = [
+  "business",
+  "product",
+  "classics",
+  "thrillers",
+  "nonfiction",
+];
+
+// Fallback tile colours per category (muted, matches site palette)
+const FALLBACK_COLOURS: Record<BookCategory, string> = {
+  business: "#C9B8A8",
+  product: "#B8C4C2",
+  classics: "#C4B8C9",
+  thrillers: "#B8BBC9",
+  nonfiction: "#C9C4B8",
+};
+
+// ---------------------------------------------------------------------------
+// BookCard — handles cover load / error state + hover tooltip
+// ---------------------------------------------------------------------------
+
+function BookCard({ book }: { book: Book }) {
+  const [imgFailed, setImgFailed] = useState(false);
+  const [hovered, setHovered] = useState(false);
+
+  const coverUrl = `https://covers.openlibrary.org/b/isbn/${book.isbn}-L.jpg`;
+  const fallbackColour = FALLBACK_COLOURS[book.category];
+
+  return (
+    <div
+      className="things-cell book-card"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {imgFailed ? (
+        <div
+          className="book-fallback"
+          style={{ backgroundColor: fallbackColour }}
+        >
+          <span className="book-fallback-title">{book.title}</span>
+        </div>
+      ) : (
+        <img
+          src={coverUrl}
+          alt={book.title}
+          className="things-img book-cover"
+          loading="lazy"
+          onError={() => setImgFailed(true)}
+          draggable={false}
+        />
+      )}
+
+      {/* Hover tooltip */}
+      <div className={`book-tooltip ${hovered ? "book-tooltip--visible" : ""}`}>
+        <span className="book-tooltip-title">{book.title}</span>
+        <span className="book-tooltip-author">{book.author}</span>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Placeholder image generators for vinyls / places (unchanged)
+// ---------------------------------------------------------------------------
+
 function vinylSvg(fill: string): string {
-  // Circle with small centre hole
   return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='40' r='40' fill='${encodeURIComponent(fill)}'/%3E%3Ccircle cx='40' cy='40' r='6' fill='%23ffffff'/%3E%3C/svg%3E`;
 }
 
 function placeSvg(fill: string): string {
-  // Landscape rectangle
   return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='66' viewBox='0 0 100 66'%3E%3Crect width='100' height='66' rx='2' fill='${encodeURIComponent(fill)}'/%3E%3C/svg%3E`;
 }
-
-// Muted colour palettes per category
-const bookColours = [
-  "#C9B8A8", "#B8C4C2", "#C4B8C9", "#B8C9BC",
-  "#C9C4B8", "#B8BBC9", "#C9B8BC", "#C4C9B8",
-  "#BEC4C9", "#C9BEB8",
-];
 
 const vinylColours = [
   "#4A4A5A", "#5A4A4A", "#4A5A4A", "#5A5A4A",
@@ -53,35 +152,19 @@ const placeColours = [
   "#A8C4C4", "#C4A8A8",
 ];
 
-interface Item {
+interface PlaceholderItem {
   id: string;
   image: string;
-  category: Tab;
+  category: "vinyls" | "places";
 }
 
-const items: Item[] = [
-  // Books (10 items)
-  ...bookColours.map((c, i) => ({
-    id: `book-${i}`,
-    image: bookSvg(c),
-    category: "books" as Tab,
-  })),
-  // Vinyls (10 items)
-  ...vinylColours.map((c, i) => ({
-    id: `vinyl-${i}`,
-    image: vinylSvg(c),
-    category: "vinyls" as Tab,
-  })),
-  // Places (10 items)
-  ...placeColours.map((c, i) => ({
-    id: `place-${i}`,
-    image: placeSvg(c),
-    category: "places" as Tab,
-  })),
+const placeholderItems: PlaceholderItem[] = [
+  ...vinylColours.map((c, i) => ({ id: `vinyl-${i}`, image: vinylSvg(c), category: "vinyls" as const })),
+  ...placeColours.map((c, i) => ({ id: `place-${i}`, image: placeSvg(c), category: "places" as const })),
 ];
 
 // ---------------------------------------------------------------------------
-// Component
+// Tab parsing
 // ---------------------------------------------------------------------------
 
 const TABS: Tab[] = ["books", "vinyls", "places"];
@@ -93,20 +176,18 @@ function parseTab(search: string): Tab {
   return "books";
 }
 
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
+
 export default function Things() {
-  // useSearch() from wouter returns the live query string and re-renders on
-  // every navigation, so activeTab is always in sync with the URL.
   const search = useSearch();
   const activeTab = parseTab(search ? `?${search}` : "");
 
   function setTab(tab: Tab) {
-    // replace so tab clicks don't stack up in browser history
     window.history.replaceState(null, "", `/things?tab=${tab}`);
-    // Trigger a wouter re-render by dispatching a popstate event
     window.dispatchEvent(new PopStateEvent("popstate"));
   }
-
-  const visible = items.filter((item) => item.category === activeTab);
 
   return (
     <motion.div
@@ -138,19 +219,45 @@ export default function Things() {
           ))}
         </div>
 
-        {/* Grid */}
-        <div className="things-grid">
-          {visible.map((item) => (
-            <div key={item.id} className="things-cell">
-              <img
-                src={item.image}
-                alt=""
-                className="things-img"
-                draggable={false}
-              />
-            </div>
-          ))}
-        </div>
+        {/* Books tab: grouped by category */}
+        {activeTab === "books" && (
+          <div className="books-sections">
+            {BOOK_CATEGORY_ORDER.map((cat) => {
+              const group = BOOKS.filter((b) => b.category === cat);
+              if (group.length === 0) return null;
+              return (
+                <div key={cat} className="books-group">
+                  <p className="books-group-label">
+                    {BOOK_CATEGORY_LABELS[cat]}
+                  </p>
+                  <div className="things-grid">
+                    {group.map((book) => (
+                      <BookCard key={book.id} book={book} />
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Vinyls / Places tabs: placeholder grid */}
+        {activeTab !== "books" && (
+          <div className="things-grid">
+            {placeholderItems
+              .filter((item) => item.category === activeTab)
+              .map((item) => (
+                <div key={item.id} className="things-cell">
+                  <img
+                    src={item.image}
+                    alt=""
+                    className="things-img"
+                    draggable={false}
+                  />
+                </div>
+              ))}
+          </div>
+        )}
       </div>
     </motion.div>
   );
