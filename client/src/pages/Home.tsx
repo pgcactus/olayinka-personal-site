@@ -60,11 +60,11 @@ const paragraphs = [
     className: "para",
     content: (
       <>
-        Right now, I lead product work across activation and trust at{" "}
+        Right now, I lead product work at{" "}
         <Highlight href="https://www.flagstoneim.com/" external>
           Flagstone
         </Highlight>
-        : getting people through the door and keeping things safe once
+        : helping people get through the door, and keeping things safe once
         they&apos;re in.
       </>
     ),
@@ -86,8 +86,8 @@ const paragraphs = [
     content: (
       <>
         I&apos;d happily skydive for a clean reset, play tennis, or do a
-        quick 5K. Still, a slow afternoon with friends is usually the better
-        version of a weekend.
+        quick 5K. A slow afternoon with friends is usually the better version
+        of a weekend.
       </>
     ),
   },
@@ -100,7 +100,8 @@ const paragraphs = [
         <Highlight href="/things?tab=books">books</Highlight> I&apos;ve read,
         the <Highlight href="/things?tab=vinyls">vinyls</Highlight> I&apos;m
         collecting, or the{" "}
-        <Highlight href="/things?tab=places">places</Highlight> I&apos;ve been.
+        <Highlight href="/things?tab=places">places</Highlight> I&apos;ve been
+        to.
       </>
     ),
   },
