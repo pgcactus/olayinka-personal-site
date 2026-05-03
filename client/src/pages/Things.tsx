@@ -11,7 +11,7 @@
  * - Back link top-left, 13px, #5A5A5A, fades to 60% on hover
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link, useSearch } from "wouter";
 
@@ -143,22 +143,106 @@ function BentoTile({ book }: { book: Book }) {
 }
 
 // ---------------------------------------------------------------------------
-// Placeholder image generators for vinyls / places (unchanged)
+// Vinyls data
 // ---------------------------------------------------------------------------
 
-function vinylSvg(fill: string): string {
-  return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='40' r='40' fill='${encodeURIComponent(fill)}'/%3E%3Ccircle cx='40' cy='40' r='6' fill='%23ffffff'/%3E%3C/svg%3E`;
+interface Vinyl {
+  id: string;
+  title: string;
+  artist: string;
+  year: number;
+  genre: string;
 }
+
+const VINYLS: Vinyl[] = [
+  { id: "for-broken-ears",    title: "For Broken Ears",                    artist: "Tems",           year: 2020, genre: "Afro R&B" },
+  { id: "untitled-unmastered",title: "untitled unmastered.",               artist: "Kendrick Lamar", year: 2016, genre: "Hip-hop" },
+  { id: "gnx",               title: "GNX",                               artist: "Kendrick Lamar", year: 2024, genre: "Hip-hop" },
+  { id: "iyrtitl",           title: "If You're Reading This It's Too Late",artist: "Drake",          year: 2015, genre: "Hip-hop" },
+  { id: "african-giant",     title: "African Giant",                      artist: "Burna Boy",      year: 2019, genre: "Afrobeats" },
+  { id: "i-told-them",       title: "I Told Them",                        artist: "Burna Boy",      year: 2023, genre: "Afrobeats" },
+  { id: "lungu-boy",         title: "Lungu Boy",                          artist: "Asake",          year: 2024, genre: "Afrobeats" },
+  { id: "wattba",            title: "What a Time to Be Alive",            artist: "Future & Drake", year: 2015, genre: "Hip-hop" },
+  { id: "the-blueprint",     title: "The Blueprint",                      artist: "Jay-Z",          year: 2001, genre: "Hip-hop" },
+  { id: "let-god-sort-em-out",title: "Let God Sort Em Out",               artist: "Clipse",         year: 2025, genre: "Hip-hop" },
+];
+
+// iTunes cover fetch with localStorage cache
+const CACHE_PREFIX = "vinyl-cover-v1-";
+
+async function fetchCoverUrl(vinyl: Vinyl): Promise<string | null> {
+  const key = CACHE_PREFIX + vinyl.id;
+  try {
+    const cached = localStorage.getItem(key);
+    if (cached !== null) return cached === "" ? null : cached;
+  } catch (_) { /* ignore */ }
+
+  try {
+    const query = encodeURIComponent(`${vinyl.artist} ${vinyl.title}`);
+    const res = await fetch(
+      `https://itunes.apple.com/search?term=${query}&media=music&entity=album&limit=1`
+    );
+    const data = await res.json();
+    const url =
+      data.results && data.results.length > 0
+        ? (data.results[0].artworkUrl100 as string).replace("100x100bb", "600x600bb")
+        : null;
+    try { localStorage.setItem(key, url ?? ""); } catch (_) { /* ignore */ }
+    return url;
+  } catch (_) {
+    return null;
+  }
+}
+
+// VinylCard component
+function VinylCard({ vinyl }: { vinyl: Vinyl }) {
+  const [coverUrl, setCoverUrl] = useState<string | null | undefined>(undefined);
+  const [hovered, setHovered] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchCoverUrl(vinyl).then((url) => {
+      if (!cancelled) setCoverUrl(url);
+    });
+    return () => { cancelled = true; };
+  }, [vinyl.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return (
+    <div
+      className={`vinyl-card${hovered ? " vinyl-card--hovered" : ""}`}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {/* Cover image or fallback tile */}
+      {coverUrl ? (
+        <img
+          src={coverUrl}
+          alt={`${vinyl.title} by ${vinyl.artist}`}
+          className="vinyl-cover"
+          draggable={false}
+        />
+      ) : (
+        <div className="vinyl-fallback">
+          <span className="vinyl-fallback-title">{vinyl.title}</span>
+          <span className="vinyl-fallback-artist">{vinyl.artist}</span>
+        </div>
+      )}
+
+      {/* Hover strip */}
+      <div className={`vinyl-overlay${hovered ? " vinyl-overlay--visible" : ""}`}>
+        {vinyl.genre}&nbsp;&middot;&nbsp;{vinyl.year}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Placeholder image generator for places (unchanged)
+// ---------------------------------------------------------------------------
 
 function placeSvg(fill: string): string {
   return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='66' viewBox='0 0 100 66'%3E%3Crect width='100' height='66' rx='2' fill='${encodeURIComponent(fill)}'/%3E%3C/svg%3E`;
 }
-
-const vinylColours = [
-  "#4A4A5A", "#5A4A4A", "#4A5A4A", "#5A5A4A",
-  "#4A5A5A", "#5A4A5A", "#4E4A5A", "#5A4E4A",
-  "#4A5A52", "#52504A",
-];
 
 const placeColours = [
   "#A8B8C9", "#B8A8C4", "#A8C4B8", "#C4A8B8",
@@ -169,11 +253,10 @@ const placeColours = [
 interface PlaceholderItem {
   id: string;
   image: string;
-  category: "vinyls" | "places";
+  category: "places";
 }
 
 const placeholderItems: PlaceholderItem[] = [
-  ...vinylColours.map((c, i) => ({ id: `vinyl-${i}`, image: vinylSvg(c), category: "vinyls" as const })),
   ...placeColours.map((c, i) => ({ id: `place-${i}`, image: placeSvg(c), category: "places" as const })),
 ];
 
@@ -242,8 +325,17 @@ export default function Things() {
           </div>
         )}
 
-        {/* Vinyls / Places tabs: placeholder grid */}
-        {activeTab !== "books" && (
+        {/* Vinyls tab: real album grid */}
+        {activeTab === "vinyls" && (
+          <div className="vinyls-grid">
+            {VINYLS.map((vinyl) => (
+              <VinylCard key={vinyl.id} vinyl={vinyl} />
+            ))}
+          </div>
+        )}
+
+        {/* Places tab: placeholder grid */}
+        {activeTab === "places" && (
           <div className="things-grid">
             {placeholderItems
               .filter((item) => item.category === activeTab)
