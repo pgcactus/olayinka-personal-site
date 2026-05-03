@@ -5,7 +5,7 @@
  * - Three tabs: books, vinyls, places — driven by ?tab= query param
  * - Active tab: ice blue highlight #E0F2FE, darkens to #BAE6FD on hover
  * - Inactive tabs: muted #9CA3AF, no background
- * - Books: programmatic gradient tiles, hover strip, category labels
+ * - Books: bento mosaic with gradient tiles, variable sizes, hover strip
  * - Vinyls / Places: placeholder SVG grid (unchanged)
  * - Page-level fade-in on mount (300ms, no stagger)
  * - Back link top-left, 13px, #5A5A5A, fades to 60% on hover
@@ -28,6 +28,8 @@ type BookCategory =
   | "thrillers"
   | "nonfiction";
 
+type TileSize = "large" | "wide" | "tall" | "small";
+
 interface Book {
   id: string;
   title: string;
@@ -35,44 +37,29 @@ interface Book {
   category: BookCategory;
   year: number | string;
   read: number;
+  size: TileSize;
 }
 
 const BOOKS: Book[] = [
-  { id: "playing-to-win", title: "Playing to Win", author: "A.G. Lafley & Roger Martin", category: "business", year: 2013, read: 2024 },
-  { id: "the-score-takes-care-of-itself", title: "The Score Takes Care of Itself", author: "Bill Walsh", category: "business", year: 2009, read: 2025 },
-  { id: "how-to-measure-anything", title: "How to Measure Anything", author: "Douglas Hubbard", category: "product", year: 2007, read: 2024 },
-  { id: "thinking-in-systems", title: "Thinking in Systems", author: "Donella H. Meadows", category: "product", year: 2008, read: 2025 },
-  { id: "human-powered", title: "Human Powered", author: "Trenton Moss", category: "product", year: 2021, read: 2024 },
-  { id: "inspired", title: "Inspired", author: "Marty Cagan", category: "product", year: 2008, read: 2026 },
-  { id: "burmese-days", title: "Burmese Days", author: "George Orwell", category: "classics", year: 1934, read: 2025 },
-  { id: "nineteen-eighty-four", title: "Nineteen Eighty-Four", author: "George Orwell", category: "classics", year: 1949, read: 2024 },
-  { id: "to-kill-a-mockingbird", title: "To Kill a Mockingbird", author: "Harper Lee", category: "classics", year: 1960, read: 2024 },
-  { id: "the-odyssey", title: "The Odyssey", author: "Homer", category: "classics", year: "~700 BC", read: 2026 },
-  { id: "dr-jekyll", title: "Dr Jekyll and Mr Hyde", author: "Robert Louis Stevenson", category: "classics", year: 1886, read: 2025 },
-  { id: "the-raven", title: "The Raven and Other Tales", author: "Edgar Allan Poe", category: "classics", year: 1845, read: 2025 },
-  { id: "simply-lies", title: "Simply Lies", author: "David Baldacci", category: "thrillers", year: 2023, read: 2024 },
-  { id: "the-24th-hour", title: "The 24th Hour", author: "James Patterson", category: "thrillers", year: 2024, read: 2024 },
-  { id: "the-exchange", title: "The Exchange", author: "John Grisham", category: "thrillers", year: 2023, read: 2025 },
-  { id: "how-to-kill-your-family", title: "How to Kill Your Family", author: "Bella Mackie", category: "thrillers", year: 2021, read: 2025 },
-  { id: "vera-wong", title: "Vera Wong's Unsolicited Advice for Murderers", author: "Jesse Q. Sutanto", category: "thrillers", year: 2023, read: 2026 },
-  { id: "the-satsuma-complex", title: "The Satsuma Complex", author: "Bob Mortimer", category: "thrillers", year: 2022, read: 2026 },
-  { id: "outliers", title: "Outliers", author: "Malcolm Gladwell", category: "nonfiction", year: 2008, read: 2024 },
-];
-
-const BOOK_CATEGORY_LABELS: Record<BookCategory, string> = {
-  business: "Business and Strategy",
-  product: "Product and Design",
-  classics: "Classics",
-  thrillers: "Thrillers and Crime Fiction",
-  nonfiction: "Non-Fiction",
-};
-
-const BOOK_CATEGORY_ORDER: BookCategory[] = [
-  "business",
-  "product",
-  "classics",
-  "thrillers",
-  "nonfiction",
+  { id: "playing-to-win", title: "Playing to Win", author: "A.G. Lafley & Roger Martin", category: "business", year: 2013, read: 2024, size: "wide" },
+  { id: "the-score-takes-care-of-itself", title: "The Score Takes Care of Itself", author: "Bill Walsh", category: "business", year: 2009, read: 2025, size: "tall" },
+  { id: "how-to-measure-anything", title: "How to Measure Anything", author: "Douglas Hubbard", category: "product", year: 2007, read: 2024, size: "small" },
+  { id: "thinking-in-systems", title: "Thinking in Systems", author: "Donella H. Meadows", category: "product", year: 2008, read: 2025, size: "large" },
+  { id: "human-powered", title: "Human Powered", author: "Trenton Moss", category: "product", year: 2021, read: 2024, size: "small" },
+  { id: "inspired", title: "Inspired", author: "Marty Cagan", category: "product", year: 2008, read: 2026, size: "wide" },
+  { id: "burmese-days", title: "Burmese Days", author: "George Orwell", category: "classics", year: 1934, read: 2025, size: "tall" },
+  { id: "nineteen-eighty-four", title: "Nineteen Eighty-Four", author: "George Orwell", category: "classics", year: 1949, read: 2024, size: "large" },
+  { id: "to-kill-a-mockingbird", title: "To Kill a Mockingbird", author: "Harper Lee", category: "classics", year: 1960, read: 2024, size: "large" },
+  { id: "the-odyssey", title: "The Odyssey", author: "Homer", category: "classics", year: "~700 BC", read: 2026, size: "large" },
+  { id: "dr-jekyll", title: "Dr Jekyll and Mr Hyde", author: "Robert Louis Stevenson", category: "classics", year: 1886, read: 2025, size: "tall" },
+  { id: "the-raven", title: "The Raven and Other Tales", author: "Edgar Allan Poe", category: "classics", year: 1845, read: 2025, size: "small" },
+  { id: "simply-lies", title: "Simply Lies", author: "David Baldacci", category: "thrillers", year: 2023, read: 2024, size: "small" },
+  { id: "the-24th-hour", title: "The 24th Hour", author: "James Patterson", category: "thrillers", year: 2024, read: 2024, size: "small" },
+  { id: "the-exchange", title: "The Exchange", author: "John Grisham", category: "thrillers", year: 2023, read: 2025, size: "small" },
+  { id: "how-to-kill-your-family", title: "How to Kill Your Family", author: "Bella Mackie", category: "thrillers", year: 2021, read: 2025, size: "wide" },
+  { id: "vera-wong", title: "Vera Wong's Unsolicited Advice for Murderers", author: "Jesse Q. Sutanto", category: "thrillers", year: 2023, read: 2026, size: "wide" },
+  { id: "the-satsuma-complex", title: "The Satsuma Complex", author: "Bob Mortimer", category: "thrillers", year: 2022, read: 2026, size: "small" },
+  { id: "outliers", title: "Outliers", author: "Malcolm Gladwell", category: "nonfiction", year: 2008, read: 2024, size: "wide" },
 ];
 
 // ---------------------------------------------------------------------------
@@ -105,28 +92,50 @@ function gradientForBook(book: Book): { from: string; to: string } {
 }
 
 // ---------------------------------------------------------------------------
-// BookCard — gradient tile with hover strip
+// Typography scale per tile size
 // ---------------------------------------------------------------------------
 
-function BookCard({ book }: { book: Book }) {
+const FONT_SIZES: Record<TileSize, { title: string; author: string }> = {
+  large: { title: "18px", author: "13px" },
+  wide:  { title: "15px", author: "12px" },
+  tall:  { title: "14px", author: "11px" },
+  small: { title: "13px", author: "11px" },
+};
+
+// ---------------------------------------------------------------------------
+// BentoTile — gradient tile with size-aware typography and hover strip
+// ---------------------------------------------------------------------------
+
+function BentoTile({ book }: { book: Book }) {
   const [hovered, setHovered] = useState(false);
   const { from, to } = gradientForBook(book);
+  const fonts = FONT_SIZES[book.size];
 
   return (
     <div
-      className={`book-tile ${hovered ? "book-tile--hovered" : ""}`}
+      className={`bento-tile tile-${book.size}${hovered ? " bento-tile--hovered" : ""}`}
       style={{ background: `linear-gradient(135deg, ${from}, ${to})` }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       {/* Title — top-left */}
-      <span className="book-tile-title">{book.title}</span>
+      <span
+        className="bento-tile-title"
+        style={{ fontSize: fonts.title }}
+      >
+        {book.title}
+      </span>
 
       {/* Author — bottom-left */}
-      <span className="book-tile-author">{book.author}</span>
+      <span
+        className="bento-tile-author"
+        style={{ fontSize: fonts.author }}
+      >
+        {book.author}
+      </span>
 
       {/* Hover strip — slides up from bottom */}
-      <div className={`book-tile-strip ${hovered ? "book-tile-strip--visible" : ""}`}>
+      <div className={`tile-overlay${hovered ? " tile-overlay--visible" : ""}`}>
         Published {book.year}&nbsp;&middot;&nbsp;Read {book.read}
       </div>
     </div>
@@ -224,25 +233,12 @@ export default function Things() {
           ))}
         </div>
 
-        {/* Books tab: grouped by category */}
+        {/* Books tab: bento mosaic */}
         {activeTab === "books" && (
-          <div className="books-sections">
-            {BOOK_CATEGORY_ORDER.map((cat) => {
-              const group = BOOKS.filter((b) => b.category === cat);
-              if (group.length === 0) return null;
-              return (
-                <div key={cat} className="books-group">
-                  <p className="books-group-label">
-                    {BOOK_CATEGORY_LABELS[cat]}
-                  </p>
-                  <div className="books-grid">
-                    {group.map((book) => (
-                      <BookCard key={book.id} book={book} />
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
+          <div className="bento-grid">
+            {BOOKS.map((book) => (
+              <BentoTile key={book.id} book={book} />
+            ))}
           </div>
         )}
 
