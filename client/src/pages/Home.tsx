@@ -8,12 +8,36 @@
  */
 
 import { motion } from "framer-motion";
+import { Link } from "wouter";
 
 interface HighlightProps {
   children: React.ReactNode;
+  href?: string;
+  external?: boolean;
 }
 
-function Highlight({ children }: HighlightProps) {
+function Highlight({ children, href, external }: HighlightProps) {
+  if (href && external) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="highlight"
+      >
+        {children}
+      </a>
+    );
+  }
+
+  if (href) {
+    return (
+      <Link href={href} className="highlight">
+        {children}
+      </Link>
+    );
+  }
+
   return (
     <a
       href="#"
@@ -29,17 +53,18 @@ const paragraphs = [
   {
     key: "p1",
     className: "para para-bold",
-    content: (
-      <>Hi, I&apos;m Olayinka.</>
-    ),
+    content: <>Hi, I&apos;m Olayinka.</>,
   },
   {
     key: "p2",
     className: "para",
     content: (
       <>
-        Right now, I lead product development at <Highlight>Flagstone</Highlight>,
-        where my work covers activation and trust: getting people through the
+        Right now, I lead product development at{" "}
+        <Highlight href="https://www.flagstoneim.com/" external>
+          Flagstone
+        </Highlight>
+        , where my work covers activation and trust: getting people through the
         door, and keeping things safe once they&apos;re in.
       </>
     ),
@@ -70,9 +95,11 @@ const paragraphs = [
     className: "para",
     content: (
       <>
-        You can see the <Highlight>books</Highlight> I&apos;ve read, the{" "}
-        <Highlight>vinyls</Highlight> I&apos;m collecting, or the{" "}
-        <Highlight>places</Highlight> I&apos;ve been.
+        You can see the{" "}
+        <Highlight href="/things?tab=books">books</Highlight> I&apos;ve read,
+        the <Highlight href="/things?tab=vinyls">vinyls</Highlight> I&apos;m
+        collecting, or the{" "}
+        <Highlight href="/things?tab=places">places</Highlight> I&apos;ve been.
       </>
     ),
   },
