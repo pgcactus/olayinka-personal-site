@@ -32,6 +32,51 @@
   --content-max-width: 640px;
 }
 
+.dark {
+  --background: #0f0f0f;
+  --foreground: #a0a0a0;
+  --border: #2a2a2a;
+  --ring: #1e3a4a;
+  --color-near-black: #f0f0f0;
+  --color-body: #a0a0a0;
+  --color-highlight-bg: #1e3a4a;
+}
+
+.dark .highlight:hover {
+  background-color: #2a5068 !important;
+}
+
+.dark .things-tab--active {
+  background-color: #1e3a4a !important;
+}
+
+.dark .things-tab--active:hover {
+  background-color: #2a5068 !important;
+}
+
+/* Dark mode: /nato page */
+.dark .nato-input {
+  color: var(--color-near-black);
+  border-bottom-color: #2a2a2a;
+  caret-color: var(--color-near-black);
+}
+
+.dark .nato-input::placeholder {
+  color: #3a3a3a;
+}
+
+.dark .nato-input:focus {
+  border-bottom-color: #1e3a4a;
+}
+
+/* Dark mode: /things back link */
+.dark .things-back {
+  color: var(--color-body);
+}
+
+/* Dark mode: bento tiles keep their gradient colours — no override needed */
+/* Dark mode: vinyl fallback tile already uses #1a1a1a — fine in dark mode */
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -129,6 +174,30 @@
     .para + .para {
       margin-top: 24px;
     }
+  }
+
+  /* Theme toggle — top-right of content block */
+  .theme-toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: var(--line-height-base);
+    color: #9ca3af;
+    text-decoration: underline;
+    text-decoration-color: #9ca3af;
+    text-underline-offset: 3px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: color 200ms ease-out, text-decoration-color 200ms ease-out;
+  }
+
+  .theme-toggle:hover {
+    color: var(--color-near-black);
+    text-decoration-color: var(--color-near-black);
   }
 
   /* LinkedIn utility link — anchored to bottom-right of content block */
