@@ -5,8 +5,9 @@
  * - Three tabs: books, vinyls, places — driven by ?tab= query param
  * - Active tab: ice blue highlight #E0F2FE, darkens to #BAE6FD on hover
  * - Inactive tabs: muted #9CA3AF, no background
- * - Books: bento mosaic with gradient tiles, variable sizes, hover strip
- * - Vinyls / Places: placeholder SVG grid (unchanged)
+ * - Books: uniform 2:3 portrait grid, captions below, lift-on-hover
+ * - Vinyls: 5-col square grid from vinyls-resolved.json
+ * - Places: placeholder SVG grid (unchanged)
  * - Page-level fade-in on mount (300ms, no stagger)
  * - Back link top-left, 13px, #5A5A5A, fades to 60% on hover
  */
@@ -31,8 +32,6 @@ type BookCategory =
   | "thrillers"
   | "nonfiction";
 
-type TileSize = "large" | "wide" | "tall" | "small";
-
 interface Book {
   id: string;
   title: string;
@@ -40,86 +39,70 @@ interface Book {
   category: BookCategory;
   year: number | string;
   read: number;
-  size: TileSize;
   isbn: string;
-  coverUrl: string | null;
-  localFallback: string;
+  coverUrl?: string;
+  localFallback?: string;
 }
 
 const BOOKS: Book[] = BOOKS_RESOLVED as Book[];
 
-// ---------------------------------------------------------------------------
-// Typography scale per tile size
-// ---------------------------------------------------------------------------
+// Category display order and labels
+const CATEGORY_ORDER: BookCategory[] = [
+  "business",
+  "product",
+  "classics",
+  "thrillers",
+  "nonfiction",
+];
 
-const FONT_SIZES: Record<TileSize, { title: string; author: string }> = {
-  large: { title: "18px", author: "13px" },
-  wide:  { title: "15px", author: "12px" },
-  tall:  { title: "14px", author: "11px" },
-  small: { title: "13px", author: "11px" },
+const CATEGORY_LABELS: Record<BookCategory, string> = {
+  business: "business",
+  product: "product",
+  classics: "classics",
+  thrillers: "thrillers",
+  nonfiction: "nonfiction",
 };
 
 // ---------------------------------------------------------------------------
-// BentoTile — cover image tile with gradient overlay and hover strip
+// BookItem — portrait cover + caption below, no text on cover
 // ---------------------------------------------------------------------------
 
-function BentoTile({ book }: { book: Book }) {
-  const [hovered, setHovered] = useState(false);
-  const [imgSrc, setImgSrc] = useState<string | null>(book.coverUrl);
+function BookItem({ book }: { book: Book }) {
+  const [imgSrc, setImgSrc] = useState<string | null>(book.coverUrl ?? null);
   const [imgFailed, setImgFailed] = useState(false);
-  const fonts = FONT_SIZES[book.size];
 
   function handleImgError() {
     if (imgSrc === book.coverUrl && book.localFallback) {
-      // Try local fallback
       setImgSrc(book.localFallback);
     } else {
-      // All sources exhausted — show text fallback
       setImgFailed(true);
     }
   }
 
   return (
-    <div
-      className={`bento-tile tile-${book.size}${hovered ? " bento-tile--hovered" : ""}`}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      {/* Cover image or dark fallback tile */}
-      {!imgFailed && imgSrc ? (
-        <img
-          src={imgSrc}
-          alt={`${book.title} cover`}
-          className="bento-cover"
-          onError={handleImgError}
-          draggable={false}
-        />
-      ) : (
-        <div className="bento-fallback" />
-      )}
-
-      {/* Gradient overlay for text readability */}
-      <div className="bento-gradient-overlay" />
-
-      {/* Title — top-left */}
-      <span
-        className="bento-tile-title"
-        style={{ fontSize: fonts.title }}
+    <div className="book-item">
+      <div
+        className="book-cover"
+        style={
+          !imgFailed && imgSrc
+            ? { backgroundImage: `url(${imgSrc})` }
+            : undefined
+        }
       >
-        {book.title}
-      </span>
-
-      {/* Author — bottom-left */}
-      <span
-        className="bento-tile-author"
-        style={{ fontSize: fonts.author }}
-      >
-        {book.author}
-      </span>
-
-      {/* Hover strip — slides up from bottom */}
-      <div className={`tile-overlay${hovered ? " tile-overlay--visible" : ""}`}>
-        Published {book.year}&nbsp;&middot;&nbsp;Read {book.read}
+        {/* Hidden img tag to trigger error handler for background-image fallback */}
+        {!imgFailed && imgSrc && (
+          <img
+            src={imgSrc}
+            alt=""
+            aria-hidden="true"
+            onError={handleImgError}
+            style={{ display: "none" }}
+          />
+        )}
+      </div>
+      <div className="book-meta">
+        <div className="book-title">{book.title}</div>
+        <div className="book-author">{book.author}</div>
       </div>
     </div>
   );
@@ -224,6 +207,15 @@ export default function Things() {
     window.dispatchEvent(new PopStateEvent("popstate"));
   }
 
+  // Group books by category in display order
+  const booksByCategory = CATEGORY_ORDER
+    .map((cat) => ({
+      category: cat,
+      label: CATEGORY_LABELS[cat],
+      books: BOOKS.filter((b) => b.category === cat),
+    }))
+    .filter((g) => g.books.length > 0);
+
   return (
     <motion.div
       className="things-wrapper"
@@ -279,11 +271,18 @@ export default function Things() {
           ))}
         </div>
 
-        {/* Books tab: bento mosaic */}
+        {/* Books tab: uniform portrait grid with category labels */}
         {activeTab === "books" && (
-          <div className="bento-grid">
-            {BOOKS.map((book) => (
-              <BentoTile key={book.id} book={book} />
+          <div className="books-sections">
+            {booksByCategory.map((group) => (
+              <div key={group.category} className="books-section">
+                <div className="books-section-label">{group.label}</div>
+                <div className="books-grid">
+                  {group.books.map((book) => (
+                    <BookItem key={book.id} book={book} />
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         )}
