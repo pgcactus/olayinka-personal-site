@@ -1,10 +1,13 @@
 /**
  * Design Philosophy: Minimal Monospace
  * - Pure white background, monospace type throughout
- * - Highlighter-yellow (#FEF08A) for key phrases, no border-radius, no underline
+ * - Highlighter-yellow (#FEF08A) for key phrases, darkens to #FDE047 on hover
  * - Content centred horizontally and vertically in viewport
+ * - Staggered fade-in on mount (300ms each, 80ms stagger)
  * - No nav, no footer, no extras — five paragraphs only
  */
+
+import { motion } from "framer-motion";
 
 interface HighlightProps {
   children: React.ReactNode;
@@ -22,39 +25,78 @@ function Highlight({ children }: HighlightProps) {
   );
 }
 
+const paragraphs = [
+  {
+    key: "p1",
+    className: "para para-bold",
+    content: (
+      <>Hi, I&apos;m Olayinka.</>
+    ),
+  },
+  {
+    key: "p2",
+    className: "para",
+    content: (
+      <>
+        Right now, I lead product development at <Highlight>Flagstone</Highlight>,
+        where my work covers activation and trust: getting people through the
+        door, and keeping things safe once they&apos;re in.
+      </>
+    ),
+  },
+  {
+    key: "p3",
+    className: "para",
+    content: (
+      <>
+        Outside of work I also build small things on the side, like{" "}
+        <Highlight>NATO Phonetic Alphabet</Highlight> and{" "}
+        <Highlight>Basketball Companion</Highlight>.
+      </>
+    ),
+  },
+  {
+    key: "p4",
+    className: "para",
+    content: (
+      <>
+        I hike or skydive when I want a clean reset. A quick 5K, tennis, or a
+        slow afternoon with friends is usually the better version of a weekend.
+      </>
+    ),
+  },
+  {
+    key: "p5",
+    className: "para",
+    content: (
+      <>
+        You can see the <Highlight>books</Highlight> I&apos;ve read, the{" "}
+        <Highlight>vinyls</Highlight> I&apos;m collecting, or the{" "}
+        <Highlight>places</Highlight> I&apos;ve been.
+      </>
+    ),
+  },
+];
+
 export default function Home() {
   return (
     <div className="page-wrapper">
       <main className="content">
-        {/* Paragraph 1 — bold, near-black */}
-        <p className="para para-bold">Hi, I&apos;m Olayinka.</p>
-
-        {/* Paragraph 2 — one highlight */}
-        <p className="para">
-          Right now I lead products at <Highlight>Flagstone</Highlight> that
-          have to do two things at once: get people in and keep things safe.
-        </p>
-
-        {/* Paragraph 3 — two highlights */}
-        <p className="para">
-          Outside of work I also build small things on the side, like{" "}
-          <Highlight>NATO Phonetic Alphabet</Highlight> and{" "}
-          <Highlight>Basketball Companion</Highlight>.
-        </p>
-
-        {/* Paragraph 4 — no highlights */}
-        <p className="para">
-          I hike or skydive when I want a clean reset. A quick 5K, tennis, or a
-          slow afternoon with friends is usually the better version of a
-          weekend.
-        </p>
-
-        {/* Paragraph 5 — three highlights */}
-        <p className="para">
-          You can see the <Highlight>books</Highlight> I&apos;ve read, the{" "}
-          <Highlight>vinyls</Highlight> I&apos;m collecting, or the{" "}
-          <Highlight>places</Highlight> I&apos;ve been.
-        </p>
+        {paragraphs.map((para, index) => (
+          <motion.p
+            key={para.key}
+            className={para.className}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{
+              duration: 0.3,
+              ease: "easeOut",
+              delay: index * 0.08,
+            }}
+          >
+            {para.content}
+          </motion.p>
+        ))}
       </main>
     </div>
   );
