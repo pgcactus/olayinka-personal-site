@@ -13,7 +13,7 @@
  */
 
 import { useState } from "react";
-import { useBlobUrl } from "@/hooks/useBlobUrl";
+import { BOOK_COVERS } from "@/assets/book-covers";
 import VINYLS_RESOLVED from "../data/vinyls-resolved.json";
 import BOOKS_RESOLVED from "../data/books-resolved.json";
 import { motion } from "framer-motion";
@@ -45,46 +45,28 @@ const BOOKS: Book[] = BOOKS_RESOLVED as Book[];
 // ---------------------------------------------------------------------------
 
 function BookItem({ book }: { book: Book }) {
-  // For /manus-storage/ paths the CDN issues a 307 redirect that browsers
-  // block on <img> src. We fetch the image via the Fetch API (which follows
-  // redirects freely) and convert it to a local blob URL instead.
-  const isManagedStorage = (book.coverUrl ?? '').startsWith('/manus-storage/');
-  const blobUrl = useBlobUrl(isManagedStorage ? book.coverUrl : null);
-
-  // For non-managed URLs fall back to the plain src approach
-  const [directSrc, setDirectSrc] = useState<string | null>(
-    !isManagedStorage ? (book.coverUrl ?? null) : null
-  );
+  // Use bundled asset (Vite import) — guaranteed to work with no CDN/redirect.
+  // Falls back to coverUrl from JSON if somehow not in the manifest.
+  const bundledSrc = BOOK_COVERS[book.id] ?? book.coverUrl ?? null;
   const [imgFailed, setImgFailed] = useState(false);
-
-  // The resolved src: blob URL for managed storage, direct src otherwise
-  const resolvedSrc = isManagedStorage ? blobUrl : directSrc;
-
-  function handleImgError() {
-    if (directSrc === book.coverUrl && book.localFallback) {
-      setDirectSrc(book.localFallback);
-    } else {
-      setImgFailed(true);
-    }
-  }
+  const resolvedSrc = imgFailed ? null : bundledSrc;
 
   return (
     <div className="book-item">
       <div
         className="book-cover"
         style={
-          !imgFailed && resolvedSrc
+          resolvedSrc
             ? { backgroundImage: `url(${resolvedSrc})` }
             : undefined
         }
       >
-        {/* Hidden img tag to trigger error handler for direct-src fallback */}
-        {!isManagedStorage && !imgFailed && directSrc && (
+        {resolvedSrc && (
           <img
-            src={directSrc}
+            src={resolvedSrc}
             alt=""
             aria-hidden="true"
-            onError={handleImgError}
+            onError={() => setImgFailed(true)}
             style={{ display: "none" }}
           />
         )}
