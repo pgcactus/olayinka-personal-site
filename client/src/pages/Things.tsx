@@ -155,20 +155,21 @@ interface Vinyl {
 }
 
 const VINYLS: Vinyl[] = [
-  { id: "for-broken-ears",     title: "For Broken Ears",                     artist: "Tems",           year: 2020, appleMusicId: "1531946098" },
-  { id: "untitled-unmastered", title: "untitled unmastered.",                artist: "Kendrick Lamar", year: 2016, appleMusicId: "1090428809" },
-  { id: "gnx",                title: "GNX",                                artist: "Kendrick Lamar", year: 2024, appleMusicId: "1779458699" },
-  { id: "iyrtitl",            title: "If You're Reading This It's Too Late", artist: "Drake",          year: 2015, appleMusicId: "971255544" },
-  { id: "african-giant",      title: "African Giant",                       artist: "Burna Boy",      year: 2019, appleMusicId: "1471798812" },
-  { id: "i-told-them",        title: "I Told Them",                         artist: "Burna Boy",      year: 2023, appleMusicId: "1701204108" },
-  { id: "lungu-boy",          title: "Lungu Boy",                           artist: "Asake",          year: 2024, appleMusicId: "1758103113" },
-  { id: "wattba",             title: "What a Time to Be Alive",             artist: "Future & Drake", year: 2015, appleMusicId: "1031021128" },
-  { id: "the-blueprint",      title: "The Blueprint",                       artist: "Jay-Z",          year: 2001, appleMusicId: "203708420" },
-  { id: "let-god-sort-em-out", title: "Let God Sort Em Out",                artist: "Clipse",         year: 2025, appleMusicId: "1815615305" },
+  { id: "for-broken-ears",     title: "For Broken Ears",                     artist: "Tems",           year: 2020, appleMusicId: "1532252592" },
+  { id: "untitled-unmastered", title: "untitled unmastered.",                artist: "Kendrick Lamar", year: 2016, appleMusicId: "1440844834" },
+  { id: "gnx",                title: "GNX",                                artist: "Kendrick Lamar", year: 2024, appleMusicId: "1781270319" },
+  { id: "iyrtitl",            title: "If You're Reading This It's Too Late", artist: "Drake",          year: 2015, appleMusicId: "1440839718" },
+  { id: "african-giant",      title: "African Giant",                       artist: "Burna Boy",      year: 2019, appleMusicId: "1471446047" },
+  { id: "i-told-them",        title: "I Told Them",                         artist: "Burna Boy",      year: 2023, appleMusicId: "1699611123" },
+  { id: "lungu-boy",          title: "Lungu Boy",                           artist: "Asake",          year: 2024, appleMusicId: "1760853689" },
+  { id: "wattba",             title: "What a Time to Be Alive",             artist: "Future & Drake", year: 2015, appleMusicId: "1440842320" },
+  { id: "the-blueprint",      title: "The Blueprint",                       artist: "Jay-Z",          year: 2001, appleMusicId: "1440757381" },
+  { id: "let-god-sort-em-out", title: "Let God Sort Em Out",                artist: "Clipse",         year: 2025, appleMusicId: "1816313639" },
+  { id: "mbdtf",              title: "My Beautiful Dark Twisted Fantasy",   artist: "Kanye West",     year: 2010, appleMusicId: "1440621197" },
 ];
 
 // Apple Music ID lookup with localStorage cache
-const CACHE_PREFIX = "vinyl-cover-v2-";
+const CACHE_PREFIX = "vinyl-cover-v3-";
 
 async function fetchCoverUrl(appleMusicId: string): Promise<string | null> {
   const key = CACHE_PREFIX + appleMusicId;
@@ -179,7 +180,7 @@ async function fetchCoverUrl(appleMusicId: string): Promise<string | null> {
 
   try {
     const res = await fetch(
-      `https://itunes.apple.com/lookup?id=${appleMusicId}`
+      `https://itunes.apple.com/lookup?id=${appleMusicId}&country=gb`
     );
     const data = await res.json();
     const url =
