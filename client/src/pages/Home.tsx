@@ -9,6 +9,7 @@
 
 import { motion } from "framer-motion";
 import { Link } from "wouter";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface HighlightProps {
   children: React.ReactNode;
@@ -108,9 +109,22 @@ const paragraphs = [
 ];
 
 export default function Home() {
+  const { theme, toggleTheme } = useTheme();
+
   return (
     <div className="page-wrapper">
       <main className="content">
+        {/* Theme toggle — top-right of content block */}
+        <motion.button
+          onClick={toggleTheme}
+          className="theme-toggle"
+          aria-label="Toggle dark mode"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, ease: "easeOut", delay: 0 }}
+        >
+          {theme === "light" ? "dark" : "light"}
+        </motion.button>
         {paragraphs.map((para, index) => (
           <motion.p
             key={para.key}
