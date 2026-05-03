@@ -13,6 +13,7 @@
 
 import { useState } from "react";
 import VINYLS_RESOLVED from "../data/vinyls-resolved.json";
+import BOOKS_RESOLVED from "../data/books-resolved.json";
 import { motion } from "framer-motion";
 import { Link, useSearch } from "wouter";
 
@@ -39,58 +40,12 @@ interface Book {
   year: number | string;
   read: number;
   size: TileSize;
+  isbn: string;
+  coverUrl: string | null;
+  localFallback: string;
 }
 
-const BOOKS: Book[] = [
-  { id: "playing-to-win", title: "Playing to Win", author: "A.G. Lafley & Roger Martin", category: "business", year: 2013, read: 2024, size: "wide" },
-  { id: "the-score-takes-care-of-itself", title: "The Score Takes Care of Itself", author: "Bill Walsh", category: "business", year: 2009, read: 2025, size: "tall" },
-  { id: "how-to-measure-anything", title: "How to Measure Anything", author: "Douglas Hubbard", category: "product", year: 2007, read: 2024, size: "small" },
-  { id: "thinking-in-systems", title: "Thinking in Systems", author: "Donella H. Meadows", category: "product", year: 2008, read: 2025, size: "large" },
-  { id: "human-powered", title: "Human Powered", author: "Trenton Moss", category: "product", year: 2021, read: 2024, size: "small" },
-  { id: "inspired", title: "Inspired", author: "Marty Cagan", category: "product", year: 2008, read: 2026, size: "wide" },
-  { id: "burmese-days", title: "Burmese Days", author: "George Orwell", category: "classics", year: 1934, read: 2025, size: "tall" },
-  { id: "nineteen-eighty-four", title: "Nineteen Eighty-Four", author: "George Orwell", category: "classics", year: 1949, read: 2024, size: "large" },
-  { id: "to-kill-a-mockingbird", title: "To Kill a Mockingbird", author: "Harper Lee", category: "classics", year: 1960, read: 2024, size: "large" },
-  { id: "the-odyssey", title: "The Odyssey", author: "Homer", category: "classics", year: "~700 BC", read: 2026, size: "large" },
-  { id: "dr-jekyll", title: "Dr Jekyll and Mr Hyde", author: "Robert Louis Stevenson", category: "classics", year: 1886, read: 2025, size: "tall" },
-  { id: "the-raven", title: "The Raven and Other Tales", author: "Edgar Allan Poe", category: "classics", year: 1845, read: 2025, size: "small" },
-  { id: "simply-lies", title: "Simply Lies", author: "David Baldacci", category: "thrillers", year: 2023, read: 2024, size: "small" },
-  { id: "the-24th-hour", title: "The 24th Hour", author: "James Patterson", category: "thrillers", year: 2024, read: 2024, size: "small" },
-  { id: "the-exchange", title: "The Exchange", author: "John Grisham", category: "thrillers", year: 2023, read: 2025, size: "small" },
-  { id: "how-to-kill-your-family", title: "How to Kill Your Family", author: "Bella Mackie", category: "thrillers", year: 2021, read: 2025, size: "wide" },
-  { id: "vera-wong", title: "Vera Wong's Unsolicited Advice for Murderers", author: "Jesse Q. Sutanto", category: "thrillers", year: 2023, read: 2026, size: "wide" },
-  { id: "the-satsuma-complex", title: "The Satsuma Complex", author: "Bob Mortimer", category: "thrillers", year: 2022, read: 2026, size: "small" },
-  { id: "outliers", title: "Outliers", author: "Malcolm Gladwell", category: "nonfiction", year: 2008, read: 2024, size: "wide" },
-];
-
-// ---------------------------------------------------------------------------
-// Gradient generator — hue derived from book id hash, constrained per category
-// ---------------------------------------------------------------------------
-
-const PALETTES: Record<BookCategory, { hueRange: [number, number]; sat: number; light: number }> = {
-  business:  { hueRange: [200, 240], sat: 55, light: 50 },
-  product:   { hueRange: [160, 200], sat: 50, light: 45 },
-  classics:  { hueRange: [25,  55],  sat: 35, light: 40 },
-  thrillers: { hueRange: [350, 380], sat: 55, light: 42 },
-  nonfiction:{ hueRange: [275, 305], sat: 45, light: 45 },
-};
-
-function gradientForBook(book: Book): { from: string; to: string } {
-  let hash = 0;
-  for (let i = 0; i < book.id.length; i++) {
-    hash = (hash << 5) - hash + book.id.charCodeAt(i);
-    hash |= 0;
-  }
-  const palette = PALETTES[book.category];
-  const range = palette.hueRange[1] - palette.hueRange[0];
-  const baseHue = palette.hueRange[0] + (Math.abs(hash) % range);
-  const hue1 = baseHue % 360;
-  const hue2 = (baseHue + 25) % 360;
-  return {
-    from: `hsl(${hue1}, ${palette.sat}%, ${palette.light + 8}%)`,
-    to:   `hsl(${hue2}, ${palette.sat + 5}%, ${palette.light - 5}%)`,
-  };
-}
+const BOOKS: Book[] = BOOKS_RESOLVED as Book[];
 
 // ---------------------------------------------------------------------------
 // Typography scale per tile size
@@ -104,21 +59,47 @@ const FONT_SIZES: Record<TileSize, { title: string; author: string }> = {
 };
 
 // ---------------------------------------------------------------------------
-// BentoTile — gradient tile with size-aware typography and hover strip
+// BentoTile — cover image tile with gradient overlay and hover strip
 // ---------------------------------------------------------------------------
 
 function BentoTile({ book }: { book: Book }) {
   const [hovered, setHovered] = useState(false);
-  const { from, to } = gradientForBook(book);
+  const [imgSrc, setImgSrc] = useState<string | null>(book.coverUrl);
+  const [imgFailed, setImgFailed] = useState(false);
   const fonts = FONT_SIZES[book.size];
+
+  function handleImgError() {
+    if (imgSrc === book.coverUrl && book.localFallback) {
+      // Try local fallback
+      setImgSrc(book.localFallback);
+    } else {
+      // All sources exhausted — show text fallback
+      setImgFailed(true);
+    }
+  }
 
   return (
     <div
       className={`bento-tile tile-${book.size}${hovered ? " bento-tile--hovered" : ""}`}
-      style={{ background: `linear-gradient(135deg, ${from}, ${to})` }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
+      {/* Cover image or dark fallback tile */}
+      {!imgFailed && imgSrc ? (
+        <img
+          src={imgSrc}
+          alt={`${book.title} cover`}
+          className="bento-cover"
+          onError={handleImgError}
+          draggable={false}
+        />
+      ) : (
+        <div className="bento-fallback" />
+      )}
+
+      {/* Gradient overlay for text readability */}
+      <div className="bento-gradient-overlay" />
+
       {/* Title — top-left */}
       <span
         className="bento-tile-title"
