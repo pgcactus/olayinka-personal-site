@@ -75,7 +75,7 @@ const BOOK_CATEGORY_ORDER: BookCategory[] = [
   "nonfiction",
 ];
 
-// Books that are known to be missing from both Google Books and Open Library.
+// Books that are known to have wrong or missing covers from APIs.
 // These skip the API cascade and go straight to the local path.
 const LOCAL_ONLY_BOOKS = new Set([
   "human-powered",
@@ -84,41 +84,23 @@ const LOCAL_ONLY_BOOKS = new Set([
   "how-to-kill-your-family",
   "vera-wong",
   "the-satsuma-complex",
+  "simply-lies", // Google Books returns wrong book for this ISBN
 ]);
 
-// Build the ordered list of cover URLs to try for a given book.
-function getCoverSources(book: Book): string[] {
-  if (LOCAL_ONLY_BOOKS.has(book.id)) {
-    return [`/images/books/${book.id}.jpg`];
-  }
-  return [
-    // 1. Google Books thumbnail (http → https, strip edge=curl)
-    `https://books.google.com/books/content?vid=ISBN${book.isbn}&printsec=frontcover&img=1&zoom=1&source=gbs_api`,
-    // 2. Open Library large cover
-    `https://covers.openlibrary.org/b/isbn/${book.isbn}-L.jpg`,
-    // 3. Local file (user-supplied)
-    `/images/books/${book.id}.jpg`,
-  ];
-}
-
 // ---------------------------------------------------------------------------
-// BookCard — multi-source fallback chain
+// BookCard — inline onError fallback chain
 // ---------------------------------------------------------------------------
 
 function BookCard({ book }: { book: Book }) {
-  const sources = getCoverSources(book);
-  const [srcIndex, setSrcIndex] = useState(0);
   const [allFailed, setAllFailed] = useState(false);
   const [hovered, setHovered] = useState(false);
 
-  function handleError() {
-    const next = srcIndex + 1;
-    if (next < sources.length) {
-      setSrcIndex(next);
-    } else {
-      setAllFailed(true);
-    }
-  }
+  const localPath = `/images/books/${book.id}.jpg`;
+  const openLibrary = `https://covers.openlibrary.org/b/isbn/${book.isbn}-L.jpg`;
+  const googleBooks = `https://books.google.com/books/content?vid=ISBN${book.isbn}&printsec=frontcover&img=1&zoom=1&source=gbs_api`;
+
+  // Primary source: local for known-missing, Google Books for the rest
+  const primarySrc = LOCAL_ONLY_BOOKS.has(book.id) ? localPath : googleBooks;
 
   return (
     <div
@@ -134,13 +116,31 @@ function BookCard({ book }: { book: Book }) {
           </div>
         ) : (
           <img
-            key={sources[srcIndex]}
-            src={sources[srcIndex]}
+            src={primarySrc}
             alt={book.title}
             className="book-cover"
             loading="lazy"
-            onError={handleError}
             draggable={false}
+            onError={(e) => {
+              const img = e.currentTarget;
+              if (img.src.includes("books.google.com")) {
+                // Step 1: Google Books failed → try Open Library
+                img.src = openLibrary;
+                img.onerror = (e2: Event | string) => {
+                  const img2 = (e2 as Event).target as HTMLImageElement;
+                  if (img2 && img2.src.includes("openlibrary.org")) {
+                    // Step 2: Open Library failed → try local file
+                    img2.src = localPath;
+                    img2.onerror = () => setAllFailed(true);
+                  } else {
+                    setAllFailed(true);
+                  }
+                };
+              } else {
+                // Local file failed → show styled tile
+                setAllFailed(true);
+              }
+            }}
           />
         )}
       </div>
