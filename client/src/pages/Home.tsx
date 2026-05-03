@@ -60,12 +60,12 @@ const paragraphs = [
     className: "para",
     content: (
       <>
-        Right now, I lead product development at{" "}
+        Right now, I lead product work across activation and trust at{" "}
         <Highlight href="https://www.flagstoneim.com/" external>
           Flagstone
         </Highlight>
-        , where my work covers activation and trust: getting people through the
-        door, and keeping things safe once they&apos;re in.
+        : getting people through the door and keeping things safe once
+        they&apos;re in.
       </>
     ),
   },
@@ -74,7 +74,7 @@ const paragraphs = [
     className: "para",
     content: (
       <>
-        Outside of work I also build small things on the side, like{" "}
+        Outside of work, I build small things, like{" "}
         <Highlight href="/nato">NATO Phonetic Alphabet</Highlight> and{" "}
         <Highlight>Basketball Companion</Highlight>.
       </>
@@ -85,8 +85,9 @@ const paragraphs = [
     className: "para",
     content: (
       <>
-        I hike or skydive when I want a clean reset. A quick 5K, tennis, or a
-        slow afternoon with friends is usually the better version of a weekend.
+        I&apos;d happily skydive for a clean reset, play tennis with
+        neighbours, or do a quick 5K. Still, a slow afternoon with friends is
+        usually the better version of a weekend.
       </>
     ),
   },
