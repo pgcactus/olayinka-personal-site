@@ -96,7 +96,7 @@ const paragraphs = [
     className: "para",
     content: (
       <>
-        You can see the{" "}
+        You can see some of the{" "}
         <Highlight href="/things?tab=books">books</Highlight> I&apos;ve read,
         the <Highlight href="/things?tab=vinyls">vinyls</Highlight> I&apos;m
         collecting, or the{" "}
