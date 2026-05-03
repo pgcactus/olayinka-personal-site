@@ -85,9 +85,9 @@ const paragraphs = [
     className: "para",
     content: (
       <>
-        I&apos;d happily skydive for a clean reset, play tennis with
-        neighbours, or do a quick 5K. Still, a slow afternoon with friends is
-        usually the better version of a weekend.
+        I&apos;d happily skydive for a clean reset, play tennis, or do a
+        quick 5K. Still, a slow afternoon with friends is usually the better
+        version of a weekend.
       </>
     ),
   },
