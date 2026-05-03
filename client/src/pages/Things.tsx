@@ -99,6 +99,10 @@ function BookItem({ book }: { book: Book }) {
             style={{ display: "none" }}
           />
         )}
+        {/* Hover strip — slides up over cover only */}
+        <div className="book-cover-overlay">
+          Published {book.year}&nbsp;&middot;&nbsp;Read {book.read}
+        </div>
       </div>
       <div className="book-meta">
         <div className="book-title">{book.title}</div>
