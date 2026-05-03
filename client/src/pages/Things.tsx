@@ -3,7 +3,7 @@
  * - Same global tokens as home: white bg, monospace, 14px, 1.75 line-height
  * - Max content width 1000px, top-aligned (not vertically centred)
  * - Three tabs: books, vinyls, places — driven by ?tab= query param
- * - Active tab: yellow highlight #FEF08A, darkens to #FDE047 on hover
+ * - Active tab: ice blue highlight #E0F2FE, darkens to #BAE6FD on hover
  * - Inactive tabs: muted #9CA3AF, no background
  * - Books: programmatic gradient tiles, hover strip, category labels
  * - Vinyls / Places: placeholder SVG grid (unchanged)
