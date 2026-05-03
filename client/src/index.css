@@ -74,9 +74,6 @@
   color: var(--color-body);
 }
 
-/* Dark mode: bento tiles keep their gradient colours — no override needed */
-/* Dark mode: vinyl fallback tile already uses #1a1a1a — fine in dark mode */
-
 @layer base {
   * {
     @apply border-border outline-ring/50;

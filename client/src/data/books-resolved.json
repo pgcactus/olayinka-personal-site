@@ -7,8 +7,7 @@
     "year": 2013,
     "read": 2024,
     "isbn": "9798892792288",
-    "coverUrl": "/manus-storage/1.playingtowin_ffa6a7f7.jpg",
-    "localFallback": "/images/books/playing-to-win.jpg"
+    "coverUrl": "/manus-storage/1.playingtowin_ffa6a7f7.jpg"
   },
   {
     "id": "the-score-takes-care-of-itself",
@@ -18,8 +17,7 @@
     "year": 2009,
     "read": 2025,
     "isbn": "9781591843474",
-    "coverUrl": "/manus-storage/2.thescoretakescareofitself_4b7754d5.jpg",
-    "localFallback": "/images/books/the-score-takes-care-of-itself.jpg"
+    "coverUrl": "/manus-storage/2.thescoretakescareofitself_4b7754d5.jpg"
   },
   {
     "id": "how-to-measure-anything",
@@ -29,8 +27,7 @@
     "year": 2007,
     "read": 2024,
     "isbn": "9781118539279",
-    "coverUrl": "/manus-storage/3.howtomeasureanything_a75971bd.jpg",
-    "localFallback": "/images/books/how-to-measure-anything.jpg"
+    "coverUrl": "/manus-storage/3.howtomeasureanything_a75971bd.jpg"
   },
   {
     "id": "thinking-in-systems",
@@ -40,8 +37,7 @@
     "year": 2008,
     "read": 2025,
     "isbn": "9781603580557",
-    "coverUrl": "/manus-storage/4.thinkinginsystems_1a647c56.jpg",
-    "localFallback": "/images/books/thinking-in-systems.jpg"
+    "coverUrl": "/manus-storage/4.thinkinginsystems_1a647c56.jpg"
   },
   {
     "id": "human-powered",
@@ -51,8 +47,7 @@
     "year": 2021,
     "read": 2024,
     "isbn": "9781781336069",
-    "coverUrl": "/manus-storage/5.humanpowered_d77f38da.jpg",
-    "localFallback": "/images/books/human-powered.jpg"
+    "coverUrl": "/manus-storage/5.humanpowered_d77f38da.jpg"
   },
   {
     "id": "inspired",
@@ -62,8 +57,7 @@
     "year": 2008,
     "read": 2026,
     "isbn": "9781119387503",
-    "coverUrl": "/manus-storage/6.inspired_cc8949a3.jpg",
-    "localFallback": "/images/books/inspired.jpg"
+    "coverUrl": "/manus-storage/6.inspired_cc8949a3.jpg"
   },
   {
     "id": "burmese-days",
@@ -73,8 +67,7 @@
     "year": 1934,
     "read": 2025,
     "isbn": "9780063344365",
-    "coverUrl": "/manus-storage/7.burmesedays_9e1b45c1.jpg",
-    "localFallback": "/images/books/burmese-days.jpg"
+    "coverUrl": "/manus-storage/7.burmesedays_9e1b45c1.jpg"
   },
   {
     "id": "nineteen-eighty-four",
@@ -84,8 +77,7 @@
     "year": 1949,
     "read": 2024,
     "isbn": "9780241705407",
-    "coverUrl": "/manus-storage/8.1984_b481a4ca.jpg",
-    "localFallback": "/images/books/nineteen-eighty-four.jpg"
+    "coverUrl": "/manus-storage/8.1984_b481a4ca.jpg"
   },
   {
     "id": "to-kill-a-mockingbird",
@@ -95,8 +87,7 @@
     "year": 1960,
     "read": 2024,
     "isbn": "9781804958728",
-    "coverUrl": "/manus-storage/9.tokillamockingbird_ca146e93.jpg",
-    "localFallback": "/images/books/to-kill-a-mockingbird.jpg"
+    "coverUrl": "/manus-storage/9.tokillamockingbird_ca146e93.jpg"
   },
   {
     "id": "the-odyssey",
@@ -106,8 +97,7 @@
     "year": "~700 BC",
     "read": 2026,
     "isbn": "9780241733592",
-    "coverUrl": "/manus-storage/10.theodyssey_0809e7cd.jpg",
-    "localFallback": "/images/books/the-odyssey.jpg"
+    "coverUrl": "/manus-storage/10.theodyssey_0809e7cd.jpg"
   },
   {
     "id": "dr-jekyll",
@@ -117,8 +107,7 @@
     "year": 1886,
     "read": 2025,
     "isbn": "9780241552681",
-    "coverUrl": "/manus-storage/11.jekyll_8c764a6e.jpg",
-    "localFallback": "/images/books/dr-jekyll.jpg"
+    "coverUrl": "/manus-storage/11.jekyll_8c764a6e.jpg"
   },
   {
     "id": "the-raven",
@@ -128,8 +117,7 @@
     "year": 1845,
     "read": 2025,
     "isbn": "9781407144030",
-    "coverUrl": "/manus-storage/12.theraven_5cc7ccb0.jpg",
-    "localFallback": "/images/books/the-raven.jpg"
+    "coverUrl": "/manus-storage/12.theraven_5cc7ccb0.jpg"
   },
   {
     "id": "simply-lies",
@@ -139,8 +127,7 @@
     "year": 2023,
     "read": 2024,
     "isbn": "9781529062045",
-    "coverUrl": "/manus-storage/13.simplylies_7ac7628c.jpg",
-    "localFallback": "/images/books/simply-lies.jpg"
+    "coverUrl": "/manus-storage/13.simplylies_7ac7628c.jpg"
   },
   {
     "id": "the-24th-hour",
@@ -150,8 +137,7 @@
     "year": 2024,
     "read": 2024,
     "isbn": "9781529160130",
-    "coverUrl": "/manus-storage/14.the24thhour_4705ce2e.jpg",
-    "localFallback": "/images/books/the-24th-hour.jpg"
+    "coverUrl": "/manus-storage/14.the24thhour_4705ce2e.jpg"
   },
   {
     "id": "the-exchange",
@@ -161,8 +147,7 @@
     "year": 2023,
     "read": 2025,
     "isbn": "9781399740357",
-    "coverUrl": "/manus-storage/15.theexchange_d4b1fc9b.jpg",
-    "localFallback": "/images/books/the-exchange.jpg"
+    "coverUrl": "/manus-storage/15.theexchange_d4b1fc9b.jpg"
   },
   {
     "id": "how-to-kill-your-family",
@@ -172,8 +157,7 @@
     "year": 2021,
     "read": 2025,
     "isbn": "9780008683535",
-    "coverUrl": "/manus-storage/16.howtokillyourfamily_8169b193.jpg",
-    "localFallback": "/images/books/how-to-kill-your-family.jpg"
+    "coverUrl": "/manus-storage/16.howtokillyourfamily_8169b193.jpg"
   },
   {
     "id": "vera-wong",
@@ -183,8 +167,7 @@
     "year": 2023,
     "read": 2026,
     "isbn": "9780008558734",
-    "coverUrl": "/manus-storage/17.verawong_a5ebb1c1.jpg",
-    "localFallback": "/images/books/vera-wong.jpg"
+    "coverUrl": "/manus-storage/17.verawong_a5ebb1c1.jpg"
   },
   {
     "id": "the-satsuma-complex",
@@ -194,8 +177,7 @@
     "year": 2022,
     "read": 2026,
     "isbn": "9781398521230",
-    "coverUrl": "/manus-storage/18.thesatsumacomplex_83ab6dbf.jpg",
-    "localFallback": "/images/books/the-satsuma-complex.jpg"
+    "coverUrl": "/manus-storage/18.thesatsumacomplex_83ab6dbf.jpg"
   },
   {
     "id": "outliers",
@@ -205,7 +187,6 @@
     "year": 2008,
     "read": 2024,
     "isbn": "9780141036250",
-    "coverUrl": "/manus-storage/19.Outliers_666d269c.jpg",
-    "localFallback": "/images/books/outliers.jpg"
+    "coverUrl": "/manus-storage/19.Outliers_666d269c.jpg"
   }
 ]
