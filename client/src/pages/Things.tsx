@@ -5,7 +5,7 @@
  * - Three tabs: books, vinyls, places — driven by ?tab= query param
  * - Active tab: yellow highlight #FEF08A, darkens to #FDE047 on hover
  * - Inactive tabs: muted #9CA3AF, no background
- * - Books: real data with Open Library covers, hover tooltip, category labels
+ * - Books: programmatic gradient tiles, hover strip, category labels
  * - Vinyls / Places: placeholder SVG grid (unchanged)
  * - Page-level fade-in on mount (300ms, no stagger)
  * - Back link top-left, 13px, #5A5A5A, fades to 60% on hover
@@ -32,31 +32,31 @@ interface Book {
   id: string;
   title: string;
   author: string;
-  isbn: string;
   category: BookCategory;
-  caption?: string;
+  year: number | string;
+  read: number;
 }
 
 const BOOKS: Book[] = [
-  { id: "playing-to-win", title: "Playing to Win", author: "A.G. Lafley & Roger Martin", isbn: "9781422187395", category: "business" },
-  { id: "the-score-takes-care-of-itself", title: "The Score Takes Care of Itself", author: "Bill Walsh", isbn: "9781591843474", category: "business" },
-  { id: "how-to-measure-anything", title: "How to Measure Anything", author: "Douglas Hubbard", isbn: "9781118539279", category: "product" },
-  { id: "thinking-in-systems", title: "Thinking in Systems", author: "Donella H. Meadows", isbn: "9781603580557", category: "product" },
-  { id: "human-powered", title: "Human Powered", author: "Trenton Moss", isbn: "9781781337691", category: "product" },
-  { id: "inspired", title: "Inspired", author: "Marty Cagan", isbn: "9781119387503", category: "product" },
-  { id: "burmese-days", title: "Burmese Days", author: "George Orwell", isbn: "9780141185378", category: "classics" },
-  { id: "nineteen-eighty-four", title: "Nineteen Eighty-Four", author: "George Orwell", isbn: "9780451524935", category: "classics" },
-  { id: "to-kill-a-mockingbird", title: "To Kill a Mockingbird", author: "Harper Lee", isbn: "9780446310789", category: "classics" },
-  { id: "the-odyssey", title: "The Odyssey", author: "Homer", isbn: "9780140268867", category: "classics" },
-  { id: "dr-jekyll-and-mr-hyde", title: "Dr Jekyll and Mr Hyde and Other Strange Tales", author: "Robert Louis Stevenson", isbn: "9780141439730", category: "classics" },
-  { id: "the-raven", title: "The Raven and Other Tales of Horror", author: "Edgar Allan Poe", isbn: "9780140437546", category: "classics" },
-  { id: "simply-lies", title: "Simply Lies", author: "David Baldacci", isbn: "9781538719893", category: "thrillers" },
-  { id: "the-24th-hour", title: "The 24th Hour", author: "James Patterson", isbn: "9780316404815", category: "thrillers" },
-  { id: "the-exchange", title: "The Exchange", author: "John Grisham", isbn: "9780385549325", category: "thrillers" },
-  { id: "how-to-kill-your-family", title: "How to Kill Your Family", author: "Bella Mackie", isbn: "9780008365974", category: "thrillers" },
-  { id: "vera-wong", title: "Vera Wong's Unsolicited Advice for Murderers", author: "Jesse Q. Sutanto", isbn: "9780593546192", category: "thrillers" },
-  { id: "the-satsuma-complex", title: "The Satsuma Complex", author: "Bob Mortimer", isbn: "9781398519312", category: "thrillers" },
-  { id: "outliers", title: "Outliers", author: "Malcolm Gladwell", isbn: "9780316017930", category: "nonfiction" },
+  { id: "playing-to-win", title: "Playing to Win", author: "A.G. Lafley & Roger Martin", category: "business", year: 2013, read: 2024 },
+  { id: "the-score-takes-care-of-itself", title: "The Score Takes Care of Itself", author: "Bill Walsh", category: "business", year: 2009, read: 2025 },
+  { id: "how-to-measure-anything", title: "How to Measure Anything", author: "Douglas Hubbard", category: "product", year: 2007, read: 2024 },
+  { id: "thinking-in-systems", title: "Thinking in Systems", author: "Donella H. Meadows", category: "product", year: 2008, read: 2025 },
+  { id: "human-powered", title: "Human Powered", author: "Trenton Moss", category: "product", year: 2021, read: 2024 },
+  { id: "inspired", title: "Inspired", author: "Marty Cagan", category: "product", year: 2008, read: 2026 },
+  { id: "burmese-days", title: "Burmese Days", author: "George Orwell", category: "classics", year: 1934, read: 2025 },
+  { id: "nineteen-eighty-four", title: "Nineteen Eighty-Four", author: "George Orwell", category: "classics", year: 1949, read: 2024 },
+  { id: "to-kill-a-mockingbird", title: "To Kill a Mockingbird", author: "Harper Lee", category: "classics", year: 1960, read: 2024 },
+  { id: "the-odyssey", title: "The Odyssey", author: "Homer", category: "classics", year: "~700 BC", read: 2026 },
+  { id: "dr-jekyll", title: "Dr Jekyll and Mr Hyde", author: "Robert Louis Stevenson", category: "classics", year: 1886, read: 2025 },
+  { id: "the-raven", title: "The Raven and Other Tales", author: "Edgar Allan Poe", category: "classics", year: 1845, read: 2025 },
+  { id: "simply-lies", title: "Simply Lies", author: "David Baldacci", category: "thrillers", year: 2023, read: 2024 },
+  { id: "the-24th-hour", title: "The 24th Hour", author: "James Patterson", category: "thrillers", year: 2024, read: 2024 },
+  { id: "the-exchange", title: "The Exchange", author: "John Grisham", category: "thrillers", year: 2023, read: 2025 },
+  { id: "how-to-kill-your-family", title: "How to Kill Your Family", author: "Bella Mackie", category: "thrillers", year: 2021, read: 2025 },
+  { id: "vera-wong", title: "Vera Wong's Unsolicited Advice for Murderers", author: "Jesse Q. Sutanto", category: "thrillers", year: 2023, read: 2026 },
+  { id: "the-satsuma-complex", title: "The Satsuma Complex", author: "Bob Mortimer", category: "thrillers", year: 2022, read: 2026 },
+  { id: "outliers", title: "Outliers", author: "Malcolm Gladwell", category: "nonfiction", year: 2008, read: 2024 },
 ];
 
 const BOOK_CATEGORY_LABELS: Record<BookCategory, string> = {
@@ -75,78 +75,60 @@ const BOOK_CATEGORY_ORDER: BookCategory[] = [
   "nonfiction",
 ];
 
-// Books that are known to have wrong or missing covers from APIs.
-// These skip the API cascade and go straight to the local path.
-const LOCAL_ONLY_BOOKS = new Set([
-  "human-powered",
-  "the-24th-hour",
-  "the-exchange",
-  "how-to-kill-your-family",
-  "vera-wong",
-  "the-satsuma-complex",
-  "simply-lies", // Google Books returns wrong book for this ISBN
-]);
+// ---------------------------------------------------------------------------
+// Gradient generator — hue derived from book id hash, constrained per category
+// ---------------------------------------------------------------------------
+
+const PALETTES: Record<BookCategory, { hueRange: [number, number]; sat: number; light: number }> = {
+  business:  { hueRange: [200, 240], sat: 55, light: 50 },
+  product:   { hueRange: [160, 200], sat: 50, light: 45 },
+  classics:  { hueRange: [25,  55],  sat: 35, light: 40 },
+  thrillers: { hueRange: [350, 380], sat: 55, light: 42 },
+  nonfiction:{ hueRange: [275, 305], sat: 45, light: 45 },
+};
+
+function gradientForBook(book: Book): { from: string; to: string } {
+  let hash = 0;
+  for (let i = 0; i < book.id.length; i++) {
+    hash = (hash << 5) - hash + book.id.charCodeAt(i);
+    hash |= 0;
+  }
+  const palette = PALETTES[book.category];
+  const range = palette.hueRange[1] - palette.hueRange[0];
+  const baseHue = palette.hueRange[0] + (Math.abs(hash) % range);
+  const hue1 = baseHue % 360;
+  const hue2 = (baseHue + 25) % 360;
+  return {
+    from: `hsl(${hue1}, ${palette.sat}%, ${palette.light + 8}%)`,
+    to:   `hsl(${hue2}, ${palette.sat + 5}%, ${palette.light - 5}%)`,
+  };
+}
 
 // ---------------------------------------------------------------------------
-// BookCard — inline onError fallback chain
+// BookCard — gradient tile with hover strip
 // ---------------------------------------------------------------------------
 
 function BookCard({ book }: { book: Book }) {
-  const [allFailed, setAllFailed] = useState(false);
   const [hovered, setHovered] = useState(false);
-
-  const localPath = `/images/books/${book.id}.jpg`;
-  const openLibrary = `https://covers.openlibrary.org/b/isbn/${book.isbn}-L.jpg`;
-  const googleBooks = `https://books.google.com/books/content?vid=ISBN${book.isbn}&printsec=frontcover&img=1&zoom=1&source=gbs_api`;
-
-  // Primary source: local for known-missing, Google Books for the rest
-  const primarySrc = LOCAL_ONLY_BOOKS.has(book.id) ? localPath : googleBooks;
+  const { from, to } = gradientForBook(book);
 
   return (
     <div
-      className={`book-card ${hovered ? "book-card--hovered" : ""}`}
+      className={`book-tile ${hovered ? "book-tile--hovered" : ""}`}
+      style={{ background: `linear-gradient(135deg, ${from}, ${to})` }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Cover image area */}
-      <div className="book-cover-frame">
-        {allFailed ? (
-          <div className="book-fallback">
-            <span className="book-fallback-title">{book.title}</span>
-          </div>
-        ) : (
-          <img
-            src={primarySrc}
-            alt={book.title}
-            className="book-cover"
-            loading="lazy"
-            draggable={false}
-            onError={(e) => {
-              const img = e.currentTarget;
-              if (img.src.includes("books.google.com")) {
-                // Step 1: Google Books failed → try Open Library
-                img.src = openLibrary;
-                img.onerror = (e2: Event | string) => {
-                  const img2 = (e2 as Event).target as HTMLImageElement;
-                  if (img2 && img2.src.includes("openlibrary.org")) {
-                    // Step 2: Open Library failed → try local file
-                    img2.src = localPath;
-                    img2.onerror = () => setAllFailed(true);
-                  } else {
-                    setAllFailed(true);
-                  }
-                };
-              } else {
-                // Local file failed → show styled tile
-                setAllFailed(true);
-              }
-            }}
-          />
-        )}
-      </div>
+      {/* Title — top-left */}
+      <span className="book-tile-title">{book.title}</span>
 
-      {/* Title below cover */}
-      <p className="book-title-label">{book.title}</p>
+      {/* Author — bottom-left */}
+      <span className="book-tile-author">{book.author}</span>
+
+      {/* Hover strip — slides up from bottom */}
+      <div className={`book-tile-strip ${hovered ? "book-tile-strip--visible" : ""}`}>
+        Published {book.year}&nbsp;&middot;&nbsp;Read {book.read}
+      </div>
     </div>
   );
 }
@@ -253,7 +235,7 @@ export default function Things() {
                   <p className="books-group-label">
                     {BOOK_CATEGORY_LABELS[cat]}
                   </p>
-                  <div className="things-grid">
+                  <div className="books-grid">
                     {group.map((book) => (
                       <BookCard key={book.id} book={book} />
                     ))}

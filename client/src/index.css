@@ -347,79 +347,95 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* Books — uniform frame, desaturation, title label                     */
+  /* Books — gradient tiles                                               */
   /* ------------------------------------------------------------------ */
 
-  /* Outer card: tight 8px padding so cover fills the cell */
-  .book-card {
-    background-color: #fafafa;
-    padding: 8px;
+  /* Three-column grid for book tiles */
+  .books-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  @media (max-width: 768px) {
+    .books-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .books-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Gradient tile */
+  .book-tile {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: 4px;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    cursor: default;
-  }
-
-  /* Inner frame: square, centres the cover */
-  .book-cover-frame {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  }
-
-  /* Cover image: fills the frame, contained so full cover is visible */
-  .book-cover {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-    filter: saturate(0.85);
-    transition: filter 200ms ease-out;
-  }
-
-  .book-card--hovered .book-cover {
-    filter: saturate(1);
-  }
-
-  /* Fallback tile when all cover sources fail */
-  .book-fallback {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     padding: 16px;
-    background-color: #fafafa;
+    cursor: default;
+    transform: translateY(0);
+    transition: transform 200ms ease-out;
   }
 
-  .book-fallback-title {
+  .book-tile--hovered {
+    transform: translateY(-2px);
+  }
+
+  /* Title — top-left */
+  .book-tile-title {
     font-family: var(--font-mono);
-    font-size: 14px;
-    line-height: 1.5;
-    color: var(--color-near-black);
-    text-align: center;
-    word-break: break-word;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    align-self: flex-start;
   }
 
-  /* Title below cover */
-  .book-title-label {
-    margin: 0;
+  /* Author — bottom-left */
+  .book-tile-author {
     font-family: var(--font-mono);
-    font-size: 12px;
-    line-height: 1.5;
-    color: var(--color-near-black);
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    align-self: flex-start;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
+  }
+
+  /* Hover strip — slides up from bottom */
+  .book-tile-strip {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 8px 12px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: #ffffff;
+    letter-spacing: 0.05em;
+    transform: translateY(100%);
+    transition: transform 200ms ease-out;
+  }
+
+  .book-tile-strip--visible {
+    transform: translateY(0);
   }
 
   /* Category group sections */
@@ -432,16 +448,16 @@
   .books-group {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
   }
 
   .books-group-label {
     margin: 0;
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: 11px;
     line-height: var(--line-height-base);
     color: #9ca3af;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
   }
 }
