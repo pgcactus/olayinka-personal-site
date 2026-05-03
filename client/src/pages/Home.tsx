@@ -125,6 +125,19 @@ export default function Home() {
           </motion.p>
         ))}
       </main>
+
+      {/* LinkedIn utility link — fixed bottom-right, not part of the highlight system */}
+      <motion.a
+        href="https://www.linkedin.com/in/olayinkaetitilola/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="linkedin-link"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, ease: "easeOut", delay: 0.4 }}
+      >
+        LinkedIn
+      </motion.a>
     </div>
   );
 }
