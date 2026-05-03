@@ -97,33 +97,33 @@ function BookCard({ book }: { book: Book }) {
 
   return (
     <div
-      className="things-cell book-card"
+      className={`book-card ${hovered ? "book-card--hovered" : ""}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {imgFailed ? (
-        <div
-          className="book-fallback"
-          style={{ backgroundColor: fallbackColour }}
-        >
-          <span className="book-fallback-title">{book.title}</span>
-        </div>
-      ) : (
-        <img
-          src={coverUrl}
-          alt={book.title}
-          className="things-img book-cover"
-          loading="lazy"
-          onError={() => setImgFailed(true)}
-          draggable={false}
-        />
-      )}
-
-      {/* Hover tooltip */}
-      <div className={`book-tooltip ${hovered ? "book-tooltip--visible" : ""}`}>
-        <span className="book-tooltip-title">{book.title}</span>
-        <span className="book-tooltip-author">{book.author}</span>
+      {/* Cover image area */}
+      <div className="book-cover-frame">
+        {imgFailed ? (
+          <div
+            className="book-fallback"
+            style={{ backgroundColor: fallbackColour }}
+          >
+            <span className="book-fallback-title">{book.title}</span>
+          </div>
+        ) : (
+          <img
+            src={coverUrl}
+            alt={book.title}
+            className="book-cover"
+            loading="lazy"
+            onError={() => setImgFailed(true)}
+            draggable={false}
+          />
+        )}
       </div>
+
+      {/* Title below cover */}
+      <p className="book-title-label">{book.title}</p>
     </div>
   );
 }
