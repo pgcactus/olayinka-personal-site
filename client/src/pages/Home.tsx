@@ -1,7 +1,7 @@
 /**
  * Design Philosophy: Minimal Monospace
  * - Pure white background, monospace type throughout
- * - Highlighter-yellow (#FEF08A) for key phrases, darkens to #FDE047 on hover
+ * - Ice blue (#E0F2FE) for key phrases, darkens to #BAE6FD on hover
  * - Content centred horizontally and vertically in viewport
  * - Staggered fade-in on mount (300ms each, 80ms stagger)
  * - No nav, no footer, no extras — five paragraphs only

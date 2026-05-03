@@ -19,12 +19,12 @@
   --background: #ffffff;
   --foreground: #5a5a5a;
   --border: #e5e5e5;
-  --ring: #fef08a;
+  --ring: #e0f2fe;
 
   /* Site-specific tokens */
   --color-near-black: #1a1a1a;
   --color-body: #5a5a5a;
-  --color-highlight-bg: #fef08a;
+  --color-highlight-bg: #e0f2fe;
   --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Menlo, Consolas, monospace;
   --font-size-base: 14px;
   --line-height-base: 1.75;
@@ -109,7 +109,7 @@
   }
 
   .highlight:hover {
-    background-color: #fde047;
+    background-color: #bae6fd;
     text-decoration: none;
   }
 
@@ -298,7 +298,7 @@
   }
 
   .things-tab--active:hover {
-    background-color: #fde047;
+    background-color: #bae6fd;
   }
 
   .things-tab--inactive {

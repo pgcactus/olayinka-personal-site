@@ -414,7 +414,7 @@ interface InputFieldProps {
 function InputField({ inputRef, value, onChange, onClear, fg, border, borderHov, cardBg, dark }: InputFieldProps) {
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
-  const activeBorder = focused ? "#FEF08A" : hovered ? borderHov : border;
+  const activeBorder = focused ? "#E0F2FE" : hovered ? borderHov : border;
 
   return (
     <div style={{ position: "relative" }}>
