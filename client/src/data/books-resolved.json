@@ -7,7 +7,7 @@
     "year": 2013,
     "read": 2024,
     "isbn": "9798892792288",
-    "coverUrl": "https://books.google.com/books/content?id=juw40QEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "coverUrl": "https://books.google.com/books/content?id=juw40QEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api",
     "localFallback": "/images/books/playing-to-win.jpg"
   },
   {
@@ -18,7 +18,7 @@
     "year": 2009,
     "read": 2025,
     "isbn": "9781591843474",
-    "coverUrl": "https://books.google.com/books/content?id=5DqQEAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "coverUrl": "https://books.google.com/books/content?id=5DqQEAAAQBAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api",
     "localFallback": "/images/books/the-score-takes-care-of-itself.jpg"
   },
   {
@@ -29,7 +29,7 @@
     "year": 2007,
     "read": 2024,
     "isbn": "9781118539279",
-    "coverUrl": "https://books.google.com/books/content?id=EAPXAgAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "coverUrl": "https://books.google.com/books/content?id=EAPXAgAAQBAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api",
     "localFallback": "/images/books/how-to-measure-anything.jpg"
   },
   {
@@ -40,7 +40,7 @@
     "year": 2008,
     "read": 2025,
     "isbn": "9781603580557",
-    "coverUrl": "https://books.google.com/books/content?id=CpbLAgAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "coverUrl": "https://books.google.com/books/content?id=CpbLAgAAQBAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api",
     "localFallback": "/images/books/thinking-in-systems.jpg"
   },
   {
@@ -51,7 +51,7 @@
     "year": 2021,
     "read": 2024,
     "isbn": "9781781336069",
-    "coverUrl": "https://books.google.com/books/content?id=W8KZzgEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "coverUrl": "https://books.google.com/books/content?id=W8KZzgEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api",
     "localFallback": "/images/books/human-powered.jpg"
   },
   {
@@ -62,7 +62,7 @@
     "year": 2008,
     "read": 2026,
     "isbn": "9781119387503",
-    "coverUrl": "https://books.google.com/books/content?id=0lU8DwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "coverUrl": "https://books.google.com/books/content?id=0lU8DwAAQBAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api",
     "localFallback": "/images/books/inspired.jpg"
   },
   {
@@ -73,7 +73,7 @@
     "year": 1934,
     "read": 2025,
     "isbn": "9780063344365",
-    "coverUrl": "https://books.google.com/books/content?id=22D6zwEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "coverUrl": "https://books.google.com/books/content?id=22D6zwEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api",
     "localFallback": "/images/books/burmese-days.jpg"
   },
   {
@@ -84,7 +84,7 @@
     "year": 1949,
     "read": 2024,
     "isbn": "9780241705407",
-    "coverUrl": "https://books.google.com/books/content?id=74th0AEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "coverUrl": "https://books.google.com/books/content?id=74th0AEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api",
     "localFallback": "/images/books/nineteen-eighty-four.jpg"
   },
   {
@@ -95,7 +95,7 @@
     "year": 1960,
     "read": 2024,
     "isbn": "9781804958728",
-    "coverUrl": "https://books.google.com/books/content?id=C0JI0QEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "coverUrl": "https://books.google.com/books/content?id=C0JI0QEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api",
     "localFallback": "/images/books/to-kill-a-mockingbird.jpg"
   },
   {
@@ -106,7 +106,7 @@
     "year": "~700 BC",
     "read": 2026,
     "isbn": "9780241733592",
-    "coverUrl": "https://books.google.com/books/content?id=pTJ-0QEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "coverUrl": "https://books.google.com/books/content?id=pTJ-0QEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api",
     "localFallback": "/images/books/the-odyssey.jpg"
   },
   {
@@ -117,7 +117,7 @@
     "year": 1886,
     "read": 2025,
     "isbn": "9780241552681",
-    "coverUrl": "https://books.google.com/books/content?id=0Qj0EAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "coverUrl": "https://books.google.com/books/content?id=0Qj0EAAAQBAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api",
     "localFallback": "/images/books/dr-jekyll.jpg"
   },
   {
@@ -128,7 +128,7 @@
     "year": 1845,
     "read": 2025,
     "isbn": "9781407144030",
-    "coverUrl": "https://books.google.com/books/content?id=Q_EsnwEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "coverUrl": "https://books.google.com/books/content?id=Q_EsnwEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api",
     "localFallback": "/images/books/the-raven.jpg"
   },
   {
@@ -139,7 +139,7 @@
     "year": 2023,
     "read": 2024,
     "isbn": "9781529062045",
-    "coverUrl": "https://books.google.com/books/content?id=bmSrzwEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "coverUrl": "https://books.google.com/books/content?id=bmSrzwEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api",
     "localFallback": "/images/books/simply-lies.jpg"
   },
   {
@@ -150,7 +150,7 @@
     "year": 2024,
     "read": 2024,
     "isbn": "9781529160130",
-    "coverUrl": "https://books.google.com/books/content?id=AJZw0AEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "coverUrl": "https://books.google.com/books/content?id=AJZw0AEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api",
     "localFallback": "/images/books/the-24th-hour.jpg"
   },
   {
@@ -161,7 +161,7 @@
     "year": 2023,
     "read": 2025,
     "isbn": "9781399740357",
-    "coverUrl": "https://books.google.com/books/content?id=gfJp0QEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "coverUrl": "https://books.google.com/books/content?id=gfJp0QEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api",
     "localFallback": "/images/books/the-exchange.jpg"
   },
   {
@@ -172,7 +172,7 @@
     "year": 2021,
     "read": 2025,
     "isbn": "9780008683535",
-    "coverUrl": "https://books.google.com/books/content?id=crWq0AEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "coverUrl": "https://books.google.com/books/content?id=crWq0AEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api",
     "localFallback": "/images/books/how-to-kill-your-family.jpg"
   },
   {
@@ -183,7 +183,7 @@
     "year": 2023,
     "read": 2026,
     "isbn": "9780008558734",
-    "coverUrl": "https://books.google.com/books/content?id=tz8rzwEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "coverUrl": "https://books.google.com/books/content?id=tz8rzwEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api",
     "localFallback": "/images/books/vera-wong.jpg"
   },
   {
@@ -194,7 +194,7 @@
     "year": 2022,
     "read": 2026,
     "isbn": "9781398521230",
-    "coverUrl": "https://books.google.com/books/content?id=UyKFzwEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "coverUrl": "https://books.google.com/books/content?id=UyKFzwEACAAJ&printsec=frontcover&img=1&zoom=2&source=gbs_api",
     "localFallback": "/images/books/the-satsuma-complex.jpg"
   },
   {
@@ -205,7 +205,7 @@
     "year": 2008,
     "read": 2024,
     "isbn": "9780141036250",
-    "coverUrl": "https://books.google.com/books/content?id=G_osyXN-mm0C&printsec=frontcover&img=1&zoom=1&source=gbs_api",
+    "coverUrl": "https://books.google.com/books/content?id=G_osyXN-mm0C&printsec=frontcover&img=1&zoom=2&source=gbs_api",
     "localFallback": "/images/books/outliers.jpg"
   }
 ]

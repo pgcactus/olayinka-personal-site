@@ -42,11 +42,14 @@ async function resolveCoverUrl(isbn, title) {
       const data = await res.json();
       const imageLinks = data?.items?.[0]?.volumeInfo?.imageLinks;
       if (imageLinks) {
-        // Prefer the largest available image, upgrade to https
+        // Prefer the largest available image, upgrade to https and request zoom=2
         const raw = imageLinks.large || imageLinks.medium || imageLinks.thumbnail || imageLinks.smallThumbnail;
         if (raw) {
-          // Remove curl edge effect and ensure https
-          return raw.replace('&edge=curl', '').replace('http://', 'https://');
+          // Remove curl edge effect, ensure https, and request higher resolution
+          return raw
+            .replace('&edge=curl', '')
+            .replace('http://', 'https://')
+            .replace(/zoom=\d/, 'zoom=2');
         }
       }
     }
@@ -65,7 +68,10 @@ async function resolveCoverUrl(isbn, title) {
       if (imageLinks) {
         const raw = imageLinks.thumbnail || imageLinks.smallThumbnail;
         if (raw) {
-          return raw.replace('&edge=curl', '').replace('http://', 'https://');
+          return raw
+            .replace('&edge=curl', '')
+            .replace('http://', 'https://')
+            .replace(/zoom=\d/, 'zoom=2');
         }
       }
     }

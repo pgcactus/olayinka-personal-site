@@ -447,24 +447,6 @@
   /* Books — uniform portrait grid                                        */
   /* ------------------------------------------------------------------ */
 
-  /* Section wrapper: space between category groups */
-  .books-sections {
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-  }
-
-  /* Category label above each group */
-  .books-section-label {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #9ca3af;
-    margin-bottom: 16px;
-  }
-
   /* 5-column portrait grid */
   .books-grid {
     display: grid;

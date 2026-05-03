@@ -25,18 +25,11 @@ type Tab = "books" | "vinyls" | "places";
 // Books data
 // ---------------------------------------------------------------------------
 
-type BookCategory =
-  | "business"
-  | "product"
-  | "classics"
-  | "thrillers"
-  | "nonfiction";
-
 interface Book {
   id: string;
   title: string;
   author: string;
-  category: BookCategory;
+  category: string;
   year: number | string;
   read: number;
   isbn: string;
@@ -45,23 +38,6 @@ interface Book {
 }
 
 const BOOKS: Book[] = BOOKS_RESOLVED as Book[];
-
-// Category display order and labels
-const CATEGORY_ORDER: BookCategory[] = [
-  "business",
-  "product",
-  "classics",
-  "thrillers",
-  "nonfiction",
-];
-
-const CATEGORY_LABELS: Record<BookCategory, string> = {
-  business: "business",
-  product: "product",
-  classics: "classics",
-  thrillers: "thrillers",
-  nonfiction: "nonfiction",
-};
 
 // ---------------------------------------------------------------------------
 // BookItem — portrait cover + caption below, no text on cover
@@ -211,15 +187,6 @@ export default function Things() {
     window.dispatchEvent(new PopStateEvent("popstate"));
   }
 
-  // Group books by category in display order
-  const booksByCategory = CATEGORY_ORDER
-    .map((cat) => ({
-      category: cat,
-      label: CATEGORY_LABELS[cat],
-      books: BOOKS.filter((b) => b.category === cat),
-    }))
-    .filter((g) => g.books.length > 0);
-
   return (
     <motion.div
       className="things-wrapper"
@@ -275,18 +242,11 @@ export default function Things() {
           ))}
         </div>
 
-        {/* Books tab: uniform portrait grid with category labels */}
+        {/* Books tab: single continuous portrait grid */}
         {activeTab === "books" && (
-          <div className="books-sections">
-            {booksByCategory.map((group) => (
-              <div key={group.category} className="books-section">
-                <div className="books-section-label">{group.label}</div>
-                <div className="books-grid">
-                  {group.books.map((book) => (
-                    <BookItem key={book.id} book={book} />
-                  ))}
-                </div>
-              </div>
+          <div className="books-grid">
+            {BOOKS.map((book) => (
+              <BookItem key={book.id} book={book} />
             ))}
           </div>
         )}
