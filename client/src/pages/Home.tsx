@@ -75,7 +75,7 @@ const paragraphs = [
     content: (
       <>
         Outside of work I also build small things on the side, like{" "}
-        <Highlight href="/nato" external>NATO Phonetic Alphabet</Highlight> and{" "}
+        <Highlight href="/nato">NATO Phonetic Alphabet</Highlight> and{" "}
         <Highlight>Basketball Companion</Highlight>.
       </>
     ),

@@ -12,6 +12,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
+import { Link } from "wouter";
 
 // ---------------------------------------------------------------------------
 // Data
@@ -216,6 +217,25 @@ export default function Nato() {
       }}
     >
       <div style={{ width: "100%", maxWidth: "420px" }}>
+
+        {/* Back link */}
+        <Link
+          href="/"
+          style={{
+            display: "inline-block",
+            fontFamily: "'JetBrains Mono', 'Fira Code', 'SF Mono', Menlo, Consolas, monospace",
+            fontSize: "13px",
+            color: "#5A5A5A",
+            textDecoration: "none",
+            marginBottom: "40px",
+            opacity: 1,
+            transition: "opacity 150ms ease-out",
+          }}
+          onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.opacity = "0.6")}
+          onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.opacity = "1")}
+        >
+          &#8627; back
+        </Link>
 
         {/* Header */}
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "4px" }}>
