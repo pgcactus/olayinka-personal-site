@@ -497,18 +497,52 @@
     transform: translateY(-2px);
   }
 
+  /* Cover image — full bleed inside tile */
+  .bento-cover {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+  }
+
+  /* Dark fallback tile when all image sources fail */
+  .bento-fallback {
+    position: absolute;
+    inset: 0;
+    background: #2a2a2a;
+  }
+
+  /* Gradient overlay for text readability over any cover */
+  .bento-gradient-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.45) 0%,
+      transparent 35%,
+      transparent 60%,
+      rgba(0, 0, 0, 0.55) 100%
+    );
+    pointer-events: none;
+  }
+
   /* Title — top-left */
   .bento-tile-title {
     font-family: var(--font-mono);
     font-weight: 700;
     line-height: 1.4;
     color: #ffffff;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
     display: -webkit-box;
     -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
     overflow: hidden;
     align-self: flex-start;
+    position: relative;
+    z-index: 2;
   }
 
   /* Author — bottom-left */
@@ -516,13 +550,15 @@
     font-family: var(--font-mono);
     font-weight: 400;
     line-height: 1.4;
-    color: #ffffff;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    color: rgba(255, 255, 255, 0.85);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
     align-self: flex-start;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    position: relative;
+    z-index: 2;
   }
 
   /* Hover strip — slides up from bottom */
@@ -539,6 +575,7 @@
     letter-spacing: 0.05em;
     transform: translateY(100%);
     transition: transform 200ms ease-out;
+    z-index: 3;
   }
 
   .tile-overlay--visible {
