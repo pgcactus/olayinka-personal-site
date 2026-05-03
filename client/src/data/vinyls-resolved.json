@@ -1,0 +1,79 @@
+[
+  {
+    "id": "for-broken-ears",
+    "title": "For Broken Ears",
+    "artist": "Tems",
+    "year": 2020,
+    "coverUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/c6/4d/ed/c64ded15-9cd9-4bd7-a3ea-051178b2427d/195497234301.jpg/600x600bb.jpg"
+  },
+  {
+    "id": "untitled-unmastered",
+    "title": "untitled unmastered.",
+    "artist": "Kendrick Lamar",
+    "year": 2016,
+    "coverUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/93/89/2e/93892e3d-6471-64eb-ee80-c42b95b53d29/16UMGIM10770.rgb.jpg/600x600bb.jpg"
+  },
+  {
+    "id": "gnx",
+    "title": "GNX",
+    "artist": "Kendrick Lamar",
+    "year": 2024,
+    "coverUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/50/c2/cc/50c2cc95-3658-9417-0d4b-831abde44ba1/24UM1IM28978.rgb.jpg/600x600bb.jpg"
+  },
+  {
+    "id": "iyrtitl",
+    "title": "If You're Reading This It's Too Late",
+    "artist": "Drake",
+    "year": 2015,
+    "coverUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/27/9a/8c/279a8c66-9914-add2-9c7f-912f2946fb8a/15UMGIM08570.rgb.jpg/600x600bb.jpg"
+  },
+  {
+    "id": "african-giant",
+    "title": "African Giant",
+    "artist": "Burna Boy",
+    "year": 2019,
+    "coverUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/8d/58/f1/8d58f169-5f12-3574-3ba1-3a482eefe459/075679849304.jpg/600x600bb.jpg"
+  },
+  {
+    "id": "i-told-them",
+    "title": "I Told Them",
+    "artist": "Burna Boy",
+    "year": 2023,
+    "coverUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/2a/a4/b2/2aa4b291-2921-4271-672a-dc3432ddc21f/075679673787.jpg/600x600bb.jpg"
+  },
+  {
+    "id": "lungu-boy",
+    "title": "Lungu Boy",
+    "artist": "Asake",
+    "year": 2024,
+    "coverUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/38/34/59/383459da-ba6a-4bee-67df-7de269764383/197342707992_cover.jpg/600x600bb.jpg"
+  },
+  {
+    "id": "wattba",
+    "title": "What a Time to Be Alive",
+    "artist": "Future & Drake",
+    "year": 2015,
+    "coverUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/4b/9c/db/4b9cdb40-effb-141c-aa20-9ebeabb1b97f/00602547616661.rgb.jpg/600x600bb.jpg"
+  },
+  {
+    "id": "the-blueprint",
+    "title": "The Blueprint",
+    "artist": "Jay-Z",
+    "year": 2001,
+    "coverUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/8f/a6/d4/8fa6d4ea-3953-f208-dd35-0d14b9fb0e03/07UMGIM02256.rgb.jpg/600x600bb.jpg"
+  },
+  {
+    "id": "let-god-sort-em-out",
+    "title": "Let God Sort Em Out",
+    "artist": "Clipse",
+    "year": 2025,
+    "coverUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/70/a6/9a/70a69aeb-3bcf-968b-de75-f3cb44a89e1b/1605.jpg/600x600bb.jpg"
+  },
+  {
+    "id": "mbdtf",
+    "title": "My Beautiful Dark Twisted Fantasy",
+    "artist": "Kanye West",
+    "year": 2010,
+    "coverUrl": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/79/36/4f/79364f95-df81-e427-f989-86ae4df1c3b9/10UMGIM30072.rgb.jpg/600x600bb.jpg"
+  }
+]
