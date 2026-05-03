@@ -105,12 +105,11 @@
     font-size: inherit;
     line-height: inherit;
     cursor: pointer;
-    opacity: 1;
-    transition: opacity 150ms ease;
+    transition: background-color 200ms ease-out;
   }
 
   .highlight:hover {
-    opacity: 0.85;
+    background-color: #fde047;
     text-decoration: none;
   }
 
