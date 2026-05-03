@@ -7,7 +7,7 @@
     "year": 2013,
     "read": 2024,
     "isbn": "9798892792288",
-    "coverUrl": "https://books.google.com/books/content?id=juw40QEACAAJ&printsec=frontcover&img=1&zoom=1&fife=w400&source=gbs_api",
+    "coverUrl": "/manus-storage/1.playingtowin_5c6d3ce0.webp",
     "localFallback": "/images/books/playing-to-win.jpg"
   },
   {
@@ -18,7 +18,7 @@
     "year": 2009,
     "read": 2025,
     "isbn": "9781591843474",
-    "coverUrl": "https://covers.openlibrary.org/b/isbn/9781591843474-L.jpg",
+    "coverUrl": "/manus-storage/2.thescoretakescareofitself_455ad99f.webp",
     "localFallback": "/images/books/the-score-takes-care-of-itself.jpg"
   },
   {
@@ -29,7 +29,7 @@
     "year": 2007,
     "read": 2024,
     "isbn": "9781118539279",
-    "coverUrl": "https://covers.openlibrary.org/b/isbn/9781118539279-L.jpg",
+    "coverUrl": "/manus-storage/3.howtomeasureanything_70ba096b.webp",
     "localFallback": "/images/books/how-to-measure-anything.jpg"
   },
   {
@@ -40,7 +40,7 @@
     "year": 2008,
     "read": 2025,
     "isbn": "9781603580557",
-    "coverUrl": "https://covers.openlibrary.org/b/isbn/9781603580557-L.jpg",
+    "coverUrl": "/manus-storage/4.thinkinginsystems_7e5f812a.webp",
     "localFallback": "/images/books/thinking-in-systems.jpg"
   },
   {
@@ -51,7 +51,7 @@
     "year": 2021,
     "read": 2024,
     "isbn": "9781781336069",
-    "coverUrl": "https://covers.openlibrary.org/b/isbn/9781781336069-L.jpg",
+    "coverUrl": "/manus-storage/5.humanpowered_e05ded36.webp",
     "localFallback": "/images/books/human-powered.jpg"
   },
   {
@@ -62,7 +62,7 @@
     "year": 2008,
     "read": 2026,
     "isbn": "9781119387503",
-    "coverUrl": "https://covers.openlibrary.org/b/isbn/9781119387503-L.jpg",
+    "coverUrl": "/manus-storage/6.inspired_cc8949a3.jpg",
     "localFallback": "/images/books/inspired.jpg"
   },
   {
