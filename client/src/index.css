@@ -340,6 +340,10 @@
   }
 
   @media (max-width: 639px) {
+    .things-wrapper {
+      padding-top: 24px;
+    }
+
     .things-heading,
     .things-tab {
       font-size: 13px;
