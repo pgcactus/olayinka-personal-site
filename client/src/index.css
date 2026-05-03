@@ -117,25 +117,44 @@
     outline: none;
   }
 
+  /* Mobile layout overrides */
+  @media (max-width: 639px) {
+    .page-wrapper {
+      align-items: flex-start;
+      padding-top: 80px;
+    }
+
+    .para {
+      font-size: 13px;
+    }
+
+    .para + .para {
+      margin-top: 24px;
+    }
+  }
+
   /* LinkedIn utility link — fixed bottom-right */
   .linkedin-link {
     position: fixed;
     bottom: 24px;
     right: 24px;
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: 13px;
     line-height: var(--line-height-base);
     color: #9ca3af;
-    text-decoration: none;
+    text-decoration: underline;
+    text-decoration-color: #9ca3af;
+    text-underline-offset: 3px;
     background: none;
     border: none;
     padding: 0;
     cursor: pointer;
-    transition: color 200ms ease-out;
+    transition: color 200ms ease-out, text-decoration-color 200ms ease-out;
   }
 
   .linkedin-link:hover {
     color: var(--color-near-black);
+    text-decoration-color: var(--color-near-black);
   }
 
   @media (max-width: 639px) {

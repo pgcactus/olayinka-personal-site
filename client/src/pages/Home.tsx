@@ -138,7 +138,7 @@ export default function Home() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3, ease: "easeOut", delay: 0.4 }}
       >
-        LinkedIn
+        LinkedIn ↗
       </motion.a>
     </div>
   );
