@@ -75,25 +75,50 @@ const BOOK_CATEGORY_ORDER: BookCategory[] = [
   "nonfiction",
 ];
 
-// Fallback tile colours per category (muted, matches site palette)
-const FALLBACK_COLOURS: Record<BookCategory, string> = {
-  business: "#C9B8A8",
-  product: "#B8C4C2",
-  classics: "#C4B8C9",
-  thrillers: "#B8BBC9",
-  nonfiction: "#C9C4B8",
-};
+// Books that are known to be missing from both Google Books and Open Library.
+// These skip the API cascade and go straight to the local path.
+const LOCAL_ONLY_BOOKS = new Set([
+  "human-powered",
+  "the-24th-hour",
+  "the-exchange",
+  "how-to-kill-your-family",
+  "vera-wong",
+  "the-satsuma-complex",
+]);
+
+// Build the ordered list of cover URLs to try for a given book.
+function getCoverSources(book: Book): string[] {
+  if (LOCAL_ONLY_BOOKS.has(book.id)) {
+    return [`/images/books/${book.id}.jpg`];
+  }
+  return [
+    // 1. Google Books thumbnail (http → https, strip edge=curl)
+    `https://books.google.com/books/content?vid=ISBN${book.isbn}&printsec=frontcover&img=1&zoom=1&source=gbs_api`,
+    // 2. Open Library large cover
+    `https://covers.openlibrary.org/b/isbn/${book.isbn}-L.jpg`,
+    // 3. Local file (user-supplied)
+    `/images/books/${book.id}.jpg`,
+  ];
+}
 
 // ---------------------------------------------------------------------------
-// BookCard — handles cover load / error state + hover tooltip
+// BookCard — multi-source fallback chain
 // ---------------------------------------------------------------------------
 
 function BookCard({ book }: { book: Book }) {
-  const [imgFailed, setImgFailed] = useState(false);
+  const sources = getCoverSources(book);
+  const [srcIndex, setSrcIndex] = useState(0);
+  const [allFailed, setAllFailed] = useState(false);
   const [hovered, setHovered] = useState(false);
 
-  const coverUrl = `https://covers.openlibrary.org/b/isbn/${book.isbn}-L.jpg`;
-  const fallbackColour = FALLBACK_COLOURS[book.category];
+  function handleError() {
+    const next = srcIndex + 1;
+    if (next < sources.length) {
+      setSrcIndex(next);
+    } else {
+      setAllFailed(true);
+    }
+  }
 
   return (
     <div
@@ -103,20 +128,18 @@ function BookCard({ book }: { book: Book }) {
     >
       {/* Cover image area */}
       <div className="book-cover-frame">
-        {imgFailed ? (
-          <div
-            className="book-fallback"
-            style={{ backgroundColor: fallbackColour }}
-          >
+        {allFailed ? (
+          <div className="book-fallback">
             <span className="book-fallback-title">{book.title}</span>
           </div>
         ) : (
           <img
-            src={coverUrl}
+            key={sources[srcIndex]}
+            src={sources[srcIndex]}
             alt={book.title}
             className="book-cover"
             loading="lazy"
-            onError={() => setImgFailed(true)}
+            onError={handleError}
             draggable={false}
           />
         )}
