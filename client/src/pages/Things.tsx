@@ -151,36 +151,35 @@ interface Vinyl {
   title: string;
   artist: string;
   year: number;
-  genre: string;
+  appleMusicId: string;
 }
 
 const VINYLS: Vinyl[] = [
-  { id: "for-broken-ears",    title: "For Broken Ears",                    artist: "Tems",           year: 2020, genre: "Afro R&B" },
-  { id: "untitled-unmastered",title: "untitled unmastered.",               artist: "Kendrick Lamar", year: 2016, genre: "Hip-hop" },
-  { id: "gnx",               title: "GNX",                               artist: "Kendrick Lamar", year: 2024, genre: "Hip-hop" },
-  { id: "iyrtitl",           title: "If You're Reading This It's Too Late",artist: "Drake",          year: 2015, genre: "Hip-hop" },
-  { id: "african-giant",     title: "African Giant",                      artist: "Burna Boy",      year: 2019, genre: "Afrobeats" },
-  { id: "i-told-them",       title: "I Told Them",                        artist: "Burna Boy",      year: 2023, genre: "Afrobeats" },
-  { id: "lungu-boy",         title: "Lungu Boy",                          artist: "Asake",          year: 2024, genre: "Afrobeats" },
-  { id: "wattba",            title: "What a Time to Be Alive",            artist: "Future & Drake", year: 2015, genre: "Hip-hop" },
-  { id: "the-blueprint",     title: "The Blueprint",                      artist: "Jay-Z",          year: 2001, genre: "Hip-hop" },
-  { id: "let-god-sort-em-out",title: "Let God Sort Em Out",               artist: "Clipse",         year: 2025, genre: "Hip-hop" },
+  { id: "for-broken-ears",     title: "For Broken Ears",                     artist: "Tems",           year: 2020, appleMusicId: "1531946098" },
+  { id: "untitled-unmastered", title: "untitled unmastered.",                artist: "Kendrick Lamar", year: 2016, appleMusicId: "1090428809" },
+  { id: "gnx",                title: "GNX",                                artist: "Kendrick Lamar", year: 2024, appleMusicId: "1779458699" },
+  { id: "iyrtitl",            title: "If You're Reading This It's Too Late", artist: "Drake",          year: 2015, appleMusicId: "971255544" },
+  { id: "african-giant",      title: "African Giant",                       artist: "Burna Boy",      year: 2019, appleMusicId: "1471798812" },
+  { id: "i-told-them",        title: "I Told Them",                         artist: "Burna Boy",      year: 2023, appleMusicId: "1701204108" },
+  { id: "lungu-boy",          title: "Lungu Boy",                           artist: "Asake",          year: 2024, appleMusicId: "1758103113" },
+  { id: "wattba",             title: "What a Time to Be Alive",             artist: "Future & Drake", year: 2015, appleMusicId: "1031021128" },
+  { id: "the-blueprint",      title: "The Blueprint",                       artist: "Jay-Z",          year: 2001, appleMusicId: "203708420" },
+  { id: "let-god-sort-em-out", title: "Let God Sort Em Out",                artist: "Clipse",         year: 2025, appleMusicId: "1815615305" },
 ];
 
-// iTunes cover fetch with localStorage cache
-const CACHE_PREFIX = "vinyl-cover-v1-";
+// Apple Music ID lookup with localStorage cache
+const CACHE_PREFIX = "vinyl-cover-v2-";
 
-async function fetchCoverUrl(vinyl: Vinyl): Promise<string | null> {
-  const key = CACHE_PREFIX + vinyl.id;
+async function fetchCoverUrl(appleMusicId: string): Promise<string | null> {
+  const key = CACHE_PREFIX + appleMusicId;
   try {
     const cached = localStorage.getItem(key);
     if (cached !== null) return cached === "" ? null : cached;
   } catch (_) { /* ignore */ }
 
   try {
-    const query = encodeURIComponent(`${vinyl.artist} ${vinyl.title}`);
     const res = await fetch(
-      `https://itunes.apple.com/search?term=${query}&media=music&entity=album&limit=1`
+      `https://itunes.apple.com/lookup?id=${appleMusicId}`
     );
     const data = await res.json();
     const url =
@@ -201,11 +200,11 @@ function VinylCard({ vinyl }: { vinyl: Vinyl }) {
 
   useEffect(() => {
     let cancelled = false;
-    fetchCoverUrl(vinyl).then((url) => {
+    fetchCoverUrl(vinyl.appleMusicId).then((url) => {
       if (!cancelled) setCoverUrl(url);
     });
     return () => { cancelled = true; };
-  }, [vinyl.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [vinyl.appleMusicId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div
@@ -230,7 +229,7 @@ function VinylCard({ vinyl }: { vinyl: Vinyl }) {
 
       {/* Hover strip */}
       <div className={`vinyl-overlay${hovered ? " vinyl-overlay--visible" : ""}`}>
-        {vinyl.genre}&nbsp;&middot;&nbsp;{vinyl.year}
+        Released {vinyl.year}
       </div>
     </div>
   );
