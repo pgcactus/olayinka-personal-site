@@ -146,6 +146,96 @@
   }
 
   /* ------------------------------------------------------------------ */
+  /* /nato page                                                           */
+  /* ------------------------------------------------------------------ */
+
+  .nato-wrapper {
+    min-height: 100vh;
+    background-color: var(--background);
+    padding: 40px 24px 64px;
+  }
+
+  .nato-content {
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .nato-heading {
+    margin: 0 0 28px;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    font-weight: 700;
+    color: var(--color-near-black);
+  }
+
+  .nato-input {
+    display: block;
+    width: 100%;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    color: var(--color-near-black);
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #e5e5e5;
+    padding: 4px 0 8px;
+    outline: none;
+    caret-color: var(--color-near-black);
+    transition: border-color 150ms ease-out;
+  }
+
+  .nato-input::placeholder {
+    color: #c4c4c4;
+  }
+
+  .nato-input:focus {
+    border-bottom-color: var(--color-highlight-bg);
+  }
+
+  .nato-output {
+    margin: 20px 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    color: var(--color-body);
+    word-break: break-word;
+  }
+
+  .nato-table-wrapper {
+    margin-top: 48px;
+  }
+
+  .nato-table {
+    border-collapse: collapse;
+    width: auto;
+  }
+
+  .nato-row:nth-child(odd) .nato-cell {
+    background: transparent;
+  }
+
+  .nato-cell {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    padding: 2px 0;
+    vertical-align: baseline;
+  }
+
+  .nato-cell--letter {
+    color: var(--color-near-black);
+    font-weight: 700;
+    width: 2rem;
+    padding-right: 1.5rem;
+  }
+
+  .nato-cell--word {
+    color: var(--color-body);
+  }
+
+  /* ------------------------------------------------------------------ */
   /* /things page                                                         */
   /* ------------------------------------------------------------------ */
 
