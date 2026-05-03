@@ -11,7 +11,8 @@
  * - Back link top-left, 13px, #5A5A5A, fades to 60% on hover
  */
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import VINYLS_RESOLVED from "../data/vinyls-resolved.json";
 import { motion } from "framer-motion";
 import { Link, useSearch } from "wouter";
 
@@ -143,7 +144,8 @@ function BentoTile({ book }: { book: Book }) {
 }
 
 // ---------------------------------------------------------------------------
-// Vinyls data
+// Vinyls data — pre-resolved at build time via scripts/resolve-vinyl-covers.mjs
+// No client-side API calls; coverUrl is baked in at build time.
 // ---------------------------------------------------------------------------
 
 interface Vinyl {
@@ -151,61 +153,14 @@ interface Vinyl {
   title: string;
   artist: string;
   year: number;
-  appleMusicId: string;
+  coverUrl: string | null;
 }
 
-const VINYLS: Vinyl[] = [
-  { id: "for-broken-ears",     title: "For Broken Ears",                     artist: "Tems",           year: 2020, appleMusicId: "1532252592" },
-  { id: "untitled-unmastered", title: "untitled unmastered.",                artist: "Kendrick Lamar", year: 2016, appleMusicId: "1440844834" },
-  { id: "gnx",                title: "GNX",                                artist: "Kendrick Lamar", year: 2024, appleMusicId: "1781270319" },
-  { id: "iyrtitl",            title: "If You're Reading This It's Too Late", artist: "Drake",          year: 2015, appleMusicId: "1440839718" },
-  { id: "african-giant",      title: "African Giant",                       artist: "Burna Boy",      year: 2019, appleMusicId: "1471446047" },
-  { id: "i-told-them",        title: "I Told Them",                         artist: "Burna Boy",      year: 2023, appleMusicId: "1699611123" },
-  { id: "lungu-boy",          title: "Lungu Boy",                           artist: "Asake",          year: 2024, appleMusicId: "1760853689" },
-  { id: "wattba",             title: "What a Time to Be Alive",             artist: "Future & Drake", year: 2015, appleMusicId: "1440842320" },
-  { id: "the-blueprint",      title: "The Blueprint",                       artist: "Jay-Z",          year: 2001, appleMusicId: "1440757381" },
-  { id: "let-god-sort-em-out", title: "Let God Sort Em Out",                artist: "Clipse",         year: 2025, appleMusicId: "1816313639" },
-  { id: "mbdtf",              title: "My Beautiful Dark Twisted Fantasy",   artist: "Kanye West",     year: 2010, appleMusicId: "1440621197" },
-];
+const VINYLS: Vinyl[] = VINYLS_RESOLVED as Vinyl[];
 
-// Apple Music ID lookup with localStorage cache
-const CACHE_PREFIX = "vinyl-cover-v3-";
-
-async function fetchCoverUrl(appleMusicId: string): Promise<string | null> {
-  const key = CACHE_PREFIX + appleMusicId;
-  try {
-    const cached = localStorage.getItem(key);
-    if (cached !== null) return cached === "" ? null : cached;
-  } catch (_) { /* ignore */ }
-
-  try {
-    const res = await fetch(
-      `https://itunes.apple.com/lookup?id=${appleMusicId}&country=gb`
-    );
-    const data = await res.json();
-    const url =
-      data.results && data.results.length > 0
-        ? (data.results[0].artworkUrl100 as string).replace("100x100bb", "600x600bb")
-        : null;
-    try { localStorage.setItem(key, url ?? ""); } catch (_) { /* ignore */ }
-    return url;
-  } catch (_) {
-    return null;
-  }
-}
-
-// VinylCard component
+// VinylCard component — renders pre-resolved cover, no async fetch
 function VinylCard({ vinyl }: { vinyl: Vinyl }) {
-  const [coverUrl, setCoverUrl] = useState<string | null | undefined>(undefined);
   const [hovered, setHovered] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    fetchCoverUrl(vinyl.appleMusicId).then((url) => {
-      if (!cancelled) setCoverUrl(url);
-    });
-    return () => { cancelled = true; };
-  }, [vinyl.appleMusicId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div
@@ -214,9 +169,9 @@ function VinylCard({ vinyl }: { vinyl: Vinyl }) {
       onMouseLeave={() => setHovered(false)}
     >
       {/* Cover image or fallback tile */}
-      {coverUrl ? (
+      {vinyl.coverUrl ? (
         <img
-          src={coverUrl}
+          src={vinyl.coverUrl}
           alt={`${vinyl.title} by ${vinyl.artist}`}
           className="vinyl-cover"
           draggable={false}
