@@ -35,7 +35,6 @@ interface Book {
   read: number;
   isbn: string;
   coverUrl?: string;
-  localFallback?: string;
 }
 
 const BOOKS: Book[] = BOOKS_RESOLVED as Book[];
@@ -45,7 +44,6 @@ const BOOKS: Book[] = BOOKS_RESOLVED as Book[];
 // ---------------------------------------------------------------------------
 
 function BookItem({ book }: { book: Book }) {
-  // Use bundled asset (Vite import) — guaranteed to work with no CDN/redirect.
   // Falls back to coverUrl from JSON if somehow not in the manifest.
   const bundledSrc = BOOK_COVERS[book.id] ?? book.coverUrl ?? null;
   const [imgFailed, setImgFailed] = useState(false);
