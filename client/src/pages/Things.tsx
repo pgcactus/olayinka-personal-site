@@ -7,7 +7,7 @@
  * - Inactive tabs: muted #9CA3AF, no background
  * - Books: uniform 2:3 portrait grid, captions below, lift-on-hover
  * - Vinyls: 5-col square grid from vinyls-resolved.json
- * - Places: placeholder SVG grid (unchanged)
+ * - Places: interactive SVG world map, visited countries highlighted, click tooltip
  * - Page-level fade-in on mount via CSS animation (no framer-motion)
  * - Back link top-left, 13px, #5A5A5A, fades to 60% on hover
  */
@@ -18,6 +18,7 @@ import VINYLS_RESOLVED from "../data/vinyls-resolved.json";
 import BOOKS_RESOLVED from "../data/books-resolved.json";
 import { Link, useLocation, useSearch } from "wouter";
 import ThemeToggle from "@/components/ThemeToggle";
+import InteractiveMap from "@/components/InteractiveMap";
 
 type Tab = "books" | "vinyls" | "places";
 
@@ -123,32 +124,6 @@ function VinylCard({ vinyl }: { vinyl: Vinyl }) {
 }
 
 // ---------------------------------------------------------------------------
-// Placeholder image generator for places (unchanged)
-// ---------------------------------------------------------------------------
-
-function placeSvg(fill: string): string {
-  return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='66' viewBox='0 0 100 66'%3E%3Crect width='100' height='66' rx='2' fill='${encodeURIComponent(fill)}'/%3E%3C/svg%3E`;
-}
-
-const placeColours = [
-  "#A8B8C9", "#B8A8C4", "#A8C4B8", "#C4A8B8",
-  "#B8C4A8", "#A8B8B8", "#C4B8A8", "#B8A8B8",
-  "#A8C4C4", "#C4A8A8",
-];
-
-interface PlaceholderItem {
-  id: string;
-  image: string;
-  category: "places";
-}
-
-const placeholderItems: PlaceholderItem[] = placeColours.map((c, i) => ({
-  id: `place-${i}`,
-  image: placeSvg(c),
-  category: "places" as const,
-}));
-
-// ---------------------------------------------------------------------------
 // Tab parsing
 // ---------------------------------------------------------------------------
 
@@ -229,21 +204,8 @@ export default function Things() {
           </div>
         )}
 
-        {/* Places tab: placeholder grid */}
-        {activeTab === "places" && (
-          <div className="things-grid">
-            {placeholderItems.map((item) => (
-              <div key={item.id} className="things-cell">
-                <img
-                  src={item.image}
-                  alt=""
-                  className="things-img"
-                  draggable={false}
-                />
-              </div>
-            ))}
-          </div>
-        )}
+        {/* Places tab: interactive world map */}
+        {activeTab === "places" && <InteractiveMap />}
       </div>
     </div>
   );
