@@ -75,12 +75,31 @@ const WORD_ORIGINS: Record<string, string> = {
   Niner:    "Spelled 'Niner' (not 'Nine') to prevent confusion with the German 'nein' (no) in international communications.",
 };
 
+// Reverse map: NATO word → letter
+const REVERSE_MAP: Record<string, string> = Object.fromEntries(
+  Object.entries(NATO_MAP).map(([letter, word]) => [word.toLowerCase(), letter])
+);
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
 function sanitise(raw: string): string {
   return raw.replace(/[^A-Za-z0-9 ]/g, "").toUpperCase();
+}
+
+function sanitiseReverse(raw: string): string {
+  // Allow letters, spaces and hyphens (for X-ray)
+  return raw.replace(/[^A-Za-z -]/g, "");
+}
+
+function fromPhonetic(value: string): string {
+  if (!value.trim()) return "";
+  // Split on spaces, treating each word as a NATO code word
+  const words = value.trim().toLowerCase().split(/\s+/);
+  return words
+    .map((w) => REVERSE_MAP[w] ?? "?")
+    .join("");
 }
 
 function toPhonetic(value: string): string {
@@ -120,7 +139,9 @@ function getInitialInput(): string {
 // ---------------------------------------------------------------------------
 
 export default function Nato() {
+  const [mode, setMode] = useState<"forward" | "reverse">("forward");
   const [input, setInput] = useState<string>(getInitialInput);
+  const [reverseInput, setReverseInput] = useState<string>("");
   const [learnOpen, setLearnOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -132,6 +153,11 @@ export default function Nato() {
     if (el) { el.focus(); el.select(); }
   }, []);
 
+  // Re-focus when mode changes
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, [mode]);
+
   function showToast(msg: string) {
     setToast(msg);
     if (toastTimer.current) clearTimeout(toastTimer.current);
@@ -139,16 +165,21 @@ export default function Nato() {
   }
 
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
-    setInput(sanitise(e.target.value));
+    if (mode === "forward") {
+      setInput(sanitise(e.target.value));
+    } else {
+      setReverseInput(sanitiseReverse(e.target.value));
+    }
   }
 
   function handleClear() {
-    setInput("");
+    if (mode === "forward") setInput(""); else setReverseInput("");
     inputRef.current?.focus();
   }
 
-  const output = toPhonetic(input);
-  const learnWords = uniqueWords(input);
+  const activeInput = mode === "forward" ? input : reverseInput;
+  const output = mode === "forward" ? toPhonetic(input) : fromPhonetic(reverseInput);
+  const learnWords = mode === "forward" ? uniqueWords(input) : [];
 
   async function handleCopy() {
     try {
@@ -190,14 +221,35 @@ export default function Nato() {
         </div>
         <p className="nato-subtitle">Never say &apos;B as in Boy&apos; again</p>
 
+        {/* Mode toggle */}
+        <div className="nato-mode-row">
+          <button
+            className={`nato-mode-btn${mode === "forward" ? " nato-mode-btn--active" : ""}`}
+            onClick={() => setMode("forward")}
+          >
+            word → NATO
+          </button>
+          <button
+            className={`nato-mode-btn${mode === "reverse" ? " nato-mode-btn--active" : ""}`}
+            onClick={() => setMode("reverse")}
+          >
+            NATO → word
+          </button>
+        </div>
+
         {/* Input */}
         <NatoInput
           inputRef={inputRef}
-          value={input}
+          value={activeInput}
           onChange={handleInput}
           onClear={handleClear}
+          placeholder={mode === "forward" ? "e.g. HERMIONE" : "e.g. Alpha Bravo Charlie"}
         />
-        <p className="nato-hint">Type anything to convert it</p>
+        <p className="nato-hint">
+          {mode === "forward"
+            ? "Type anything to convert it"
+            : "Type NATO words separated by spaces"}
+        </p>
 
         {/* Output */}
         {output && <p className="nato-output">{output}</p>}
@@ -267,9 +319,10 @@ interface NatoInputProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onClear: () => void;
+  placeholder?: string;
 }
 
-function NatoInput({ inputRef, value, onChange, onClear }: NatoInputProps) {
+function NatoInput({ inputRef, value, onChange, onClear, placeholder }: NatoInputProps) {
   return (
     <div className="nato-input-wrap">
       <input
@@ -277,6 +330,7 @@ function NatoInput({ inputRef, value, onChange, onClear }: NatoInputProps) {
         type="text"
         value={value}
         onChange={onChange}
+        placeholder={placeholder}
         spellCheck={false}
         autoComplete="off"
         autoCorrect="off"

@@ -126,16 +126,23 @@ export default function Home() {
           </p>
         ))}
 
-        {/* LinkedIn utility link — anchored to bottom-right of content block */}
-        <a
-          href="https://www.linkedin.com/in/olayinkaetitilola/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="linkedin-link home-para"
-          style={{ animationDelay: "400ms" }}
-        >
-          LinkedIn ↗
-        </a>
+        {/* Utility links — bottom-right of content block */}
+        <div className="home-links home-para" style={{ animationDelay: "400ms" }}>
+          <a
+            href="mailto:dlayinka@gmail.com"
+            className="linkedin-link"
+          >
+            Email ↗
+          </a>
+          <a
+            href="https://www.linkedin.com/in/olayinkaetitilola/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="linkedin-link"
+          >
+            LinkedIn ↗
+          </a>
+        </div>
       </main>
     </div>
   );

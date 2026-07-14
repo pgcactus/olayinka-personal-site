@@ -275,6 +275,9 @@ export default function InteractiveMap() {
       <p className="map-hint">
         Tap a highlighted country to learn something about it.
       </p>
+      <p className="map-counter">
+        <strong>{visitedSet.size}</strong> {visitedSet.size === 1 ? "country" : "countries"} visited
+      </p>
     </div>
   );
 }
