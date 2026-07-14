@@ -3,13 +3,12 @@
  * - Pure white background, monospace type throughout
  * - Ice blue (#E0F2FE) for key phrases, darkens to #BAE6FD on hover
  * - Content centred horizontally and vertically in viewport
- * - Staggered fade-in on mount (300ms each, 80ms stagger)
+ * - Staggered fade-in on mount via CSS animation (no framer-motion)
  * - No nav, no footer, no extras — five paragraphs only
  */
 
-import { motion } from "framer-motion";
 import { Link } from "wouter";
-import { useTheme } from "@/contexts/ThemeContext";
+import ThemeToggle from "@/components/ThemeToggle";
 
 interface HighlightProps {
   children: React.ReactNode;
@@ -40,25 +39,21 @@ function Highlight({ children, href, external }: HighlightProps) {
   }
 
   return (
-    <a
-      href="#"
-      onClick={(e) => e.preventDefault()}
-      className="highlight"
-    >
-      {children}
-    </a>
+    <span className="highlight">{children}</span>
   );
 }
 
 const paragraphs = [
   {
     key: "p1",
-    className: "para para-bold",
+    className: "para para-bold home-para",
+    style: { animationDelay: "0ms" },
     content: <>Hi, I&apos;m Olayinka.</>,
   },
   {
     key: "p2",
-    className: "para",
+    className: "para home-para",
+    style: { animationDelay: "80ms" },
     content: (
       <>
         Right now, I lead product work at{" "}
@@ -72,18 +67,23 @@ const paragraphs = [
   },
   {
     key: "p3",
-    className: "para",
+    className: "para home-para",
+    style: { animationDelay: "160ms" },
     content: (
       <>
         Outside of work, I build small things, like{" "}
         <Highlight href="/nato">NATO Phonetic Alphabet</Highlight> and{" "}
-        <Highlight>Basketball Companion</Highlight>.
+        <Highlight href="https://github.com/pgcactus/basketball-companion" external>
+          Basketball Companion
+        </Highlight>
+        .
       </>
     ),
   },
   {
     key: "p4",
-    className: "para",
+    className: "para home-para",
+    style: { animationDelay: "240ms" },
     content: (
       <>
         I&apos;d happily skydive for a clean reset, play tennis, or do a
@@ -94,7 +94,8 @@ const paragraphs = [
   },
   {
     key: "p5",
-    className: "para",
+    className: "para home-para",
+    style: { animationDelay: "320ms" },
     content: (
       <>
         You can see some of the{" "}
@@ -109,68 +110,32 @@ const paragraphs = [
 ];
 
 export default function Home() {
-  const { theme, toggleTheme } = useTheme();
-
   return (
     <div className="page-wrapper">
       <main className="content">
         {/* Theme toggle — top-right of content block */}
-        <motion.button
-          onClick={toggleTheme}
-          className="theme-toggle"
-          aria-label={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3, ease: "easeOut", delay: 0 }}
-        >
-          {theme === "light" ? (
-            /* Moon icon — shown in light mode, click to go dark */
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-            </svg>
-          ) : (
-            /* Sun icon — shown in dark mode, click to go light */
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="5" />
-              <line x1="12" y1="1" x2="12" y2="3" />
-              <line x1="12" y1="21" x2="12" y2="23" />
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-              <line x1="1" y1="12" x2="3" y2="12" />
-              <line x1="21" y1="12" x2="23" y2="12" />
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-            </svg>
-          )}
-        </motion.button>
-        {paragraphs.map((para, index) => (
-          <motion.p
+        <ThemeToggle className="home-fade-in" />
+
+        {paragraphs.map((para) => (
+          <p
             key={para.key}
             className={para.className}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{
-              duration: 0.3,
-              ease: "easeOut",
-              delay: index * 0.08,
-            }}
+            style={para.style}
           >
             {para.content}
-          </motion.p>
+          </p>
         ))}
 
         {/* LinkedIn utility link — anchored to bottom-right of content block */}
-        <motion.a
+        <a
           href="https://www.linkedin.com/in/olayinkaetitilola/"
           target="_blank"
           rel="noopener noreferrer"
-          className="linkedin-link"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3, ease: "easeOut", delay: 0.4 }}
+          className="linkedin-link home-para"
+          style={{ animationDelay: "400ms" }}
         >
           LinkedIn ↗
-        </motion.a>
+        </a>
       </main>
     </div>
   );

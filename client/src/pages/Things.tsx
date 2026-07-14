@@ -2,13 +2,13 @@
  * Design Philosophy: Minimal Monospace — /things page
  * - Same global tokens as home: white bg, monospace, 14px, 1.75 line-height
  * - Max content width 1000px, top-aligned (not vertically centred)
- * - Three tabs: books, vinyls, places — driven by ?tab= query param
+ * - Three tabs: books, vinyls, places — driven by ?tab= query param via wouter useLocation
  * - Active tab: ice blue highlight #E0F2FE, darkens to #BAE6FD on hover
  * - Inactive tabs: muted #9CA3AF, no background
  * - Books: uniform 2:3 portrait grid, captions below, lift-on-hover
  * - Vinyls: 5-col square grid from vinyls-resolved.json
  * - Places: placeholder SVG grid (unchanged)
- * - Page-level fade-in on mount (300ms, no stagger)
+ * - Page-level fade-in on mount via CSS animation (no framer-motion)
  * - Back link top-left, 13px, #5A5A5A, fades to 60% on hover
  */
 
@@ -16,9 +16,8 @@ import { useState } from "react";
 import { BOOK_COVERS } from "@/assets/book-covers";
 import VINYLS_RESOLVED from "../data/vinyls-resolved.json";
 import BOOKS_RESOLVED from "../data/books-resolved.json";
-import { motion } from "framer-motion";
-import { Link, useSearch } from "wouter";
-import { useTheme } from "@/contexts/ThemeContext";
+import { Link, useLocation, useSearch } from "wouter";
+import ThemeToggle from "@/components/ThemeToggle";
 
 type Tab = "books" | "vinyls" | "places";
 
@@ -44,7 +43,6 @@ const BOOKS: Book[] = BOOKS_RESOLVED as Book[];
 // ---------------------------------------------------------------------------
 
 function BookItem({ book }: { book: Book }) {
-  // Falls back to coverUrl from JSON if somehow not in the manifest.
   const bundledSrc = BOOK_COVERS[book.id] ?? book.coverUrl ?? null;
   const [imgFailed, setImgFailed] = useState(false);
   const resolvedSrc = imgFailed ? null : bundledSrc;
@@ -83,7 +81,6 @@ function BookItem({ book }: { book: Book }) {
 
 // ---------------------------------------------------------------------------
 // Vinyls data — pre-resolved at build time via scripts/resolve-vinyl-covers.mjs
-// No client-side API calls; coverUrl is baked in at build time.
 // ---------------------------------------------------------------------------
 
 interface Vinyl {
@@ -96,7 +93,6 @@ interface Vinyl {
 
 const VINYLS: Vinyl[] = VINYLS_RESOLVED as Vinyl[];
 
-// VinylCard component — renders pre-resolved cover, no async fetch
 function VinylCard({ vinyl }: { vinyl: Vinyl }) {
   const [hovered, setHovered] = useState(false);
 
@@ -106,7 +102,6 @@ function VinylCard({ vinyl }: { vinyl: Vinyl }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Cover image or fallback tile */}
       {vinyl.coverUrl ? (
         <img
           src={vinyl.coverUrl}
@@ -120,8 +115,6 @@ function VinylCard({ vinyl }: { vinyl: Vinyl }) {
           <span className="vinyl-fallback-artist">{vinyl.artist}</span>
         </div>
       )}
-
-      {/* Hover strip */}
       <div className={`vinyl-overlay${hovered ? " vinyl-overlay--visible" : ""}`}>
         Released {vinyl.year}
       </div>
@@ -149,9 +142,11 @@ interface PlaceholderItem {
   category: "places";
 }
 
-const placeholderItems: PlaceholderItem[] = [
-  ...placeColours.map((c, i) => ({ id: `place-${i}`, image: placeSvg(c), category: "places" as const })),
-];
+const placeholderItems: PlaceholderItem[] = placeColours.map((c, i) => ({
+  id: `place-${i}`,
+  image: placeSvg(c),
+  category: "places" as const,
+}));
 
 // ---------------------------------------------------------------------------
 // Tab parsing
@@ -172,21 +167,16 @@ function parseTab(search: string): Tab {
 
 export default function Things() {
   const search = useSearch();
+  const [, navigate] = useLocation();
   const activeTab = parseTab(search ? `?${search}` : "");
-  const { theme, toggleTheme } = useTheme();
 
   function setTab(tab: Tab) {
-    window.history.replaceState(null, "", `/things?tab=${tab}`);
-    window.dispatchEvent(new PopStateEvent("popstate"));
+    navigate(`/things?tab=${tab}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   return (
-    <motion.div
-      className="things-wrapper"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
-    >
+    <div className="things-wrapper things-fade-in">
       <div className="things-content">
         {/* Back link */}
         <Link href="/" className="things-back">
@@ -194,29 +184,7 @@ export default function Things() {
         </Link>
 
         {/* Theme toggle — top-right of content block */}
-        <button
-          onClick={toggleTheme}
-          className="theme-toggle"
-          aria-label={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
-        >
-          {theme === "light" ? (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-            </svg>
-          ) : (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="5" />
-              <line x1="12" y1="1" x2="12" y2="3" />
-              <line x1="12" y1="21" x2="12" y2="23" />
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-              <line x1="1" y1="12" x2="3" y2="12" />
-              <line x1="21" y1="12" x2="23" y2="12" />
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-            </svg>
-          )}
-        </button>
+        <ThemeToggle />
 
         {/* Heading / tab row */}
         <div className="things-heading">
@@ -256,21 +224,19 @@ export default function Things() {
         {/* Places tab: placeholder grid */}
         {activeTab === "places" && (
           <div className="things-grid">
-            {placeholderItems
-              .filter((item) => item.category === activeTab)
-              .map((item) => (
-                <div key={item.id} className="things-cell">
-                  <img
-                    src={item.image}
-                    alt=""
-                    className="things-img"
-                    draggable={false}
-                  />
-                </div>
-              ))}
+            {placeholderItems.map((item) => (
+              <div key={item.id} className="things-cell">
+                <img
+                  src={item.image}
+                  alt=""
+                  className="things-img"
+                  draggable={false}
+                />
+              </div>
+            ))}
           </div>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }

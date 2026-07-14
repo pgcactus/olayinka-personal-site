@@ -1,19 +1,23 @@
 /**
  * /nato — NATO Phonetic Alphabet tool
  *
+ * Design Philosophy: Minimal Monospace — same tokens as the rest of the site.
+ * All colours via CSS variables / .dark class — no inline style tokens.
+ *
  * Features:
  * - Real-time conversion with bullet separators and / word boundaries
- * - Dark/light mode toggle, persisted to localStorage, defaults to system pref
+ * - Dark/light mode toggle via shared ThemeToggle component
  * - Collapsible "Learn about these words" panel with word origins
  * - Copy output and Share tool action buttons
  * - URL ?q= state: read on mount, written on share
+ * - Back link to home page (top-left)
  * - Footer linking to LinkedIn
  * - Input pre-filled with "HERMIONE", auto-focused, text pre-selected
  */
 
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
-import { useTheme } from "@/contexts/ThemeContext";
+import ThemeToggle from "@/components/ThemeToggle";
 
 // ---------------------------------------------------------------------------
 // Data
@@ -81,8 +85,8 @@ function sanitise(raw: string): string {
 
 function toPhonetic(value: string): string {
   if (!value.trim()) return "";
-  const words = value.split(" ");
-  return words
+  return value
+    .split(" ")
     .filter((w) => w.length > 0)
     .map((word) =>
       word
@@ -116,8 +120,6 @@ function getInitialInput(): string {
 // ---------------------------------------------------------------------------
 
 export default function Nato() {
-  const { theme: globalTheme, toggleTheme } = useTheme();
-  const theme = globalTheme as "dark" | "light";
   const [input, setInput] = useState<string>(getInitialInput);
   const [learnOpen, setLearnOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -127,10 +129,7 @@ export default function Nato() {
   // Auto-focus and pre-select on mount
   useEffect(() => {
     const el = inputRef.current;
-    if (el) {
-      el.focus();
-      el.select();
-    }
+    if (el) { el.focus(); el.select(); }
   }, []);
 
   function showToast(msg: string) {
@@ -163,9 +162,8 @@ export default function Nato() {
   async function handleShare() {
     const url = `${window.location.origin}/nato?q=${encodeURIComponent(input)}`;
     if (navigator.share) {
-      try {
-        await navigator.share({ title: "NATO Phonetic Alphabet", url });
-      } catch (_) { /* user cancelled */ }
+      try { await navigator.share({ title: "NATO Phonetic Alphabet", url }); }
+      catch (_) { /* user cancelled */ }
     } else {
       try {
         await navigator.clipboard.writeText(url);
@@ -176,181 +174,55 @@ export default function Nato() {
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // Theme tokens
-  // ---------------------------------------------------------------------------
-  const dark = theme === "dark";
-  const bg        = dark ? "#1F1F1F" : "#F7F7F7";
-  const cardBg    = dark ? "#2A2A2A" : "#FFFFFF";
-  const fg        = dark ? "#E8E8E8" : "#1A1A1A";
-  const muted     = dark ? "#9CA3AF" : "#9CA3AF";
-  const border    = dark ? "#3A3A3A" : "#E0E0E0";
-  const borderHov = dark ? "#666666" : "#AAAAAA";
-  const btnBg     = dark ? "#333333" : "#F0F0F0";
-  const btnHovBg  = dark ? "#444444" : "#E4E4E4";
-
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: bg,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        padding: "40px 24px 64px",
-        fontFamily: "'JetBrains Mono', 'Fira Code', 'SF Mono', Menlo, Consolas, monospace",
-        fontSize: "14px",
-        lineHeight: "1.75",
-        color: fg,
-        transition: "background 200ms, color 200ms",
-      }}
-    >
-      <div style={{ width: "100%", maxWidth: "420px" }}>
+    <div className="nato-page">
+      <div className="nato-inner">
 
         {/* Back link */}
-        <Link
-          href="/"
-          style={{
-            display: "inline-block",
-            fontFamily: "'JetBrains Mono', 'Fira Code', 'SF Mono', Menlo, Consolas, monospace",
-            fontSize: "13px",
-            color: "#5A5A5A",
-            textDecoration: "none",
-            marginBottom: "40px",
-            opacity: 1,
-            transition: "opacity 150ms ease-out",
-          }}
-          onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.opacity = "0.6")}
-          onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.opacity = "1")}
-        >
+        <Link href="/" className="nato-back">
           &#8627; back
         </Link>
 
-        {/* Header */}
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "4px" }}>
-          <h1 style={{ margin: 0, fontSize: "14px", fontWeight: 700, color: fg, lineHeight: "1.75" }}>
-            NATO Phonetic Alphabet
-          </h1>
-          <button
-            onClick={toggleTheme}
-            aria-label={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
-            style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              padding: "2px 0 2px 8px",
-              color: muted,
-              lineHeight: "0",
-              flexShrink: 0,
-              display: "flex",
-              alignItems: "center",
-              transition: "color 200ms ease-out",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = fg)}
-            onMouseLeave={(e) => (e.currentTarget.style.color = muted)}
-          >
-            {theme === "light" ? (
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-              </svg>
-            ) : (
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="5" />
-                <line x1="12" y1="1" x2="12" y2="3" />
-                <line x1="12" y1="21" x2="12" y2="23" />
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                <line x1="1" y1="12" x2="3" y2="12" />
-                <line x1="21" y1="12" x2="23" y2="12" />
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-              </svg>
-            )}
-          </button>
+        {/* Header row: title + theme toggle */}
+        <div className="nato-header-row">
+          <h1 className="nato-title">NATO Phonetic Alphabet</h1>
+          <ThemeToggle className="nato-toggle" />
         </div>
-        <p style={{ margin: "0 0 24px", color: muted, fontSize: "13px" }}>
-          Never say &apos;B as in Boy&apos; again
-        </p>
+        <p className="nato-subtitle">Never say &apos;B as in Boy&apos; again</p>
 
         {/* Input */}
-        <InputField
+        <NatoInput
           inputRef={inputRef}
           value={input}
           onChange={handleInput}
           onClear={handleClear}
-          fg={fg}
-          border={border}
-          borderHov={borderHov}
-          cardBg={cardBg}
-          dark={dark}
         />
-        <p style={{ margin: "6px 0 0", fontSize: "12px", color: muted }}>
-          Type anything to convert it
-        </p>
+        <p className="nato-hint">Type anything to convert it</p>
 
         {/* Output */}
-        {output && (
-          <p style={{
-            margin: "20px 0 0",
-            fontWeight: 700,
-            color: fg,
-            wordBreak: "break-word",
-            lineHeight: "2",
-          }}>
-            {output}
-          </p>
-        )}
+        {output && <p className="nato-output">{output}</p>}
 
         {/* Learn panel */}
         {learnWords.length > 0 && (
-          <div style={{ marginTop: "28px" }}>
+          <div className="nato-learn">
             <button
+              className="nato-learn-toggle"
               onClick={() => setLearnOpen((o) => !o)}
-              style={{
-                width: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                background: btnBg,
-                border: `1px solid ${border}`,
-                color: fg,
-                fontFamily: "inherit",
-                fontSize: "13px",
-                padding: "8px 12px",
-                cursor: "pointer",
-                textAlign: "left",
-                transition: "background 150ms",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = btnHovBg)}
-              onMouseLeave={(e) => (e.currentTarget.style.background = btnBg)}
             >
               <span>💡 Learn about these words</span>
-              <span style={{
-                display: "inline-block",
-                transform: learnOpen ? "rotate(180deg)" : "rotate(0deg)",
-                transition: "transform 200ms",
-                fontSize: "10px",
-              }}>▼</span>
+              <span className={`nato-learn-chevron${learnOpen ? " nato-learn-chevron--open" : ""}`}>▼</span>
             </button>
-            <div style={{
-              overflow: "hidden",
-              maxHeight: learnOpen ? "9999px" : "0",
-              transition: "max-height 300ms ease-out",
-              border: learnOpen ? `1px solid ${border}` : "none",
-              borderTop: "none",
-            }}>
-              <ul style={{ margin: 0, padding: "0", listStyle: "none" }}>
+            <div className={`nato-learn-body${learnOpen ? " nato-learn-body--open" : ""}`}>
+              <ul className="nato-learn-list">
                 {learnWords.map((word, i) => (
                   <li
                     key={word}
-                    style={{
-                      padding: "8px 12px",
-                      borderTop: i > 0 ? `1px solid ${border}` : "none",
-                      fontSize: "13px",
-                    }}
+                    className={`nato-learn-item${i < learnWords.length - 1 ? " nato-learn-item--bordered" : ""}`}
                   >
-                    <span style={{ fontWeight: 700, color: fg }}>{word}:</span>{" "}
-                    <span style={{ color: muted }}>{WORD_ORIGINS[word] ?? "A word chosen for its clear, unambiguous pronunciation in radio communications."}</span>
+                    <span className="nato-learn-word">{word}:</span>{" "}
+                    <span className="nato-learn-desc">
+                      {WORD_ORIGINS[word] ?? "A word chosen for its clear, unambiguous pronunciation in radio communications."}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -360,22 +232,20 @@ export default function Nato() {
 
         {/* Action buttons */}
         {output && (
-          <div style={{ display: "flex", gap: "12px", marginTop: "24px" }}>
-            <ActionButton label="Copy output" onClick={handleCopy} fg={fg} border={border} btnBg={btnBg} btnHovBg={btnHovBg} />
-            <ActionButton label="Share tool" onClick={handleShare} fg={fg} border={border} btnBg={btnBg} btnHovBg={btnHovBg} />
+          <div className="nato-actions">
+            <button className="nato-btn" onClick={handleCopy}>Copy output</button>
+            <button className="nato-btn" onClick={handleShare}>Share tool</button>
           </div>
         )}
 
         {/* Footer */}
-        <p style={{ marginTop: "48px", textAlign: "right", fontSize: "12px", color: muted }}>
+        <p className="nato-footer">
           Crafted by{" "}
           <a
             href="https://www.linkedin.com/in/olayinkaetitilola/"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ color: muted, textDecoration: "none" }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = fg)}
-            onMouseLeave={(e) => (e.currentTarget.style.color = muted)}
+            className="nato-footer-link"
           >
             Olayinka ↗
           </a>
@@ -383,23 +253,7 @@ export default function Nato() {
       </div>
 
       {/* Toast */}
-      {toast && (
-        <div style={{
-          position: "fixed",
-          bottom: "24px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          background: dark ? "#444" : "#1A1A1A",
-          color: "#fff",
-          fontFamily: "inherit",
-          fontSize: "13px",
-          padding: "8px 16px",
-          pointerEvents: "none",
-          whiteSpace: "nowrap",
-        }}>
-          {toast}
-        </div>
-      )}
+      {toast && <div className="nato-toast">{toast}</div>}
     </div>
   );
 }
@@ -408,112 +262,36 @@ export default function Nato() {
 // Sub-components
 // ---------------------------------------------------------------------------
 
-interface InputFieldProps {
+interface NatoInputProps {
   inputRef: React.RefObject<HTMLInputElement | null>;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onClear: () => void;
-  fg: string;
-  border: string;
-  borderHov: string;
-  cardBg: string;
-  dark: boolean;
 }
 
-function InputField({ inputRef, value, onChange, onClear, fg, border, borderHov, cardBg, dark }: InputFieldProps) {
-  const [hovered, setHovered] = useState(false);
-  const [focused, setFocused] = useState(false);
-  const activeBorder = focused ? "#E0F2FE" : hovered ? borderHov : border;
-
+function NatoInput({ inputRef, value, onChange, onClear }: NatoInputProps) {
   return (
-    <div style={{ position: "relative" }}>
+    <div className="nato-input-wrap">
       <input
         ref={inputRef}
         type="text"
         value={value}
         onChange={onChange}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
         spellCheck={false}
         autoComplete="off"
         autoCorrect="off"
         autoCapitalize="off"
-        style={{
-          display: "block",
-          width: "100%",
-          boxSizing: "border-box",
-          fontFamily: "'JetBrains Mono', 'Fira Code', 'SF Mono', Menlo, Consolas, monospace",
-          fontSize: "14px",
-          lineHeight: "1.75",
-          color: fg,
-          background: cardBg,
-          border: `1px solid ${activeBorder}`,
-          padding: "8px 52px 8px 12px",
-          outline: "none",
-          cursor: "text",
-          transition: "border-color 150ms",
-        }}
+        className="nato-input"
       />
       {value && (
         <button
           onClick={onClear}
           tabIndex={-1}
-          style={{
-            position: "absolute",
-            right: "10px",
-            top: "50%",
-            transform: "translateY(-50%)",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            fontFamily: "inherit",
-            fontSize: "12px",
-            color: "#9CA3AF",
-            padding: "0",
-            lineHeight: "1",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = fg)}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "#9CA3AF")}
+          className="nato-clear"
         >
           Clear
         </button>
       )}
     </div>
-  );
-}
-
-interface ActionButtonProps {
-  label: string;
-  onClick: () => void;
-  fg: string;
-  border: string;
-  btnBg: string;
-  btnHovBg: string;
-}
-
-function ActionButton({ label, onClick, fg, border, btnBg, btnHovBg }: ActionButtonProps) {
-  const [hovered, setHovered] = useState(false);
-  return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        flex: 1,
-        fontFamily: "'JetBrains Mono', 'Fira Code', 'SF Mono', Menlo, Consolas, monospace",
-        fontSize: "13px",
-        color: fg,
-        background: hovered ? btnHovBg : btnBg,
-        border: `1px solid ${border}`,
-        padding: "8px 12px",
-        cursor: "pointer",
-        transition: "background 150ms",
-        textAlign: "center",
-      }}
-    >
-      {label}
-    </button>
   );
 }
