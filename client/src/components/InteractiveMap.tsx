@@ -224,7 +224,7 @@ export default function InteractiveMap() {
         aria-label="Interactive world map showing visited countries"
         onClick={() => setTooltip(null)}
       >
-        {geoData.features.map((feat) => {
+        {geoData.features.map((feat, idx) => {
           const iso2 = feat.properties.iso2;
           const visited = visitedSet.has(iso2);
           const isActive = tooltip?.iso2 === iso2;
@@ -233,7 +233,7 @@ export default function InteractiveMap() {
 
           return (
             <path
-              key={iso2 || feat.properties.name}
+              key={iso2 || feat.properties.name || `feat-${idx}`}
               d={d}
               className={[
                 "map-country",
