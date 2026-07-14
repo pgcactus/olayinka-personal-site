@@ -625,30 +625,46 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* Books — uniform portrait grid                                        */
+  /* Shelf layout — shared by books and vinyls                            */
+  /* Inspired by sesan.studio: covers sit on physical white ledge shelves */
   /* ------------------------------------------------------------------ */
 
-  /* 5-column portrait grid */
-  .books-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 24px 16px;
+  /* Outer shelf container: off-white background, full width */
+  .shelf-section {
+    width: 100%;
   }
 
-  @media (max-width: 1024px) {
-    .books-grid { grid-template-columns: repeat(4, 1fr); gap: 20px 16px; }
+  /* One shelf row: covers + the ledge beneath them */
+  .shelf-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    padding-bottom: 0;
+    margin-bottom: 40px;
+    position: relative;
   }
 
-  @media (max-width: 768px) {
-    .books-grid { grid-template-columns: repeat(3, 1fr); gap: 20px 12px; }
+  /* The physical shelf ledge */
+  .shelf-row::after {
+    content: '';
+    position: absolute;
+    left: -8px;
+    right: -8px;
+    bottom: -10px;
+    height: 10px;
+    background: #ffffff;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.13), 0 2px 4px rgba(0, 0, 0, 0.07);
+    border-radius: 1px;
   }
 
-  @media (max-width: 480px) {
-    .books-grid { grid-template-columns: repeat(2, 1fr); gap: 20px 12px; }
-  }
+  /* ------------------------------------------------------------------ */
+  /* Books on shelves                                                     */
+  /* ------------------------------------------------------------------ */
 
-  /* Individual book item: cover + caption */
+  /* Individual book item: cover + caption below */
   .book-item {
+    flex: 1;
+    min-width: 0;
     cursor: default;
   }
 
@@ -661,13 +677,13 @@
     background-size: cover;
     background-position: center;
     background-color: #2a2a2a;
-    border-radius: 2px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-radius: 1px;
+    box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.18), -1px 0 4px rgba(0,0,0,0.06);
     transition: transform 200ms ease-out;
   }
 
   .book-item:hover .book-cover {
-    transform: translateY(-4px);
+    transform: translateY(-6px);
   }
 
   /* Hover strip — slides up from bottom of cover only */
@@ -698,51 +714,45 @@
   }
 
   .book-title {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     color: var(--color-near-black);
     line-height: 1.3;
     font-family: var(--font-mono);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .book-author {
-    font-size: 10px;
+    font-size: 9px;
     color: var(--color-body);
     margin-top: 2px;
     font-family: var(--font-mono);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* ------------------------------------------------------------------ */
-  /* Vinyls — uniform square grid                                         */
+  /* Vinyls on shelves                                                    */
   /* ------------------------------------------------------------------ */
 
-  .vinyls-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 16px;
-  }
-
-  @media (max-width: 1024px) {
-    .vinyls-grid { grid-template-columns: repeat(3, 1fr); }
-  }
-
-  @media (max-width: 640px) {
-    .vinyls-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-
-  /* Vinyl cell */
+  /* Vinyl cell — square, sits on shelf */
   .vinyl-card {
+    flex: 1;
+    min-width: 0;
     position: relative;
     aspect-ratio: 1 / 1;
-    border-radius: 4px;
     overflow: hidden;
     cursor: default;
-    transform: translateY(0);
+    border-radius: 1px;
+    box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.18), -1px 0 4px rgba(0,0,0,0.06);
     transition: transform 200ms ease-out;
   }
 
   .vinyl-card--hovered {
-    transform: translateY(-2px);
+    transform: translateY(-6px);
   }
 
   /* Cover image — full bleed */
@@ -804,5 +814,13 @@
 
   .vinyl-overlay--visible {
     transform: translateY(0);
+  }
+
+  /* Mobile: reduce shelf gap */
+  @media (max-width: 640px) {
+    .shelf-row {
+      gap: 8px;
+      margin-bottom: 32px;
+    }
   }
 }

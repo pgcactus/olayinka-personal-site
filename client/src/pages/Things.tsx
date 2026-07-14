@@ -203,20 +203,28 @@ export default function Things() {
           ))}
         </div>
 
-        {/* Books tab: single continuous portrait grid */}
+        {/* Books tab: shelf layout — 5 books per shelf row */}
         {activeTab === "books" && (
-          <div className="books-grid">
-            {BOOKS.map((book) => (
-              <BookItem key={book.id} book={book} />
+          <div className="shelf-section">
+            {Array.from({ length: Math.ceil(BOOKS.length / 5) }, (_, rowIdx) => (
+              <div key={rowIdx} className="shelf-row">
+                {BOOKS.slice(rowIdx * 5, rowIdx * 5 + 5).map((book) => (
+                  <BookItem key={book.id} book={book} />
+                ))}
+              </div>
             ))}
           </div>
         )}
 
-        {/* Vinyls tab: real album grid */}
+        {/* Vinyls tab: shelf layout — 5 vinyls per shelf row */}
         {activeTab === "vinyls" && (
-          <div className="vinyls-grid">
-            {VINYLS.map((vinyl) => (
-              <VinylCard key={vinyl.id} vinyl={vinyl} />
+          <div className="shelf-section">
+            {Array.from({ length: Math.ceil(VINYLS.length / 5) }, (_, rowIdx) => (
+              <div key={rowIdx} className="shelf-row">
+                {VINYLS.slice(rowIdx * 5, rowIdx * 5 + 5).map((vinyl) => (
+                  <VinylCard key={vinyl.id} vinyl={vinyl} />
+                ))}
+              </div>
             ))}
           </div>
         )}
