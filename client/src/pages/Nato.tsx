@@ -18,6 +18,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import ThemeToggle from "@/components/ThemeToggle";
+import PageMeta from "@/components/PageMeta";
 
 // ---------------------------------------------------------------------------
 // Data
@@ -127,6 +128,7 @@ function uniqueWords(value: string): string[] {
 
 function getInitialInput(): string {
   try {
+    if (typeof window === "undefined") return "HERMIONE";
     const params = new URLSearchParams(window.location.search);
     const q = params.get("q");
     if (q) return sanitise(decodeURIComponent(q));
@@ -207,6 +209,11 @@ export default function Nato() {
 
   return (
     <div className="nato-page">
+      <PageMeta
+        title="NATO alphabet — Olayinka Titilola"
+        description="Convert any word or phrase to the NATO phonetic alphabet instantly. Never say 'B as in Boy' again."
+        path="/nato"
+      />
       <div className="nato-inner">
 
         {/* Back link */}

@@ -18,6 +18,7 @@
     "lucide-react": "^0.453.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
+    "react-helmet-async": "^3.0.0",
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
     "wouter": "^3.3.5"
@@ -43,6 +44,7 @@
     "typescript": "5.6.3",
     "vite": "^7.1.7",
     "vite-plugin-manus-runtime": "^0.0.57",
+    "vite-prerender-plugin": "^0.5.13",
     "vitest": "^2.1.4"
   },
   "packageManager": "pnpm@10.4.1+sha512.c753b6c3ad7afa13af388fa6d808035a008e30ea9993f58c6663e2bc5ff21679aa834db094987129aa4d488b86df57f7b634981b2f827cdcacc698cc0cfb88af",

@@ -5,6 +5,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { defineConfig, type Plugin, type ViteDevServer } from "vite";
 import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
+import { vitePrerenderPlugin } from "vite-prerender-plugin";
 
 // =============================================================================
 // Manus Debug Collector - Vite Plugin
@@ -203,7 +204,64 @@ function vitePluginStorageProxy(): Plugin {
   };
 }
 
-const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector(), vitePluginStorageProxy()];
+// =============================================================================
+// Sitemap + robots.txt emitter — runs at the end of every production build
+// =============================================================================
+
+const SITE_URL = "https://olayinka.xyz";
+const PRERENDER_ROUTES = [
+  "/",
+  "/things/books",
+  "/things/vinyls",
+  "/things/places",
+  "/nato",
+];
+
+function vitePluginSitemapRobots(): Plugin {
+  return {
+    name: "manus-sitemap-robots",
+    apply: "build",
+    generateBundle() {
+      const now = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+
+      // sitemap.xml
+      const urlEntries = PRERENDER_ROUTES.map(
+        (route) =>
+          `  <url>\n    <loc>${SITE_URL}${route}</loc>\n    <lastmod>${now}</lastmod>\n  </url>`
+      ).join("\n");
+      const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urlEntries}\n</urlset>\n`;
+
+      this.emitFile({
+        type: "asset",
+        fileName: "sitemap.xml",
+        source: sitemap,
+      });
+
+      // robots.txt
+      const robots = `User-agent: *\nAllow: /\nSitemap: ${SITE_URL}/sitemap.xml\n`;
+
+      this.emitFile({
+        type: "asset",
+        fileName: "robots.txt",
+        source: robots,
+      });
+    },
+  };
+}
+
+const plugins = [
+  react(),
+  tailwindcss(),
+  jsxLocPlugin(),
+  vitePluginManusRuntime(),
+  vitePluginManusDebugCollector(),
+  vitePluginStorageProxy(),
+  ...vitePrerenderPlugin({
+    prerenderScript: path.resolve(import.meta.dirname, "client/src/prerender.tsx"),
+    additionalPrerenderRoutes: PRERENDER_ROUTES,
+  }),
+  vitePluginSitemapRobots(),
+];
 
 export default defineConfig({
   plugins,

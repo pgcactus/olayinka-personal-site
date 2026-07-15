@@ -2,7 +2,7 @@
  * Design Philosophy: Minimal Monospace — /things page
  * - Same global tokens as home: white bg, monospace, 14px, 1.75 line-height
  * - Max content width 1000px, top-aligned (not vertically centred)
- * - Three tabs: books, vinyls, places — driven by ?tab= query param via wouter useLocation
+ * - Three tabs: books, vinyls, places — driven by /things/:tab path route
  * - Active tab: ice blue highlight #E0F2FE, darkens to #BAE6FD on hover
  * - Inactive tabs: muted #9CA3AF, no background
  * - Books: shelf rows, portrait covers, hover overlay, click-to-expand detail panel,
@@ -17,9 +17,10 @@ import { useState, useRef, useEffect } from "react";
 import { BOOK_COVERS } from "@/assets/book-covers";
 import VINYLS_RESOLVED from "../data/vinyls-resolved.json";
 import BOOKS_RESOLVED from "../data/books-resolved.json";
-import { Link, useLocation, useSearch } from "wouter";
+import { Link, useLocation, useParams } from "wouter";
 import ThemeToggle from "@/components/ThemeToggle";
 import InteractiveMap from "@/components/InteractiveMap";
+import PageMeta from "@/components/PageMeta";
 
 type Tab = "books" | "vinyls" | "places";
 
@@ -134,7 +135,7 @@ function BookDetailPanel({ book, onClose }: { book: Book; onClose: () => void })
   return (
     <div className="book-panel" ref={panelRef}>
       <button className="book-panel-close" onClick={onClose} aria-label="Close">
-        ✕
+        &#x2715;
       </button>
       <div className="book-panel-inner">
         {resolvedSrc && (
@@ -252,7 +253,7 @@ function VinylCard({ vinyl }: { vinyl: Vinyl }) {
           <span className="vinyl-fallback-artist">{vinyl.artist}</span>
         </div>
       )}
-      {playing && <div className="vinyl-playing-indicator">▶ playing</div>}
+      {playing && <div className="vinyl-playing-indicator">&#9654; playing</div>}
       <div className={`vinyl-overlay${hovered ? " vinyl-overlay--visible" : ""}`}>
         <span>Released {vinyl.year}</span>
         {vinyl.favouriteTrack && (
@@ -264,14 +265,27 @@ function VinylCard({ vinyl }: { vinyl: Vinyl }) {
 }
 
 // ---------------------------------------------------------------------------
-// Tab parsing
+// Tab metadata
 // ---------------------------------------------------------------------------
 
 const TABS: Tab[] = ["books", "vinyls", "places"];
 
-function parseTab(search: string): Tab {
-  const params = new URLSearchParams(search);
-  const raw = params.get("tab");
+const TAB_META: Record<Tab, { title: string; description: string }> = {
+  books: {
+    title: "Books — Olayinka Titilola",
+    description: "Books I have read: product strategy, systems thinking, fiction, and more.",
+  },
+  vinyls: {
+    title: "Vinyls — Olayinka Titilola",
+    description: "Records in my collection, with favourite tracks and 30-second previews.",
+  },
+  places: {
+    title: "Places — Olayinka Titilola",
+    description: "Countries I have visited, mapped out with a few notes on each.",
+  },
+};
+
+function parseTab(raw: string | undefined): Tab {
   if (raw === "vinyls" || raw === "places") return raw;
   return "books";
 }
@@ -281,9 +295,9 @@ function parseTab(search: string): Tab {
 // ---------------------------------------------------------------------------
 
 export default function Things() {
-  const search = useSearch();
+  const params = useParams<{ tab?: string }>();
   const [, navigate] = useLocation();
-  const activeTab = parseTab(search ? `?${search}` : "");
+  const activeTab = parseTab(params.tab);
 
   // Books filter state
   const [catFilter, setCatFilter] = useState<string>("all");
@@ -291,8 +305,10 @@ export default function Things() {
   const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
 
   function setTab(tab: Tab) {
-    navigate(`/things?tab=${tab}`);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    navigate(`/things/${tab}`);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
     setSelectedBookId(null);
   }
 
@@ -315,8 +331,16 @@ export default function Things() {
     ? shelfRows.findIndex((row) => row.some((b) => b.id === selectedBookId))
     : -1;
 
+  const meta = TAB_META[activeTab];
+
   return (
     <div className="things-wrapper things-fade-in">
+      <PageMeta
+        title={meta.title}
+        description={meta.description}
+        path={`/things/${activeTab}`}
+      />
+
       <div className="things-content">
         {/* Back link */}
         <Link href="/" className="things-back">

@@ -211,6 +211,12 @@ export default function InteractiveMap() {
     return (
       <div className="map-container map-loading">
         <span className="map-loading-text">Loading map...</span>
+        {/* Semantic fallback for prerendered HTML — visible to crawlers even before GeoJSON loads */}
+        <ul className="map-visited-list" aria-label="Countries visited">
+          {Object.values(VISITED).map((c) => (
+            <li key={c.name}>{c.name}</li>
+          ))}
+        </ul>
       </div>
     );
   }

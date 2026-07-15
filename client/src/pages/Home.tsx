@@ -9,6 +9,7 @@
 
 import { Link } from "wouter";
 import ThemeToggle from "@/components/ThemeToggle";
+import PageMeta from "@/components/PageMeta";
 
 interface HighlightProps {
   children: React.ReactNode;
@@ -42,6 +43,18 @@ function Highlight({ children, href, external }: HighlightProps) {
     <span className="highlight">{children}</span>
   );
 }
+
+const personJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Olayinka Titilola",
+  jobTitle: "Product Manager",
+  url: "https://olayinka.xyz",
+  sameAs: [
+    "https://www.linkedin.com/in/olayinkaetitilola/",
+    "https://github.com/pgcactus",
+  ],
+};
 
 const paragraphs = [
   {
@@ -99,10 +112,10 @@ const paragraphs = [
     content: (
       <>
         You can see some of the{" "}
-        <Highlight href="/things?tab=books">books</Highlight> I&apos;ve read,
-        the <Highlight href="/things?tab=vinyls">vinyls</Highlight> I&apos;m
+        <Highlight href="/things/books">books</Highlight> I&apos;ve read,
+        the <Highlight href="/things/vinyls">vinyls</Highlight> I&apos;m
         collecting, or the{" "}
-        <Highlight href="/things?tab=places">places</Highlight> I&apos;ve been
+        <Highlight href="/things/places">places</Highlight> I&apos;ve been
         to.
       </>
     ),
@@ -112,6 +125,13 @@ const paragraphs = [
 export default function Home() {
   return (
     <div className="page-wrapper">
+      <PageMeta
+        title="Olayinka Titilola"
+        description="Product manager in London. I lead product at Flagstone, and on the side I build small things like a NATO phonetic alphabet tool and Basketball Companion."
+        path="/"
+        jsonLd={personJsonLd}
+      />
+
       <main className="content">
         {/* Theme toggle — top-right of content block */}
         <ThemeToggle className="home-fade-in" />
@@ -132,7 +152,7 @@ export default function Home() {
             href="mailto:dlayinka@gmail.com"
             className="linkedin-link"
           >
-            Email ↗
+            Email &#8599;
           </a>
           <a
             href="https://www.linkedin.com/in/olayinkaetitilola/"
@@ -140,7 +160,7 @@ export default function Home() {
             rel="noopener noreferrer"
             className="linkedin-link"
           >
-            LinkedIn ↗
+            LinkedIn &#8599;
           </a>
         </div>
       </main>
