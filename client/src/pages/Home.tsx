@@ -149,12 +149,6 @@ export default function Home() {
         {/* Utility links — bottom-right of content block */}
         <div className="home-links home-para" style={{ animationDelay: "400ms" }}>
           <a
-            href="mailto:dlayinka@gmail.com"
-            className="linkedin-link"
-          >
-            Email &#8599;
-          </a>
-          <a
             href="https://www.linkedin.com/in/olayinkaetitilola/"
             target="_blank"
             rel="noopener noreferrer"
