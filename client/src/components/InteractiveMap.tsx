@@ -237,9 +237,14 @@ export default function InteractiveMap() {
           const d = featureToPath(feat, MAP_W, MAP_H);
           if (!d) return null;
 
+          // iso2 === '-99' is a sentinel in this GeoJSON for unrecognised territories;
+          // treat it the same as missing so we fall back to a unique key.
+          const featureKey =
+            iso2 && iso2 !== "-99" ? iso2 : feat.properties.name || `feat-${idx}`;
+
           return (
             <path
-              key={iso2 || feat.properties.name || `feat-${idx}`}
+              key={featureKey}
               d={d}
               className={[
                 "map-country",
