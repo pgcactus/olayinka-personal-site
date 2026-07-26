@@ -17,12 +17,12 @@ import { useState, useRef, useEffect } from "react";
 import { BOOK_COVERS } from "@/assets/book-covers";
 import VINYLS_RESOLVED from "../data/vinyls-resolved.json";
 import BOOKS_RESOLVED from "../data/books-resolved.json";
-import { Link, useLocation, useParams } from "wouter";
+import { Link, Redirect, useParams } from "wouter";
 import ThemeToggle from "@/components/ThemeToggle";
 import InteractiveMap from "@/components/InteractiveMap";
 import PageMeta from "@/components/PageMeta";
-
-type Tab = "books" | "vinyls" | "places";
+import { ROUTE_META, type RouteMeta } from "@/site-meta";
+import { parseThingsTab, THINGS_TABS, type ThingsTab } from "@/lib/routes";
 
 // ---------------------------------------------------------------------------
 // Books data
@@ -37,20 +37,23 @@ interface Book {
   read: number;
   isbn: string;
   coverUrl?: string;
-  current?: boolean;
+  status?: "reading" | "read";
   note?: string;
 }
 
-const BOOKS: Book[] = (BOOKS_RESOLVED as Book[]).map((b, i) => ({
-  ...b,
-  // Mark the most recently read book as "currently reading" placeholder
-  current: i === 0,
-  note: undefined,
-}));
+const BOOKS = BOOKS_RESOLVED as Book[];
 
 // Categories derived from data
-const BOOK_CATEGORIES = ["all", ...Array.from(new Set(BOOKS.map((b) => b.category)))];
-const BOOK_YEARS = ["all", ...Array.from(new Set(BOOKS.map((b) => b.read))).sort((a, b) => b - a).map(String)];
+const BOOK_CATEGORIES = [
+  "all",
+  ...Array.from(new Set(BOOKS.map(b => b.category))),
+];
+const BOOK_YEARS = [
+  "all",
+  ...Array.from(new Set(BOOKS.map(b => b.read)))
+    .sort((a, b) => b - a)
+    .map(String),
+];
 
 // ---------------------------------------------------------------------------
 // BookItem — portrait cover + caption below + click-to-expand panel
@@ -70,29 +73,28 @@ function BookItem({
   const resolvedSrc = imgFailed ? null : bundledSrc;
 
   return (
-    <div
+    <button
+      type="button"
       className={`book-item${isActive ? " book-item--active" : ""}`}
       onClick={onClick}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => e.key === "Enter" && onClick()}
       aria-expanded={isActive}
+      aria-controls={isActive ? `book-panel-${book.id}` : undefined}
     >
-      <div
-        className="book-cover"
-        style={resolvedSrc ? { backgroundImage: `url(${resolvedSrc})` } : undefined}
-      >
+      <div className="book-cover">
         {resolvedSrc && (
           <img
             src={resolvedSrc}
-            alt=""
-            aria-hidden="true"
+            alt={`Cover of ${book.title} by ${book.author}`}
+            className="book-cover-image"
+            width="320"
+            height="480"
+            loading="lazy"
+            decoding="async"
             onError={() => setImgFailed(true)}
-            style={{ display: "none" }}
           />
         )}
         {/* Currently reading badge */}
-        {book.current && (
+        {book.status === "reading" && (
           <div className="book-current-badge">reading</div>
         )}
         {/* Hover strip — slides up over cover only */}
@@ -104,7 +106,7 @@ function BookItem({
         <div className="book-title">{book.title}</div>
         <div className="book-author">{book.author}</div>
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -112,11 +114,17 @@ function BookItem({
 // BookDetailPanel — slides in below the shelf row when a book is selected
 // ---------------------------------------------------------------------------
 
-function BookDetailPanel({ book, onClose }: { book: Book; onClose: () => void }) {
+function BookDetailPanel({
+  book,
+  onClose,
+}: {
+  book: Book;
+  onClose: () => void;
+}) {
   const bundledSrc = BOOK_COVERS[book.id] ?? book.coverUrl ?? null;
   const [imgFailed, setImgFailed] = useState(false);
   const resolvedSrc = imgFailed ? null : bundledSrc;
-  const panelRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
 
   // Close on Escape
   useEffect(() => {
@@ -133,8 +141,18 @@ function BookDetailPanel({ book, onClose }: { book: Book; onClose: () => void })
   }, [book.id]);
 
   return (
-    <div className="book-panel" ref={panelRef}>
-      <button className="book-panel-close" onClick={onClose} aria-label="Close">
+    <section
+      className="book-panel"
+      ref={panelRef}
+      id={`book-panel-${book.id}`}
+      aria-label={`Details for ${book.title}`}
+    >
+      <button
+        type="button"
+        className="book-panel-close"
+        onClick={onClose}
+        aria-label={`Close details for ${book.title}`}
+      >
         &#x2715;
       </button>
       <div className="book-panel-inner">
@@ -144,6 +162,10 @@ function BookDetailPanel({ book, onClose }: { book: Book; onClose: () => void })
               src={resolvedSrc}
               alt={book.title}
               className="book-panel-cover"
+              width="144"
+              height="216"
+              loading="lazy"
+              decoding="async"
               onError={() => setImgFailed(true)}
             />
           </div>
@@ -158,15 +180,13 @@ function BookDetailPanel({ book, onClose }: { book: Book; onClose: () => void })
             <span className="book-panel-dot">&middot;</span>
             <span>Read {book.read}</span>
           </div>
-          {book.current && (
+          {book.status === "reading" && (
             <div className="book-panel-current">Currently reading</div>
           )}
-          <p className="book-panel-note">
-            {book.note ?? "No note yet — add one to books-resolved.json to share your thoughts on this book."}
-          </p>
+          {book.note && <p className="book-panel-note">{book.note}</p>}
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -180,72 +200,41 @@ interface Vinyl {
   artist: string;
   year: number;
   coverUrl: string | null;
-  previewUrl?: string | null;
   favouriteTrack?: string;
 }
 
 const VINYL_EXTRAS: Record<string, { favouriteTrack?: string }> = {
-  "for-broken-ears":       { favouriteTrack: "Found" },
-  "untitled-unmastered":   { favouriteTrack: "untitled 07" },
-  "gnx":                   { favouriteTrack: "wacced out murals" },
-  "iyrtitl":               { favouriteTrack: "Know Yourself" },
-  "african-giant":         { favouriteTrack: "Ye" },
-  "i-told-them":           { favouriteTrack: "City Boys" },
-  "lungu-boy":             { favouriteTrack: "Lungu Boy" },
-  "wattba":                { favouriteTrack: "Jumpman" },
-  "the-blueprint":         { favouriteTrack: "Izzo (H.O.V.A.)" },
-  "let-god-sort-em-out":   { favouriteTrack: "Birds & Bees" },
-  "mbdtf":                 { favouriteTrack: "Runaway" },
+  "for-broken-ears": { favouriteTrack: "Found" },
+  "untitled-unmastered": { favouriteTrack: "untitled 07" },
+  gnx: { favouriteTrack: "wacced out murals" },
+  iyrtitl: { favouriteTrack: "Know Yourself" },
+  "african-giant": { favouriteTrack: "Ye" },
+  "i-told-them": { favouriteTrack: "City Boys" },
+  "lungu-boy": { favouriteTrack: "Lungu Boy" },
+  wattba: { favouriteTrack: "Jumpman" },
+  "the-blueprint": { favouriteTrack: "Izzo (H.O.V.A.)" },
+  "let-god-sort-em-out": { favouriteTrack: "Birds & Bees" },
+  mbdtf: { favouriteTrack: "Runaway" },
 };
 
-const VINYLS: Vinyl[] = (VINYLS_RESOLVED as Vinyl[]).map((v) => ({
+const VINYLS: Vinyl[] = (VINYLS_RESOLVED as Vinyl[]).map(v => ({
   ...v,
   ...(VINYL_EXTRAS[v.id] ?? {}),
 }));
 
 function VinylCard({ vinyl }: { vinyl: Vinyl }) {
-  const [hovered, setHovered] = useState(false);
-  const [playing, setPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  function handleClick() {
-    if (!vinyl.previewUrl) return;
-    if (playing) {
-      audioRef.current?.pause();
-      setPlaying(false);
-    } else {
-      if (!audioRef.current) {
-        audioRef.current = new Audio(vinyl.previewUrl);
-        audioRef.current.onended = () => setPlaying(false);
-      }
-      audioRef.current.play();
-      setPlaying(true);
-    }
-  }
-
-  // Cleanup audio on unmount
-  useEffect(() => {
-    return () => {
-      audioRef.current?.pause();
-    };
-  }, []);
-
   return (
-    <div
-      className={`vinyl-card${hovered ? " vinyl-card--hovered" : ""}${playing ? " vinyl-card--playing" : ""}`}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onClick={handleClick}
-      role={vinyl.previewUrl ? "button" : undefined}
-      tabIndex={vinyl.previewUrl ? 0 : undefined}
-      onKeyDown={(e) => e.key === "Enter" && handleClick()}
-    >
+    <figure className="vinyl-card">
       {vinyl.coverUrl ? (
         <img
           src={vinyl.coverUrl}
           alt={`${vinyl.title} by ${vinyl.artist}`}
           className="vinyl-cover"
           draggable={false}
+          width="600"
+          height="600"
+          loading="lazy"
+          decoding="async"
         />
       ) : (
         <div className="vinyl-fallback">
@@ -253,14 +242,15 @@ function VinylCard({ vinyl }: { vinyl: Vinyl }) {
           <span className="vinyl-fallback-artist">{vinyl.artist}</span>
         </div>
       )}
-      {playing && <div className="vinyl-playing-indicator">&#9654; playing</div>}
-      <div className={`vinyl-overlay${hovered ? " vinyl-overlay--visible" : ""}`}>
+      <figcaption className="vinyl-overlay">
         <span>Released {vinyl.year}</span>
         {vinyl.favouriteTrack && (
-          <span className="vinyl-fav-track">&nbsp;&middot;&nbsp;{vinyl.favouriteTrack}</span>
+          <span className="vinyl-fav-track">
+            &nbsp;&middot;&nbsp;Favourite: {vinyl.favouriteTrack}
+          </span>
         )}
-      </div>
-    </div>
+      </figcaption>
+    </figure>
   );
 }
 
@@ -268,27 +258,11 @@ function VinylCard({ vinyl }: { vinyl: Vinyl }) {
 // Tab metadata
 // ---------------------------------------------------------------------------
 
-const TABS: Tab[] = ["books", "vinyls", "places"];
-
-const TAB_META: Record<Tab, { title: string; description: string }> = {
-  books: {
-    title: "Books — Olayinka Titilola",
-    description: "Books I have read: product strategy, systems thinking, fiction, and more.",
-  },
-  vinyls: {
-    title: "Vinyls — Olayinka Titilola",
-    description: "Records in my collection, with favourite tracks and 30-second previews.",
-  },
-  places: {
-    title: "Places — Olayinka Titilola",
-    description: "Countries I have visited, mapped out with a few notes on each.",
-  },
+const TAB_META: Record<ThingsTab, RouteMeta> = {
+  books: ROUTE_META.books,
+  vinyls: ROUTE_META.vinyls,
+  places: ROUTE_META.places,
 };
-
-function parseTab(raw: string | undefined): Tab {
-  if (raw === "vinyls" || raw === "places") return raw;
-  return "books";
-}
 
 // ---------------------------------------------------------------------------
 // Component
@@ -296,52 +270,50 @@ function parseTab(raw: string | undefined): Tab {
 
 export default function Things() {
   const params = useParams<{ tab?: string }>();
-  const [, navigate] = useLocation();
-  const activeTab = parseTab(params.tab);
+  const activeTab = parseThingsTab(params.tab);
 
+  if (!activeTab) {
+    return <Redirect to="/things/books" replace />;
+  }
+
+  return <ThingsContent activeTab={activeTab} />;
+}
+
+function ThingsContent({ activeTab }: { activeTab: ThingsTab }) {
   // Books filter state
   const [catFilter, setCatFilter] = useState<string>("all");
   const [yearFilter, setYearFilter] = useState<string>("all");
   const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
 
-  function setTab(tab: Tab) {
-    navigate(`/things/${tab}`);
-    if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-    setSelectedBookId(null);
-  }
-
   // Filtered books
-  const filteredBooks = BOOKS.filter((b) => {
+  const filteredBooks = BOOKS.filter(b => {
     if (catFilter !== "all" && b.category !== catFilter) return false;
     if (yearFilter !== "all" && String(b.read) !== yearFilter) return false;
     return true;
   });
 
-  const selectedBook = selectedBookId ? BOOKS.find((b) => b.id === selectedBookId) ?? null : null;
+  const selectedBook = selectedBookId
+    ? (BOOKS.find(b => b.id === selectedBookId) ?? null)
+    : null;
 
   // Group filtered books into shelf rows of 5
-  const shelfRows = Array.from({ length: Math.ceil(filteredBooks.length / 5) }, (_, i) =>
-    filteredBooks.slice(i * 5, i * 5 + 5)
+  const shelfRows = Array.from(
+    { length: Math.ceil(filteredBooks.length / 5) },
+    (_, i) => filteredBooks.slice(i * 5, i * 5 + 5)
   );
 
   // Find which row the selected book is in (to insert panel after that row)
   const selectedRowIdx = selectedBookId
-    ? shelfRows.findIndex((row) => row.some((b) => b.id === selectedBookId))
+    ? shelfRows.findIndex(row => row.some(b => b.id === selectedBookId))
     : -1;
 
   const meta = TAB_META[activeTab];
 
   return (
     <div className="things-wrapper things-fade-in">
-      <PageMeta
-        title={meta.title}
-        description={meta.description}
-        path={`/things/${activeTab}`}
-      />
+      <PageMeta meta={meta} />
 
-      <div className="things-content">
+      <main className="things-content">
         {/* Back link */}
         <Link href="/" className="things-back">
           &#8627; back
@@ -350,22 +322,28 @@ export default function Things() {
         {/* Theme toggle — top-right of content block */}
         <ThemeToggle />
 
-        {/* Heading / tab row */}
-        <div className="things-heading">
-          {TABS.map((tab, i) => (
+        <h1 className="sr-only">
+          {meta.title.replace(" — Olayinka Titilola", "")}
+        </h1>
+
+        {/* Heading / route navigation */}
+        <nav className="things-heading" aria-label="Collections">
+          {THINGS_TABS.map((tab, i) => (
             <span key={tab}>
-              <button
+              <Link
+                href={`/things/${tab}`}
                 className={`things-tab ${activeTab === tab ? "things-tab--active" : "things-tab--inactive"}`}
-                onClick={() => setTab(tab)}
+                aria-current={activeTab === tab ? "page" : undefined}
+                onClick={() => setSelectedBookId(null)}
               >
                 {tab}
-              </button>
-              {i < TABS.length - 1 && (
+              </Link>
+              {i < THINGS_TABS.length - 1 && (
                 <span className="things-dot">&nbsp;&middot;&nbsp;</span>
               )}
             </span>
           ))}
-        </div>
+        </nav>
 
         {/* Books tab */}
         {activeTab === "books" && (
@@ -373,22 +351,32 @@ export default function Things() {
             {/* Filter bar */}
             <div className="books-filter-bar">
               <div className="books-filter-group">
-                {BOOK_CATEGORIES.map((cat) => (
+                {BOOK_CATEGORIES.map(cat => (
                   <button
+                    type="button"
                     key={cat}
                     className={`books-filter-btn${catFilter === cat ? " books-filter-btn--active" : ""}`}
-                    onClick={() => { setCatFilter(cat); setSelectedBookId(null); }}
+                    onClick={() => {
+                      setCatFilter(cat);
+                      setSelectedBookId(null);
+                    }}
+                    aria-pressed={catFilter === cat}
                   >
                     {cat}
                   </button>
                 ))}
               </div>
               <div className="books-filter-group">
-                {BOOK_YEARS.map((yr) => (
+                {BOOK_YEARS.map(yr => (
                   <button
+                    type="button"
                     key={yr}
                     className={`books-filter-btn${yearFilter === yr ? " books-filter-btn--active" : ""}`}
-                    onClick={() => { setYearFilter(yr); setSelectedBookId(null); }}
+                    onClick={() => {
+                      setYearFilter(yr);
+                      setSelectedBookId(null);
+                    }}
+                    aria-pressed={yearFilter === yr}
                   >
                     {yr === "all" ? "all years" : yr}
                   </button>
@@ -401,13 +389,15 @@ export default function Things() {
               {shelfRows.map((row, rowIdx) => (
                 <div key={rowIdx}>
                   <div className="shelf-row">
-                    {row.map((book) => (
+                    {row.map(book => (
                       <BookItem
                         key={book.id}
                         book={book}
                         isActive={book.id === selectedBookId}
                         onClick={() =>
-                          setSelectedBookId(book.id === selectedBookId ? null : book.id)
+                          setSelectedBookId(
+                            book.id === selectedBookId ? null : book.id
+                          )
                         }
                       />
                     ))}
@@ -431,19 +421,22 @@ export default function Things() {
         {/* Vinyls tab: shelf layout — 5 vinyls per shelf row */}
         {activeTab === "vinyls" && (
           <div className="shelf-section">
-            {Array.from({ length: Math.ceil(VINYLS.length / 5) }, (_, rowIdx) => (
-              <div key={rowIdx} className="shelf-row">
-                {VINYLS.slice(rowIdx * 5, rowIdx * 5 + 5).map((vinyl) => (
-                  <VinylCard key={vinyl.id} vinyl={vinyl} />
-                ))}
-              </div>
-            ))}
+            {Array.from(
+              { length: Math.ceil(VINYLS.length / 5) },
+              (_, rowIdx) => (
+                <div key={rowIdx} className="shelf-row">
+                  {VINYLS.slice(rowIdx * 5, rowIdx * 5 + 5).map(vinyl => (
+                    <VinylCard key={vinyl.id} vinyl={vinyl} />
+                  ))}
+                </div>
+              )
+            )}
           </div>
         )}
 
         {/* Places tab: interactive world map */}
         {activeTab === "places" && <InteractiveMap />}
-      </div>
+      </main>
     </div>
   );
 }

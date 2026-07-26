@@ -22,9 +22,12 @@ export function ThemeProvider({
   switchable = false,
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(() => {
-    if (switchable && typeof window !== "undefined") {
-      const stored = localStorage.getItem("theme");
-      return (stored as Theme) || defaultTheme;
+    if (
+      switchable &&
+      typeof document !== "undefined" &&
+      document.documentElement.classList.contains("dark")
+    ) {
+      return "dark";
     }
     return defaultTheme;
   });
@@ -37,8 +40,12 @@ export function ThemeProvider({
       root.classList.remove("dark");
     }
 
-    if (switchable && typeof window !== "undefined") {
-      localStorage.setItem("theme", theme);
+    if (switchable) {
+      try {
+        window.localStorage.setItem("theme", theme);
+      } catch {
+        // The visual theme still works when storage is unavailable.
+      }
     }
   }, [theme, switchable]);
 
