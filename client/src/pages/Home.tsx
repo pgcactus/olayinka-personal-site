@@ -10,6 +10,7 @@
 import { Link } from "wouter";
 import ThemeToggle from "@/components/ThemeToggle";
 import PageMeta from "@/components/PageMeta";
+import { ROUTE_META } from "@/site-meta";
 
 interface HighlightProps {
   children: React.ReactNode;
@@ -27,6 +28,8 @@ function Highlight({ children, href, external }: HighlightProps) {
         className="highlight"
       >
         {children}
+        <span aria-hidden="true"> ↗</span>
+        <span className="sr-only"> (opens in a new tab)</span>
       </a>
     );
   }
@@ -39,30 +42,10 @@ function Highlight({ children, href, external }: HighlightProps) {
     );
   }
 
-  return (
-    <span className="highlight">{children}</span>
-  );
+  return <span className="highlight">{children}</span>;
 }
 
-const personJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  name: "Olayinka Titilola",
-  jobTitle: "Product Manager",
-  url: "https://olayinka.xyz",
-  sameAs: [
-    "https://www.linkedin.com/in/olayinkaetitilola/",
-    "https://github.com/pgcactus",
-  ],
-};
-
 const paragraphs = [
-  {
-    key: "p1",
-    className: "para para-bold home-para",
-    style: { animationDelay: "0ms" },
-    content: <>Hi, I&apos;m Olayinka.</>,
-  },
   {
     key: "p2",
     className: "para home-para",
@@ -72,9 +55,9 @@ const paragraphs = [
         Right now, I lead product work at{" "}
         <Highlight href="https://www.flagstoneim.com/" external>
           Flagstone
-        </Highlight>
-        : helping people get through the door, and keeping things safe once
-        they&apos;re in.
+        </Highlight>{" "}
+        across onboarding, identity verification, fraud controls and account
+        security.
       </>
     ),
   },
@@ -86,7 +69,10 @@ const paragraphs = [
       <>
         Outside of work, I build small things, like{" "}
         <Highlight href="/nato">NATO Phonetic Alphabet</Highlight> and{" "}
-        <Highlight href="https://github.com/pgcactus/basketball-companion" external>
+        <Highlight
+          href="https://github.com/pgcactus/basketball-companion"
+          external
+        >
           Basketball Companion
         </Highlight>
         .
@@ -99,9 +85,9 @@ const paragraphs = [
     style: { animationDelay: "240ms" },
     content: (
       <>
-        I&apos;d happily skydive for a clean reset, play tennis, or do a
-        quick 5K. A slow afternoon with friends is usually the better version
-        of a weekend.
+        I&apos;d happily skydive for a clean reset, play tennis, or do a quick
+        5K. A slow afternoon with friends is usually the better version of a
+        weekend.
       </>
     ),
   },
@@ -112,11 +98,10 @@ const paragraphs = [
     content: (
       <>
         You can see some of the{" "}
-        <Highlight href="/things/books">books</Highlight> I&apos;ve read,
-        the <Highlight href="/things/vinyls">vinyls</Highlight> I&apos;m
-        collecting, or the{" "}
-        <Highlight href="/things/places">places</Highlight> I&apos;ve been
-        to.
+        <Highlight href="/things/books">books</Highlight> I&apos;ve read, the{" "}
+        <Highlight href="/things/vinyls">vinyls</Highlight> I&apos;m collecting,
+        or the <Highlight href="/things/places">places</Highlight> I&apos;ve
+        been to.
       </>
     ),
   },
@@ -125,29 +110,25 @@ const paragraphs = [
 export default function Home() {
   return (
     <div className="page-wrapper">
-      <PageMeta
-        title="Olayinka Titilola"
-        description="Product manager in London. I lead product at Flagstone, and on the side I build small things like a NATO phonetic alphabet tool and Basketball Companion."
-        path="/"
-        jsonLd={personJsonLd}
-      />
+      <PageMeta meta={ROUTE_META.home} />
 
       <main className="content">
-        {/* Theme toggle — top-right of content block */}
-        <ThemeToggle className="home-fade-in" />
+        <header className="home-header home-para">
+          <h1 className="para para-bold">Hi, I&apos;m Olayinka.</h1>
+          <ThemeToggle />
+        </header>
 
-        {paragraphs.map((para) => (
-          <p
-            key={para.key}
-            className={para.className}
-            style={para.style}
-          >
+        {paragraphs.map(para => (
+          <p key={para.key} className={para.className} style={para.style}>
             {para.content}
           </p>
         ))}
 
         {/* Utility links — bottom-right of content block */}
-        <div className="home-links home-para" style={{ animationDelay: "400ms" }}>
+        <div
+          className="home-links home-para"
+          style={{ animationDelay: "400ms" }}
+        >
           <a
             href="https://www.linkedin.com/in/olayinkaetitilola/"
             target="_blank"
@@ -155,6 +136,14 @@ export default function Home() {
             className="linkedin-link"
           >
             LinkedIn &#8599;
+          </a>
+          <a
+            href="https://github.com/pgcactus"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="linkedin-link"
+          >
+            GitHub &#8599;
           </a>
         </div>
       </main>
