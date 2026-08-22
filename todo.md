@@ -210,5 +210,5 @@
 - [x] Create a descriptive commit with the complete latest site state.
 
 ## 3. Push and confirm
-- [ ] Push the commit to the selected repository default branch.
-- [ ] Confirm the GitHub commit SHA and a clean working tree.
+- [x] Push the commit to the selected repository default branch.
+- [x] Confirm the GitHub commit SHA and a clean working tree.
