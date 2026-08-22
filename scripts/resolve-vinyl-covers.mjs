@@ -88,12 +88,21 @@ async function fetchCoverUrl(appleMusicId) {
 async function main() {
   console.log("Resolving vinyl covers from Apple Music...");
 
+  let existingById = new Map();
+  try {
+    const existing = JSON.parse(readFileSync(outPath, "utf8"));
+    existingById = new Map(existing.map((entry) => [entry.id, entry]));
+  } catch {
+    // No existing metadata is fine on the first run.
+  }
+
   const resolved = [];
   for (const vinyl of VINYLS) {
     process.stdout.write(`  ${vinyl.artist} - ${vinyl.title} (${vinyl.appleMusicId})... `);
     const coverUrl = await fetchCoverUrl(vinyl.appleMusicId);
     console.log(coverUrl ? "OK" : "FAILED (will use fallback tile)");
     resolved.push({
+      ...existingById.get(vinyl.id),
       id:       vinyl.id,
       title:    vinyl.title,
       artist:   vinyl.artist,

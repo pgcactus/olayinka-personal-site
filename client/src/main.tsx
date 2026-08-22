@@ -1,13 +1,15 @@
-import { createRoot, hydrateRoot } from "react-dom/client";
-import App from "./App";
 import "./index.css";
 
-const rootEl = document.getElementById("root")!;
+function hydrateWhenIdle() {
+  import("./main-client").then(({ startClient }) => startClient());
+}
 
-// If the root element already has server-rendered HTML (from prerender),
-// hydrate it; otherwise do a fresh client-side render.
-if (rootEl.innerHTML.trim().length > 0) {
-  hydrateRoot(rootEl, <App />);
+const hasPrerenderedHtml = Boolean(document.getElementById("root")?.innerHTML.trim());
+
+if (window.location.pathname.replace(/\/+$/, "") === "/things/places" && hasPrerenderedHtml) {
+  import("./places-client").then(({ startPlacesClient }) => startPlacesClient());
+} else if (document.readyState === "complete") {
+  window.setTimeout(hydrateWhenIdle, 0);
 } else {
-  createRoot(rootEl).render(<App />);
+  window.addEventListener("load", () => window.setTimeout(hydrateWhenIdle, 0), { once: true });
 }

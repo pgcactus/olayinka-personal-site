@@ -1,107 +1,103 @@
-import express, { type Response } from "express";
-import { createServer } from "node:http";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import express from "express";
+import { createServer } from "http";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const HTML_ROUTES = new Map([
-  ["/", "index.html"],
-  ["/nato", "nato/index.html"],
-  ["/things/books", "things/books/index.html"],
-  ["/things/vinyls", "things/vinyls/index.html"],
-  ["/things/places", "things/places/index.html"],
-]);
-
-const SECURITY_POLICY = [
-  "default-src 'self'",
-  "base-uri 'self'",
-  "object-src 'none'",
-  "frame-ancestors 'none'",
-  "form-action 'self'",
-  "script-src 'self' https://manus-analytics.com",
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "font-src 'self' https://fonts.gstatic.com",
-  "img-src 'self' data: https://is1-ssl.mzstatic.com",
-  "connect-src 'self' https://manus-analytics.com",
-  "upgrade-insecure-requests",
-].join("; ");
-
-function sendHtml(response: Response, staticPath: string, fileName: string) {
-  response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-  response.sendFile(path.join(staticPath, fileName));
-}
-
 async function startServer() {
   const app = express();
   const server = createServer(app);
+
+  app.disable("x-powered-by");
+
+  // Security defaults apply to static files, redirects, and the 404 document.
+  app.use((_req, res, next) => {
+    res.setHeader("Content-Security-Policy", [
+      "default-src 'self'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'none'",
+      "object-src 'none'",
+      "script-src 'self'",
+      "connect-src 'self'",
+      "img-src 'self' data: https:",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "font-src 'self' data: https://fonts.gstatic.com",
+    ].join("; "));
+    res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("X-Frame-Options", "DENY");
+    res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+    if (process.env.NODE_ENV === "production") {
+      res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+    }
+    next();
+  });
+
+  app.get("/manus-storage/:key", async (req, res) => {
+    const forgeBaseUrl = (process.env.BUILT_IN_FORGE_API_URL || "").replace(/\/+$/, "");
+    const forgeKey = process.env.BUILT_IN_FORGE_API_KEY;
+    if (!forgeBaseUrl || !forgeKey) {
+      res.status(500).send("Storage proxy not configured");
+      return;
+    }
+
+    try {
+      const forgeUrl = new URL("v1/storage/presign/get", `${forgeBaseUrl}/`);
+      forgeUrl.searchParams.set("path", req.params.key);
+      const forgeResponse = await fetch(forgeUrl, {
+        headers: { Authorization: `Bearer ${forgeKey}` },
+      });
+      if (!forgeResponse.ok) {
+        res.status(502).send("Storage backend error");
+        return;
+      }
+      const { url } = await forgeResponse.json() as { url?: string };
+      if (!url) {
+        res.status(502).send("Storage backend error");
+        return;
+      }
+      res.redirect(307, url);
+    } catch {
+      res.status(502).send("Storage proxy error");
+    }
+  });
+
+  // Serve static files from dist/public in production
   const staticPath =
     process.env.NODE_ENV === "production"
       ? path.resolve(__dirname, "public")
       : path.resolve(__dirname, "..", "dist", "public");
 
-  app.disable("x-powered-by");
-
-  app.use((_request, response, next) => {
-    response.setHeader("Content-Security-Policy", SECURITY_POLICY);
-    response.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
-    response.setHeader(
-      "Permissions-Policy",
-      "camera=(), microphone=(), geolocation=()"
-    );
-    response.setHeader("X-Content-Type-Options", "nosniff");
-    if (process.env.NODE_ENV === "production") {
-      response.setHeader(
-        "Strict-Transport-Security",
-        "max-age=31536000; includeSubDomains"
-      );
-    }
-    next();
+  // Preserve old search results and bookmarks with a permanent redirect.
+  app.get("/things/books", (_req, res) => {
+    res.redirect(301, "/things/vinyls");
   });
 
-  app.get("/things", (_request, response) => {
-    response.redirect(308, "/things/books");
+  const prerenderedRoutes = ["/", "/things/vinyls", "/things/places", "/nato"];
+  app.get(prerenderedRoutes, (req, res) => {
+    const routeFile = req.path === "/"
+      ? path.join(staticPath, "index.html")
+      : path.join(staticPath, req.path.slice(1), "index.html");
+    res.sendFile(routeFile);
   });
 
-  for (const [route, fileName] of HTML_ROUTES) {
-    app.get(
-      [route, route === "/" ? route : `${route}/`],
-      (_request, response) => {
-        sendHtml(response, staticPath, fileName);
-      }
-    );
-  }
+  app.use(express.static(staticPath, { extensions: ["html"], redirect: false }));
 
-  app.use(
-    express.static(staticPath, {
-      index: false,
-      redirect: false,
-      setHeaders(response, filePath) {
-        if (filePath.includes(`${path.sep}assets${path.sep}`)) {
-          response.setHeader(
-            "Cache-Control",
-            "public, max-age=31536000, immutable"
-          );
-        } else if (!filePath.endsWith(".html")) {
-          response.setHeader("Cache-Control", "public, max-age=86400");
-        }
-      },
-    })
-  );
-
-  app.use((_request, response) => {
-    response.status(404);
-    sendHtml(response, staticPath, "404/index.html");
+  // Known client-side routes are emitted as static HTML during the build. Any
+  // route that is neither a static file nor a valid emitted route must be an
+  // actual 404 rather than silently receiving the homepage shell.
+  app.get("*", (_req, res) => {
+    res.status(404).sendFile(path.join(staticPath, "404.html"));
   });
 
-  const port = Number(process.env.PORT) || 3000;
+  const port = process.env.PORT || 3000;
+
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
   });
 }
 
-startServer().catch((error: unknown) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+startServer().catch(console.error);

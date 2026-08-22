@@ -3,6 +3,3 @@ node_modules
 .git
 *.min.js
 *.min.css
-client/public/world.geojson
-client/src/assets/book-covers/index.ts
-scripts/resolve-vinyl-covers.mjs

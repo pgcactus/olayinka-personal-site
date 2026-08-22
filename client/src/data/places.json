@@ -1,0 +1,11 @@
+[
+  { "city": "Paris", "country": "France", "countryCode": "FR", "year": "", "note": "", "audio": "" },
+  { "city": "Rome", "country": "Italy", "countryCode": "IT", "year": "", "note": "", "audio": "" },
+  { "city": "Podgorica", "country": "Montenegro", "countryCode": "ME", "year": "", "note": "", "audio": "" },
+  { "city": "Madrid", "country": "Spain", "countryCode": "ES", "year": "", "note": "", "audio": "" },
+  { "city": "Bern", "country": "Switzerland", "countryCode": "CH", "year": "", "note": "", "audio": "" },
+  { "city": "London", "country": "United Kingdom", "countryCode": "GB", "year": "", "note": "", "audio": "" },
+  { "city": "Washington, D.C.", "country": "United States", "countryCode": "US", "year": "", "note": "", "audio": "" },
+  { "city": "Berlin", "country": "Germany", "countryCode": "DE", "year": "", "note": "", "audio": "" },
+  { "city": "Brussels", "country": "Belgium", "countryCode": "BE", "year": "", "note": "", "audio": "" }
+]
