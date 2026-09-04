@@ -1,45 +1,33 @@
 import NotFound from "@/pages/NotFound";
-import { Route, Router, useLocation } from "wouter";
-import { ComponentType, LazyExoticComponent, Suspense } from "react";
+import { Route, Switch, Redirect } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ScrollReset from "./components/ScrollReset";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import Home from "./pages/Home";
+import Nato from "./pages/Nato";
+import Things from "./pages/Things";
 
-export type ClientPage = ComponentType;
-
-type AppProps = {
-  initialPath: string;
-  InitialPage: ClientPage;
-  loadPage: (path: string) => LazyExoticComponent<ClientPage>;
-};
-
-function routePattern(path: string) {
-  if (path.startsWith("/things/")) return "/things/:tab";
-  return path || "/";
-}
-
-function ClientRoute({ initialPath, InitialPage, loadPage }: AppProps) {
-  const [location] = useLocation();
-  const currentPath = location.replace(/\/+$/, "") || "/";
-  const initial = currentPath === initialPath;
-  const Page = initial ? InitialPage : loadPage(currentPath);
-  const RoutedPage: ComponentType = () => <Page />;
-
+function Router() {
   return (
-    <Suspense fallback={null}>
-      <Route path={routePattern(currentPath)} component={RoutedPage} />
-    </Suspense>
+    <Switch>
+      <Route path="/" component={Home} />
+      {/* Redirect bare /things to /things/books */}
+      <Route path="/things">
+        <Redirect to="/things/books" />
+      </Route>
+      <Route path="/things/:tab" component={Things} />
+      <Route path="/nato" component={Nato} />
+      <Route component={NotFound} />
+    </Switch>
   );
 }
 
-function App(props: AppProps) {
+function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light" switchable>
-        <Router>
-          <ScrollReset />
-          <ClientRoute {...props} />
-        </Router>
+        <ScrollReset />
+        <Router />
       </ThemeProvider>
     </ErrorBoundary>
   );

@@ -76,12 +76,52 @@ const WORD_ORIGINS: Record<string, string> = {
   Niner:    "Spelled 'Niner' (not 'Nine') to prevent confusion with the German 'nein' (no) in international communications.",
 };
 
+// Reverse map: NATO word → letter
+const REVERSE_MAP: Record<string, string> = {
+  // Standard NATO spellings
+  ...Object.fromEntries(
+    Object.entries(NATO_MAP).map(([letter, word]) => [word.toLowerCase(), letter])
+  ),
+  // Common variants
+  alpha: "A",  // Common misspelling of Alfa
+  juliet: "J", // US spelling variant
+  juliett: "J", // Official NATO spelling
+};
+
+// Validation: check if a word is a known NATO code word
+function isValidNatoWord(word: string): boolean {
+  return word.toLowerCase() in REVERSE_MAP;
+}
+
+// Get first unrecognised word for error message
+function getFirstInvalidWord(value: string): string | null {
+  const words = value.trim().toLowerCase().split(/\s+/);
+  for (const w of words) {
+    if (w && !isValidNatoWord(w)) return w;
+  }
+  return null;
+}
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
 function sanitise(raw: string): string {
   return raw.replace(/[^A-Za-z0-9 ]/g, "").toUpperCase();
+}
+
+function sanitiseReverse(raw: string): string {
+  // Allow letters, spaces and hyphens (for X-ray)
+  return raw.replace(/[^A-Za-z -]/g, "").trim();
+}
+
+function fromPhonetic(value: string): string {
+  if (!value.trim()) return "";
+  // Split on multiple spaces, treating each word as a NATO code word
+  const words = value.trim().toLowerCase().split(/\s+/).filter(w => w.length > 0);
+  return words
+    .map((w) => REVERSE_MAP[w] ?? "?")
+    .join("");
 }
 
 function toPhonetic(value: string): string {
@@ -122,9 +162,12 @@ function getInitialInput(): string {
 // ---------------------------------------------------------------------------
 
 export default function Nato() {
+  const [mode, setMode] = useState<"forward" | "reverse">("forward");
   const [input, setInput] = useState<string>(getInitialInput);
+  const [reverseInput, setReverseInput] = useState<string>("");
   const [learnOpen, setLearnOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -134,6 +177,11 @@ export default function Nato() {
     if (el) { el.focus(); el.select(); }
   }, []);
 
+  // Re-focus when mode changes
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, [mode]);
+
   function showToast(msg: string) {
     setToast(msg);
     if (toastTimer.current) clearTimeout(toastTimer.current);
@@ -141,16 +189,30 @@ export default function Nato() {
   }
 
   function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
-    setInput(sanitise(e.target.value));
+    if (mode === "forward") {
+      setInput(sanitise(e.target.value));
+      setValidationError(null);
+    } else {
+      const cleaned = sanitiseReverse(e.target.value);
+      setReverseInput(cleaned);
+      // Check for invalid words
+      const invalid = getFirstInvalidWord(cleaned);
+      if (cleaned.trim() && invalid) {
+        setValidationError(`'${invalid}' is not a NATO word. Try 'Alfa', 'Bravo', 'Charlie', etc.`);
+      } else {
+        setValidationError(null);
+      }
+    }
   }
 
   function handleClear() {
-    setInput("");
+    if (mode === "forward") setInput(""); else setReverseInput("");
     inputRef.current?.focus();
   }
 
-  const output = toPhonetic(input);
-  const learnWords = uniqueWords(input);
+  const activeInput = mode === "forward" ? input : reverseInput;
+  const output = mode === "forward" ? toPhonetic(input) : fromPhonetic(reverseInput);
+  const learnWords = mode === "forward" ? uniqueWords(input) : [];
 
   async function handleCopy() {
     try {
@@ -179,7 +241,7 @@ export default function Nato() {
   return (
     <div className="nato-page">
       <PageMeta
-        title="NATO alphabet · Olayinka Titilola"
+        title="NATO alphabet — Olayinka Titilola"
         description="Convert any word or phrase to the NATO phonetic alphabet instantly. Never say 'B as in Boy' again."
         path="/nato"
       />
@@ -187,7 +249,7 @@ export default function Nato() {
 
         {/* Back link */}
         <Link href="/" className="nato-back">
-          Olayinka
+          &#8627; back
         </Link>
 
         {/* Header row: title + theme toggle */}
@@ -195,18 +257,47 @@ export default function Nato() {
           <h1 className="nato-title">NATO Phonetic Alphabet</h1>
           <ThemeToggle className="nato-toggle" />
         </div>
-        <p className="nato-subtitle">A small tool for saying the right thing clearly.</p>
+        <p className="nato-subtitle">Never say &apos;B as in Boy&apos; again</p>
+
+        {/* Mode toggle */}
+        <div className="nato-mode-row" role="group" aria-label="Conversion mode">
+          <button
+            className={`nato-mode-btn${mode === "forward" ? " nato-mode-btn--active" : ""}`}
+            onClick={() => { setMode("forward"); setValidationError(null); }}
+            aria-pressed={mode === "forward"}
+          >
+            word → NATO
+          </button>
+          <button
+            className={`nato-mode-btn${mode === "reverse" ? " nato-mode-btn--active" : ""}`}
+            onClick={() => { setMode("reverse"); setValidationError(null); }}
+            aria-pressed={mode === "reverse"}
+          >
+            NATO → word
+          </button>
+        </div>
 
         {/* Input */}
         <NatoInput
           inputRef={inputRef}
-          value={input}
+          value={activeInput}
           onChange={handleInput}
           onClear={handleClear}
-          placeholder="e.g. HERMIONE"
-          label="Enter text to convert"
+          placeholder={mode === "forward" ? "e.g. HERMIONE" : "e.g. Alfa Bravo Charlie"}
+          label={mode === "forward" ? "Enter text to convert" : "Enter NATO words"}
+          mode={mode}
         />
-        <p className="nato-hint">Type anything to convert it</p>
+        <p className="nato-hint">
+          {mode === "forward"
+            ? "Type anything to convert it"
+            : "Type NATO words separated by spaces"}
+        </p>
+        {/* Validation error */}
+        {validationError && (
+          <p className="nato-error" role="alert">
+            {validationError}
+          </p>
+        )}
 
         {/* Output */}
         {output && <p className="nato-output">{output}</p>}
@@ -218,13 +309,11 @@ export default function Nato() {
               className="nato-learn-toggle"
               onClick={() => setLearnOpen((o) => !o)}
               aria-expanded={learnOpen}
-              aria-controls="nato-learn-body"
-              type="button"
             >
-              <span>note: learn about these words</span>
-              <span className={`nato-learn-chevron${learnOpen ? " nato-learn-chevron--open" : ""}`} aria-hidden="true">▼</span>
+              <span>💡 Learn about these words</span>
+              <span className={`nato-learn-chevron${learnOpen ? " nato-learn-chevron--open" : ""}`}>▼</span>
             </button>
-            <div id="nato-learn-body" className={`nato-learn-body${learnOpen ? " nato-learn-body--open" : ""}`}>
+            <div className={`nato-learn-body${learnOpen ? " nato-learn-body--open" : ""}`}>
               <ul className="nato-learn-list">
                 {learnWords.map((word, i) => (
                   <li
@@ -245,8 +334,8 @@ export default function Nato() {
         {/* Action buttons */}
         {output && (
           <div className="nato-actions">
-            <button type="button" className="nato-btn" onClick={handleCopy}>Copy output</button>
-            <button type="button" className="nato-btn" onClick={handleShare}>Share tool</button>
+            <button className="nato-btn" onClick={handleCopy}>Copy output</button>
+            <button className="nato-btn" onClick={handleShare}>Share tool</button>
           </div>
         )}
 
@@ -281,9 +370,10 @@ interface NatoInputProps {
   onClear: () => void;
   placeholder?: string;
   label: string;
+  mode: "forward" | "reverse";
 }
 
-function NatoInput({ inputRef, value, onChange, onClear, placeholder, label }: NatoInputProps) {
+function NatoInput({ inputRef, value, onChange, onClear, placeholder, label, mode }: NatoInputProps) {
   return (
     <div className="nato-input-wrap">
       <label htmlFor="nato-input" className="nato-input-label">{label}</label>
@@ -303,8 +393,8 @@ function NatoInput({ inputRef, value, onChange, onClear, placeholder, label }: N
       />
       {value && (
         <button
-          type="button"
           onClick={onClear}
+          tabIndex={-1}
           className="nato-clear"
           aria-label="Clear input"
         >

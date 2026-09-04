@@ -3,7 +3,8 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./client/src/*"],
-      "@shared/*": ["./shared/*"]
+      "@shared/*": ["./shared/*"],
+      "@/assets/book-covers": ["./scripts/book-covers-mock"]
     }
   }
 }

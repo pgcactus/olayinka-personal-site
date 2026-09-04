@@ -18,7 +18,7 @@ import { createServer } from "node:http";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
 const DIST = join(ROOT, "dist", "public");
-const PRERENDER_ROUTES = ["/", "/things/vinyls", "/things/places", "/nato"];
+const PRERENDER_ROUTES = ["/", "/things/books", "/things/vinyls", "/things/places", "/nato"];
 
 // The prerender entry is built as assets/prerender.js (fixed name via rollupOptions)
 const prerenderChunk = "prerender.js";

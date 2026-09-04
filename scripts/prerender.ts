@@ -6,7 +6,7 @@
  *
  * Uses tsx to execute TypeScript/JSX directly in Node without a separate
  * build step, avoiding the source-map WASM worker hang from vite-prerender-plugin.
- *
+ * 
  * React 19 renders head tags (title, meta, script) as JSX elements in the component tree.
  * We extract these tags from the rendered HTML and inject them into the actual <head>.
  */
@@ -17,7 +17,7 @@ import { fileURLToPath } from "node:url";
 import { renderToString } from "react-dom/server";
 import { createElement } from "react";
 import { Router } from "wouter";
-import AppServer from "../client/src/AppServer";
+import App from "../client/src/App";
 
 // PRERENDER_ROOT is set by vite.config.ts when running as a CJS bundle via esbuild.
 // Fall back to import.meta.url for direct tsx execution.
@@ -27,6 +27,7 @@ const DIST = join(ROOT, "dist", "public");
 
 const PRERENDER_ROUTES = [
   "/",
+  "/things/books",
   "/things/vinyls",
   "/things/places",
   "/nato",
@@ -73,7 +74,7 @@ for (const route of PRERENDER_ROUTES) {
 
   // Render the app to HTML
   const html = renderToString(
-    createElement(Router, { ssrPath: route }, createElement(AppServer, null))
+    createElement(Router, { ssrPath: route }, createElement(App, null))
   );
 
   // Extract head tags from the rendered HTML using regex
@@ -81,7 +82,7 @@ for (const route of PRERENDER_ROUTES) {
   const headTagRegex = /<(title|meta|link|script)(?:\s[^>]*)?>(?:.*?)<\/\1>|<(meta|link)(?:\s[^>]*)?\s*\/>/gi;
   const headTags: string[] = [];
   let match;
-
+  
   // Extract all head tags
   while ((match = headTagRegex.exec(html)) !== null) {
     headTags.push(match[0]);
@@ -96,13 +97,13 @@ for (const route of PRERENDER_ROUTES) {
 
   // Inject prerendered HTML into the root div, not directly in body
   let output = tpl;
-
+  
   // Inject head tags before </head>
   if (headTags.length > 0) {
     const headContent = headTags.join("\n    ");
     output = output.replace("</head>", `    ${headContent}\n  </head>`);
   }
-
+  
   // Inject prerendered HTML into the root div
   output = output.replace(/<div id="root"><\/div>/, `<div id="root">${bodyHtml}</div>`);
   // If root div not found, fall back to injecting after body tag

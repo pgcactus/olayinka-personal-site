@@ -7,14 +7,14 @@
 
 import { renderToString } from "react-dom/server";
 import { Router } from "wouter";
-import AppServer from "./AppServer";
+import App from "./App";
 
-const ROUTES = ["/", "/things/vinyls", "/things/places", "/nato"];
+const ROUTES = ["/", "/things/books", "/things/vinyls", "/things/places", "/nato"];
 
 export async function prerender({ url }: { url: string }) {
   const html = renderToString(
     <Router ssrPath={url}>
-      <AppServer />
+      <App />
     </Router>
   );
 

@@ -106,11 +106,8 @@ const paragraphs = [
     style: { animationDelay: "320ms" },
     content: (
       <>
-        You can see the{" "}
-        <Highlight href="/things/vinyls">vinyls</Highlight> I&apos;m
-        collecting, or the{" "}
-        <Highlight href="/things/places">places</Highlight> I&apos;ve been
-        to.
+        I&apos;m also collecting{" "}
+        <Highlight href="/things/vinyls">vinyls</Highlight>, one record at a time.
       </>
     ),
   },
@@ -131,7 +128,7 @@ export default function Home() {
         <ThemeToggle className="home-fade-in" />
 
         {/* First paragraph as h1 */}
-        <h1 className="para para-bold home-title home-para" style={{ animationDelay: "0ms" }}>
+        <h1 className="para para-bold home-para" style={{ animationDelay: "0ms" }}>
           Hi, I&apos;m Olayinka.
         </h1>
 
