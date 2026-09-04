@@ -28,6 +28,6 @@ __Imported request: temporarily kill the Places redirect because the current exp
 - [x] Verify the remote commit and report the result.
 
 ## Correct GitHub repository sync
-- [ ] Inspect pgcactus/olayinka-personal-site and its default branch.
-- [ ] Sync the current site source to the linked repository rather than pgcactus/cactus.
-- [ ] Verify the linked repository exposes the site files and latest commit.
+- [x] Inspect pgcactus/olayinka-personal-site and its default branch.
+- [x] Sync the current site source to the linked repository rather than pgcactus/cactus.
+- [x] Verify the linked repository exposes the site files and latest commit.
