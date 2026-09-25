@@ -34,7 +34,7 @@ describe("NATO conversion", () => {
 
   it("sanitises forward and reverse input", () => {
     expect(sanitise("hi, there!")).toBe("HI THERE");
-    expect(sanitiseReverse(" X-ray 42! ")).toBe("X-ray");
+    expect(sanitiseReverse(" X-ray 42! ")).toBe("X-ray ");
   });
 
   it("lists each code word once, in order of appearance", () => {

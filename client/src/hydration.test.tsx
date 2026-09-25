@@ -58,7 +58,7 @@ describe("hydration", () => {
     window.localStorage.clear();
   });
 
-  it.each(["/", "/nato", "/things/places", "/things/vinyls"])(
+  it.each(["/", "/nato", "/things/places", "/things/vinyls", "/missing"])(
     "hydrates %s without a mismatch",
     async route => {
       const { errors } = await hydrateRoute(route);
@@ -80,8 +80,8 @@ describe("hydration", () => {
   it("shows a shared NATO value after hydrating", async () => {
     const { container, errors } = await hydrateRoute("/nato?q=abc");
     expect(errors).toEqual([]);
-    expect(container.querySelector(".nato-output")?.textContent).toBe(
-      "Alfa • Bravo • Charlie"
-    );
+    expect(
+      [...container.querySelectorAll(".nt-word")].map(el => el.textContent)
+    ).toEqual(["Alfa", "Bravo", "Charlie"]);
   });
 });

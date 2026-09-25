@@ -1,0 +1,63 @@
+.nf {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 96px 24px;
+  text-align: center;
+}
+
+.nf-art .da-svg {
+  max-width: 320px;
+}
+
+.nf-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 30rem;
+}
+
+.nf-title {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(34px, 3.4vw, 48px);
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.nf-body {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.nf-links {
+  display: flex;
+  gap: 24px;
+  margin: 8px 0 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.nf-links a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  text-underline-offset: 0.2em;
+}
+
+.nf-links a:hover {
+  text-decoration-color: var(--accent);
+}
+
+.nf-links a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}

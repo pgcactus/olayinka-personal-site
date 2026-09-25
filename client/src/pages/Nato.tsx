@@ -1,36 +1,27 @@
 /**
- * /nato — NATO Phonetic Alphabet tool
+ * /nato — NATO phonetic alphabet tool.
  *
- * Design Philosophy: Minimal Monospace — same tokens as the rest of the site.
- * All colours via CSS variables / .dark class — no inline style tokens.
- *
- * Features:
- * - Real-time conversion with bullet separators and / word boundaries
- * - Dark/light mode toggle via shared ThemeToggle component
- * - Collapsible "Learn about these words" panel with word origins
- * - Copy output and Share tool action buttons
- * - URL ?q= state: read on mount, written on share
- * - Back link to home page (top-left)
- * - Footer linking to LinkedIn
- * - Input pre-filled with "HERMIONE", auto-focused, text pre-selected
+ * - Word → NATO: each letter becomes a tile (letter above, code word below).
+ *   New tiles pop in as you type; hovering, focusing or tapping a tile shows
+ *   where its word comes from.
+ * - NATO → word: type code words, get the word back, with a note on the
+ *   first word it doesn't recognise.
+ * - Copy the output or share a link; a shared ?q= is read after hydration so
+ *   the first client render matches the prerendered HTML.
  */
 
 import { useEffect, useRef, useState } from "react";
-import { Link } from "wouter";
-import ThemeToggle from "@/components/ThemeToggle";
 import PageMeta from "@/components/PageMeta";
+import SiteHeader from "@/components/SiteHeader";
 import {
+  NATO_MAP,
   fromPhonetic,
   getFirstInvalidWord,
   sanitise,
   sanitiseReverse,
   toPhonetic,
-  uniqueWords,
 } from "@/lib/nato";
-
-// ---------------------------------------------------------------------------
-// Data
-// ---------------------------------------------------------------------------
+import "./nato.css";
 
 const WORD_ORIGINS: Record<string, string> = {
   Alfa: "Spelled 'Alfa' (not 'Alpha') to avoid mispronunciation in languages where 'ph' sounds like 'f' is not guaranteed.",
@@ -94,6 +85,10 @@ const WORD_ORIGINS: Record<string, string> = {
 };
 
 const DEFAULT_INPUT = "HERMIONE";
+const FALLBACK_ORIGIN =
+  "A word chosen for its clear, unambiguous pronunciation in radio communications.";
+
+type Mode = "forward" | "reverse";
 
 function getSharedInput(): string | null {
   try {
@@ -104,22 +99,30 @@ function getSharedInput(): string | null {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
+/** Words of the input, each as its letters with their code words. */
+function toTiles(value: string) {
+  let n = 0;
+  return value
+    .split(" ")
+    .filter(Boolean)
+    .map(word =>
+      [...word].map(ch => ({
+        index: n++,
+        letter: ch,
+        word: NATO_MAP[ch] ?? ch,
+      }))
+    );
+}
 
 export default function Nato() {
-  const [mode, setMode] = useState<"forward" | "reverse">("forward");
-  const [input, setInput] = useState<string>(DEFAULT_INPUT);
-  const [reverseInput, setReverseInput] = useState<string>("");
-  const [learnOpen, setLearnOpen] = useState(false);
+  const [mode, setMode] = useState<Mode>("forward");
+  const [input, setInput] = useState(DEFAULT_INPUT);
+  const [reverseInput, setReverseInput] = useState("");
+  const [picked, setPicked] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  const [validationError, setValidationError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Auto-focus and pre-select on mount. A shared ?q= value is read here, after
-  // hydration, so the first client render matches the prerendered HTML.
   useEffect(() => {
     const shared = getSharedInput();
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -131,53 +134,53 @@ export default function Nato() {
     }
   }, []);
 
-  // Re-focus when mode changes
   useEffect(() => {
-    inputRef.current?.focus();
-  }, [mode]);
+    return () => {
+      if (toastTimer.current) clearTimeout(toastTimer.current);
+    };
+  }, []);
 
-  function showToast(msg: string) {
-    setToast(msg);
+  function showToast(message: string) {
+    setToast(message);
     if (toastTimer.current) clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToast(null), 2500);
+    toastTimer.current = setTimeout(() => setToast(null), 2200);
   }
 
-  function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
-    if (mode === "forward") {
-      setInput(sanitise(e.target.value));
-      setValidationError(null);
+  function switchMode(next: Mode) {
+    setMode(next);
+    setPicked(null);
+    inputRef.current?.focus();
+  }
+
+  const forward = mode === "forward";
+  const value = forward ? input : reverseInput;
+  const output = forward ? toPhonetic(input) : fromPhonetic(reverseInput);
+  const tiles = forward ? toTiles(input) : [];
+  const invalid =
+    !forward && reverseInput.trim() ? getFirstInvalidWord(reverseInput) : null;
+
+  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+    if (forward) {
+      setInput(sanitise(event.target.value));
+      setPicked(null);
     } else {
-      const cleaned = sanitiseReverse(e.target.value);
-      setReverseInput(cleaned);
-      // Check for invalid words
-      const invalid = getFirstInvalidWord(cleaned);
-      if (cleaned.trim() && invalid) {
-        setValidationError(
-          `'${invalid}' is not a NATO word. Try 'Alfa', 'Bravo', 'Charlie', etc.`
-        );
-      } else {
-        setValidationError(null);
-      }
+      setReverseInput(sanitiseReverse(event.target.value));
     }
   }
 
   function handleClear() {
-    if (mode === "forward") setInput("");
+    if (forward) setInput("");
     else setReverseInput("");
+    setPicked(null);
     inputRef.current?.focus();
   }
-
-  const activeInput = mode === "forward" ? input : reverseInput;
-  const output =
-    mode === "forward" ? toPhonetic(input) : fromPhonetic(reverseInput);
-  const learnWords = mode === "forward" ? uniqueWords(input) : [];
 
   async function handleCopy() {
     try {
       await navigator.clipboard.writeText(output);
-      showToast("Copied to clipboard");
+      showToast("copied");
     } catch {
-      showToast("Could not copy");
+      showToast("could not copy");
     }
   }
 
@@ -187,211 +190,153 @@ export default function Nato() {
       try {
         await navigator.share({ title: "NATO Phonetic Alphabet", url });
       } catch {
-        /* user cancelled */
+        /* cancelled */
       }
-    } else {
-      try {
-        await navigator.clipboard.writeText(url);
-        showToast("Share link copied");
-      } catch {
-        showToast("Could not copy link");
-      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      showToast("link copied");
+    } catch {
+      showToast("could not copy the link");
     }
   }
 
   return (
-    <div className="nato-page">
+    <div className="site-page">
       <PageMeta
         title="NATO alphabet — Olayinka Titilola"
         description="Convert any word or phrase to the NATO phonetic alphabet instantly. Never say 'B as in Boy' again."
         path="/nato"
       />
-      <main className="nato-inner">
-        {/* Back link */}
-        <Link href="/" className="nato-back">
-          &#8627; back
-        </Link>
+      <SiteHeader />
 
-        {/* Header row: title + theme toggle */}
-        <div className="nato-header-row">
-          <h1 className="nato-title">NATO Phonetic Alphabet</h1>
-          <ThemeToggle className="nato-toggle" />
+      <main className="nt">
+        <div className="nt-heading">
+          <h1 className="nt-title">NATO Phonetic Alphabet</h1>
+          <p className="nt-sub">Never say ‘B as in Boy’ again.</p>
         </div>
-        <p className="nato-subtitle">Never say &apos;B as in Boy&apos; again</p>
 
-        {/* Mode toggle */}
         <div
-          className="nato-mode-row"
+          className={`nt-modes nt-modes--${mode}`}
           role="group"
           aria-label="Conversion mode"
         >
+          <span className="nt-thumb" aria-hidden="true" />
           <button
-            className={`nato-mode-btn${mode === "forward" ? " nato-mode-btn--active" : ""}`}
-            onClick={() => {
-              setMode("forward");
-              setValidationError(null);
-            }}
-            aria-pressed={mode === "forward"}
+            type="button"
+            aria-pressed={forward}
+            onClick={() => switchMode("forward")}
           >
             word → NATO
           </button>
           <button
-            className={`nato-mode-btn${mode === "reverse" ? " nato-mode-btn--active" : ""}`}
-            onClick={() => {
-              setMode("reverse");
-              setValidationError(null);
-            }}
-            aria-pressed={mode === "reverse"}
+            type="button"
+            aria-pressed={!forward}
+            onClick={() => switchMode("reverse")}
           >
             NATO → word
           </button>
         </div>
 
-        {/* Input */}
-        <NatoInput
-          inputRef={inputRef}
-          value={activeInput}
-          onChange={handleInput}
-          onClear={handleClear}
-          placeholder={
-            mode === "forward" ? "e.g. HERMIONE" : "e.g. Alfa Bravo Charlie"
-          }
-          label={
-            mode === "forward" ? "Enter text to convert" : "Enter NATO words"
-          }
-        />
-        <p className="nato-hint">
-          {mode === "forward"
-            ? "Type anything to convert it"
-            : "Type NATO words separated by spaces"}
-        </p>
-        {/* Validation error */}
-        {validationError && (
-          <p className="nato-error" role="alert">
-            {validationError}
+        <div className="nt-field">
+          <label htmlFor="nato-input" className="nt-label">
+            {forward ? "Type anything" : "Type NATO words, separated by spaces"}
+          </label>
+          <div className="nt-inputrow">
+            <input
+              id="nato-input"
+              ref={inputRef}
+              className={`nt-input nt-input--${mode}`}
+              type="text"
+              value={value}
+              onChange={handleChange}
+              placeholder={forward ? "HERMIONE" : "Alfa Bravo Charlie"}
+              spellCheck={false}
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize={forward ? "characters" : "off"}
+            />
+            {value && (
+              <button type="button" className="nt-clear" onClick={handleClear}>
+                ( clear )
+              </button>
+            )}
+          </div>
+        </div>
+
+        {forward && tiles.length > 0 && (
+          <>
+            <div className="nt-tiles">
+              {tiles.map(group => (
+                <div className="nt-group" key={group[0].index}>
+                  {group.map(tile => (
+                    <button
+                      type="button"
+                      key={`${tile.index}-${tile.letter}`}
+                      className={`nt-tile${picked === tile.word ? " nt-tile--on" : ""}`}
+                      style={
+                        {
+                          "--nt-delay": `${Math.min(tile.index, 12) * 28}ms`,
+                        } as React.CSSProperties
+                      }
+                      aria-label={`${tile.letter} for ${tile.word}`}
+                      aria-pressed={picked === tile.word}
+                      onMouseEnter={() => setPicked(tile.word)}
+                      onFocus={() => setPicked(tile.word)}
+                      onClick={() => setPicked(tile.word)}
+                    >
+                      <span className="nt-letter">{tile.letter}</span>
+                      <span className="nt-word">{tile.word}</span>
+                    </button>
+                  ))}
+                </div>
+              ))}
+            </div>
+            <p className="nt-origin" aria-live="polite">
+              {picked ? (
+                <>
+                  <strong>{picked}.</strong>{" "}
+                  {WORD_ORIGINS[picked] ?? FALLBACK_ORIGIN}
+                </>
+              ) : (
+                <span className="nt-muted">
+                  ( hover or tap a word for its story )
+                </span>
+              )}
+            </p>
+          </>
+        )}
+
+        {!forward && output && (
+          <p className="nt-result" aria-live="polite">
+            {output}
+          </p>
+        )}
+        {invalid && (
+          <p className="nt-error" role="alert">
+            ‘{invalid}’ isn’t a NATO word. Try Alfa, Bravo or Charlie.
           </p>
         )}
 
-        {/* Output */}
-        {output && <p className="nato-output">{output}</p>}
-
-        {/* Learn panel */}
-        {learnWords.length > 0 && (
-          <div className="nato-learn">
-            <button
-              className="nato-learn-toggle"
-              onClick={() => setLearnOpen(o => !o)}
-              aria-expanded={learnOpen}
-            >
-              <span>💡 Learn about these words</span>
-              <span
-                className={`nato-learn-chevron${learnOpen ? " nato-learn-chevron--open" : ""}`}
-              >
-                ▼
-              </span>
-            </button>
-            <div
-              className={`nato-learn-body${learnOpen ? " nato-learn-body--open" : ""}`}
-            >
-              <ul className="nato-learn-list">
-                {learnWords.map((word, i) => (
-                  <li
-                    key={word}
-                    className={`nato-learn-item${i < learnWords.length - 1 ? " nato-learn-item--bordered" : ""}`}
-                  >
-                    <span className="nato-learn-word">{word}:</span>{" "}
-                    <span className="nato-learn-desc">
-                      {WORD_ORIGINS[word] ??
-                        "A word chosen for its clear, unambiguous pronunciation in radio communications."}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        )}
-
-        {/* Action buttons */}
         {output && (
-          <div className="nato-actions">
-            <button className="nato-btn" onClick={handleCopy}>
-              Copy output
+          <div className="nt-actions">
+            <button type="button" className="site-note" onClick={handleCopy}>
+              ( copy )
             </button>
-            <button className="nato-btn" onClick={handleShare}>
-              Share tool
-            </button>
+            {forward && (
+              <button type="button" className="site-note" onClick={handleShare}>
+                ( share )
+              </button>
+            )}
           </div>
         )}
-
-        {/* Footer */}
-        <p className="nato-footer">
-          Crafted by{" "}
-          <a
-            href="https://www.linkedin.com/in/olayinkaetitilola/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="nato-footer-link"
-          >
-            Olayinka ↗
-          </a>
-        </p>
       </main>
 
-      {/* Toast */}
-      {toast && <div className="nato-toast">{toast}</div>}
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Sub-components
-// ---------------------------------------------------------------------------
-
-interface NatoInputProps {
-  inputRef: React.RefObject<HTMLInputElement | null>;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onClear: () => void;
-  placeholder?: string;
-  label: string;
-}
-
-function NatoInput({
-  inputRef,
-  value,
-  onChange,
-  onClear,
-  placeholder,
-  label,
-}: NatoInputProps) {
-  return (
-    <div className="nato-input-wrap">
-      <label htmlFor="nato-input" className="nato-input-label">
-        {label}
-      </label>
-      <input
-        id="nato-input"
-        ref={inputRef}
-        type="text"
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        spellCheck={false}
-        autoComplete="off"
-        autoCorrect="off"
-        autoCapitalize="off"
-        className="nato-input"
-        aria-label={label}
-      />
-      {value && (
-        <button
-          onClick={onClear}
-          tabIndex={-1}
-          className="nato-clear"
-          aria-label="Clear input"
-        >
-          Clear
-        </button>
+      {toast && (
+        <div className="nt-toast" role="status">
+          {toast}
+        </div>
       )}
     </div>
   );

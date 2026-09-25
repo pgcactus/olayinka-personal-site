@@ -26,7 +26,14 @@ const ROOT =
   join(dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = join(ROOT, "dist", "public");
 
-const PRERENDER_ROUTES = ["/", "/things/vinyls", "/things/places", "/nato"];
+// "/404" matches no route, so it renders the NotFound page into 404.html.
+const PRERENDER_ROUTES = [
+  "/",
+  "/things/vinyls",
+  "/things/places",
+  "/nato",
+  "/404",
+];
 
 // Block external fetch during prerender (no network in deployment)
 globalThis.fetch = async (url: RequestInfo | URL) => {
@@ -114,9 +121,11 @@ for (const route of PRERENDER_ROUTES) {
 
   // Write output file
   const outDir =
-    route === "/" ? DIST : join(DIST, ...route.replace(/^\//, "").split("/"));
+    route === "/" || route === "/404"
+      ? DIST
+      : join(DIST, ...route.replace(/^\//, "").split("/"));
   mkdirSync(outDir, { recursive: true });
-  const outFile = join(outDir, "index.html");
+  const outFile = join(outDir, route === "/404" ? "404.html" : "index.html");
   writeFileSync(outFile, output, "utf-8");
   console.log(`  Prerendered: ${route} → ${outFile.replace(ROOT + "/", "")}`);
 }
