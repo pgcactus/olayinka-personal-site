@@ -6,11 +6,13 @@
  *   the card becomes a sheet at the bottom of the screen.
  * - Drawing phrases (plants, skydive, tennis, quick 5K) only change the dot
  *   drawing beside the copy.
- * - Hover opens with a mouse; tap, click or keyboard focus opens elsewhere.
- *   Escape, tapping outside or moving away closes.
+ * - With a mouse on a wide screen, hovering previews a card and moving away
+ *   closes it. Clicking or tapping pins it open until Escape, a click
+ *   outside, "( close )" or a second click. Where cards become sheets,
+ *   hovering does nothing, so the mouse can travel to the sheet.
  */
 
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { Link } from "wouter";
 import DotArt, { type Drawing } from "@/components/DotArt";
 import PageMeta from "@/components/PageMeta";
@@ -30,6 +32,8 @@ type Key =
   | "run";
 
 const CARD_KEYS: Key[] = ["hello", "flatiron", "things", "records"];
+// Keep in sync with the sheet breakpoint in home.css.
+const HOVER_QUERY = "(hover: hover) and (min-width: 768px)";
 const LINKEDIN = "https://www.linkedin.com/in/olayinkaetitilola/";
 
 const ART: Record<Key | "idle", [Drawing, string]> = {
@@ -62,10 +66,18 @@ const personJsonLd = {
 
 interface HomeState {
   active: Key | null;
+  /** Opens `key` unless another card is pinned. */
   open: (key: Key) => void;
-  close: (key?: Key) => void;
+  /** Opens `key` from a mouse hover, where hover previews are allowed. */
+  hover: (key: Key) => void;
+  /** Closes `key` if it is open and not pinned. */
+  release: (key: Key) => void;
+  close: () => void;
   toggle: (key: Key) => void;
-  pointerTypeRef: React.MutableRefObject<string>;
+}
+
+function canHover() {
+  return window.matchMedia?.(HOVER_QUERY).matches ?? true;
 }
 
 const HomeContext = createContext<HomeState | null>(null);
@@ -92,26 +104,24 @@ function CardPhrase({
   href?: string;
   children: React.ReactNode;
 }) {
-  const { active, open, close, toggle, pointerTypeRef } = useHome();
+  const { active, open, hover, release, close, toggle } = useHome();
   const on = active === k;
   const cls = `hm-door${on ? " hm-door--on" : ""}`;
   const shared = {
     className: cls,
     "aria-expanded": on,
     "aria-controls": `hm-card-${k}`,
-    onPointerDown: (e: React.PointerEvent) => {
-      pointerTypeRef.current = e.pointerType;
-    },
     onFocus: () => open(k),
   };
 
   return (
     <span
       className="hm-doorwrap"
-      onPointerEnter={e => e.pointerType === "mouse" && open(k)}
-      onPointerLeave={e => e.pointerType === "mouse" && close(k)}
+      onPointerEnter={e => e.pointerType === "mouse" && hover(k)}
+      onPointerLeave={e => e.pointerType === "mouse" && release(k)}
       onBlur={e => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) close(k);
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null))
+          release(k);
       }}
     >
       {href ? (
@@ -143,15 +153,15 @@ function CardPhrase({
 
 /** A phrase that only changes the drawing. */
 function DrawingPhrase({ k, children }: { k: Key; children: React.ReactNode }) {
-  const { active, open, close } = useHome();
+  const { active, open, hover, release } = useHome();
   return (
     <span
       className={`hm-hint${active === k ? " hm-hint--on" : ""}`}
       tabIndex={0}
-      onPointerEnter={e => e.pointerType === "mouse" && open(k)}
-      onPointerLeave={e => e.pointerType === "mouse" && close(k)}
+      onPointerEnter={e => e.pointerType === "mouse" && hover(k)}
+      onPointerLeave={e => e.pointerType === "mouse" && release(k)}
       onFocus={() => open(k)}
-      onBlur={() => close(k)}
+      onBlur={() => release(k)}
     >
       {children}
     </span>
@@ -184,24 +194,31 @@ function NatoCard() {
 
 export default function Home() {
   const { theme, toggleTheme } = useTheme();
-  const [active, setActive] = useState<Key | null>(null);
+  const [card, setCard] = useState<{ key: Key; pinned: boolean } | null>(null);
   const [now, setNow] = useState<number | null>(null);
   const [shelf, setShelf] = useState(0);
-  const pointerTypeRef = useRef("mouse");
+  const active = card?.key ?? null;
 
+  const open = (key: Key) =>
+    setCard(current =>
+      current?.key === key || current?.pinned ? current : { key, pinned: false }
+    );
   const state: HomeState = {
     active,
-    open: key => setActive(key),
-    close: key =>
-      setActive(current =>
-        key === undefined || current === key ? null : current
+    open,
+    hover: key => {
+      if (canHover()) open(key);
+    },
+    release: key =>
+      setCard(current =>
+        current?.key === key && !current.pinned ? null : current
       ),
-    // A second tap closes on touch; a click after hovering keeps it open.
+    close: () => setCard(null),
+    // The first click or tap pins the card; a second one closes it.
     toggle: key =>
-      setActive(current =>
-        current === key && pointerTypeRef.current !== "mouse" ? null : key
+      setCard(current =>
+        current?.key === key && current.pinned ? null : { key, pinned: true }
       ),
-    pointerTypeRef,
   };
 
   // The clock and shelf note are filled in after hydration, so the
@@ -224,11 +241,11 @@ export default function Home() {
   useEffect(() => {
     if (!active) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setActive(null);
+      if (e.key === "Escape") setCard(null);
     };
     const onPointerDown = (e: PointerEvent) => {
       if (!(e.target as Element | null)?.closest(".hm-doorwrap, .hm-hint"))
-        setActive(null);
+        setCard(null);
     };
     document.addEventListener("keydown", onKey);
     document.addEventListener("pointerdown", onPointerDown);

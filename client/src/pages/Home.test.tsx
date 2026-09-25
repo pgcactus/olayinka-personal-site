@@ -51,6 +51,49 @@ describe("Home", () => {
     expect(screen.queryByText(/I work on identity and access/)).toBeNull();
   });
 
+  it("keeps a clicked card open when the mouse moves away", async () => {
+    const user = userEvent.setup();
+    renderHome();
+    const flatiron = screen.getByRole("button", { name: "Flatiron Health" });
+
+    await user.hover(flatiron);
+    expect(flatiron.getAttribute("aria-expanded")).toBe("true");
+    await user.unhover(flatiron);
+    expect(flatiron.getAttribute("aria-expanded")).toBe("false");
+
+    await user.click(flatiron);
+    await user.unhover(flatiron);
+    await user.hover(screen.getByText("tennis"));
+    expect(flatiron.getAttribute("aria-expanded")).toBe("true");
+
+    await user.click(flatiron);
+    expect(flatiron.getAttribute("aria-expanded")).toBe("false");
+  });
+
+  it("opens cards only on click where they become sheets", async () => {
+    window.matchMedia = (query: string) =>
+      ({ matches: false, media: query }) as MediaQueryList;
+    try {
+      const user = userEvent.setup();
+      renderHome();
+      const things = screen.getByRole("button", { name: "small things" });
+
+      await user.hover(things);
+      expect(things.getAttribute("aria-expanded")).toBe("false");
+
+      await user.click(things);
+      await user.unhover(things);
+      await user.type(
+        screen.getByLabelText("NATO phonetic alphabet"),
+        "{Backspace>8}hi"
+      );
+      expect(screen.getByText("Hotel • India")).toBeTruthy();
+    } finally {
+      // @ts-expect-error jsdom has no matchMedia of its own.
+      delete window.matchMedia;
+    }
+  });
+
   it("converts text in the small things card", async () => {
     const user = userEvent.setup();
     renderHome();
