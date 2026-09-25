@@ -72,8 +72,8 @@ describe("hydration", () => {
     );
     expect(errors).toEqual([]);
     expect(document.documentElement.classList.contains("dark")).toBe(true);
-    expect(container.querySelector(".hm-theme")?.textContent).toBe(
-      "( day mode )"
+    expect(container.querySelector(".hm-title")?.textContent).toBe(
+      "Hi, I’m Olayinka."
     );
   });
 

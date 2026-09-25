@@ -27,10 +27,10 @@
   inset: 0;
   z-index: -1;
   background: radial-gradient(
-    130% 100% at 50% 0%,
-    color-mix(in srgb, var(--paper), var(--card) 70%) 0%,
-    var(--paper) 50%,
-    color-mix(in srgb, var(--paper), var(--ink) 7%) 100%
+    120% 90% at 50% 20%,
+    var(--paper) 0%,
+    var(--paper) 40%,
+    var(--paper-deep) 100%
   );
   transition: background-color 0.4s ease;
 }
@@ -51,10 +51,10 @@
 
 .vx-title {
   margin: 0;
-  font-family: var(--serif);
+  font-family: var(--hand);
   font-weight: 400;
   font-size: clamp(34px, 3.4vw, 48px);
-  letter-spacing: -0.005em;
+  letter-spacing: 0.01em;
 }
 
 .vx-count {

@@ -6,7 +6,13 @@
 .site-page {
   position: relative;
   min-height: 100vh;
-  background: var(--paper);
+  background: radial-gradient(
+    110% 85% at 50% 30%,
+    var(--paper) 0%,
+    var(--paper) 40%,
+    var(--paper-deep) 100%
+  );
+  background-attachment: fixed;
   color: var(--ink);
   font-family: var(--sans);
   -webkit-font-smoothing: antialiased;
