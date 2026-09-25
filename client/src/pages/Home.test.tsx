@@ -22,89 +22,51 @@ function renderHome() {
   );
 }
 
-const caption = () => document.querySelector(".da-caption")?.textContent;
-const copy = () => document.querySelector(".hm-copy");
+const panel = () => document.querySelector(".hm-panel");
 
 describe("Home", () => {
-  it("links the name to LinkedIn and invites a poke", () => {
+  it("greets and links to LinkedIn", () => {
     renderHome();
-    const name = screen.getByRole("link", { name: "Olayinka" });
-    expect(name.getAttribute("href")).toBe(
-      "https://www.linkedin.com/in/olayinkaetitilola/"
-    );
-    expect(caption()).toBe("( spinning, gently · poke it )");
+    expect(
+      screen.getByRole("heading", { name: "Hi, I’m Olayinka." })
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("link", { name: "LinkedIn" }).getAttribute("href")
+    ).toBe("https://www.linkedin.com/in/olayinkaetitilola/");
+    expect(panel()).toBeNull();
   });
 
-  it("opens the Flatiron card and closes it with Escape", async () => {
-    const user = userEvent.setup();
-    renderHome();
-    const flatiron = screen.getByRole("button", { name: "Flatiron Health" });
-
-    await user.click(flatiron);
-    expect(flatiron.getAttribute("aria-expanded")).toBe("true");
-    expect(screen.getByText(/I work on identity and access/)).toBeTruthy();
-    expect(copy()?.classList.contains("hm-copy--focus")).toBe(true);
-    expect(caption()).toBe("( the day job )");
-
-    fireEvent.keyDown(document, { key: "Escape" });
-    expect(flatiron.getAttribute("aria-expanded")).toBe("false");
-    expect(screen.queryByText(/I work on identity and access/)).toBeNull();
-  });
-
-  it("keeps a clicked card open when the mouse moves away", async () => {
+  it("shows the day job on hover and hides it when the mouse leaves", async () => {
     const user = userEvent.setup();
     renderHome();
     const flatiron = screen.getByRole("button", { name: "Flatiron Health" });
 
     await user.hover(flatiron);
-    expect(flatiron.getAttribute("aria-expanded")).toBe("true");
-    await user.unhover(flatiron);
-    expect(flatiron.getAttribute("aria-expanded")).toBe("false");
+    expect(screen.getByText(/identity and access/)).toBeTruthy();
 
-    await user.click(flatiron);
     await user.unhover(flatiron);
-    await user.hover(screen.getByText("tennis"));
-    expect(flatiron.getAttribute("aria-expanded")).toBe("true");
-
-    await user.click(flatiron);
-    expect(flatiron.getAttribute("aria-expanded")).toBe("false");
+    await act(() => new Promise(r => setTimeout(r, 700)));
+    expect(panel()).toBeNull();
   });
 
-  it("opens cards only on click where they become sheets", async () => {
-    window.matchMedia = (query: string) =>
-      ({ matches: false, media: query }) as MediaQueryList;
-    try {
-      const user = userEvent.setup();
-      renderHome();
-      const things = screen.getByRole("button", { name: "small things" });
-
-      await user.hover(things);
-      expect(things.getAttribute("aria-expanded")).toBe("false");
-
-      await user.click(things);
-      await user.unhover(things);
-      await user.type(
-        screen.getByLabelText("NATO phonetic alphabet"),
-        "{Backspace>8}hi"
-      );
-      expect(screen.getByText("Hotel • India")).toBeTruthy();
-    } finally {
-      // @ts-expect-error jsdom has no matchMedia of its own.
-      delete window.matchMedia;
-    }
-  });
-
-  it("converts text in the small things card", async () => {
+  it("opens the NATO speller on click and closes it with Escape", async () => {
     const user = userEvent.setup();
     renderHome();
-    await user.click(screen.getByRole("button", { name: "small things" }));
+    const things = screen.getByRole("button", { name: "small things" });
 
-    const input = screen.getByLabelText("NATO phonetic alphabet");
-    fireEvent.change(input, { target: { value: "ab!" } });
+    await user.click(things);
+    expect(things.getAttribute("aria-pressed")).toBe("true");
+    fireEvent.change(screen.getByLabelText("Type anything"), {
+      target: { value: "ab!" },
+    });
     expect(screen.getByText("Alfa • Bravo")).toBeTruthy();
+
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(things.getAttribute("aria-pressed")).toBe("false");
+    expect(panel()).toBeNull();
   });
 
-  it("links the vinyls card to the wall", async () => {
+  it("links the vinyls panel to the wall", async () => {
     const user = userEvent.setup();
     renderHome();
     await user.click(screen.getByRole("button", { name: "vinyls" }));
@@ -113,15 +75,24 @@ describe("Home", () => {
     ).toBe("/things/vinyls");
   });
 
-  it("changes only the drawing for drawing phrases", () => {
+  it("switches the copy to French and back", async () => {
+    const user = userEvent.setup();
     renderHome();
-    const tennis = screen.getByText("tennis");
+    await user.click(
+      screen.getByRole("button", { name: "Translate to French" })
+    );
+    await act(() => new Promise(r => setTimeout(r, 300)));
+    expect(
+      screen.getByRole("heading", { name: "Bonjour, je m’appelle Olayinka." })
+    ).toBeTruthy();
+    expect(document.documentElement.lang).toBe("fr");
 
-    act(() => tennis.focus());
-    expect(caption()).toBe("( love all )");
-    expect(copy()?.classList.contains("hm-copy--focus")).toBe(false);
-
-    act(() => tennis.blur());
-    expect(caption()).toBe("( spinning, gently · poke it )");
+    await user.click(
+      screen.getByRole("button", { name: "Traduire en anglais" })
+    );
+    await act(() => new Promise(r => setTimeout(r, 300)));
+    expect(
+      screen.getByRole("heading", { name: "Hi, I’m Olayinka." })
+    ).toBeTruthy();
   });
 });

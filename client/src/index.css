@@ -32,30 +32,31 @@
   --content-max-width: 640px;
 }
 
-/* Site system: stone paper, cool ink, one cobalt accent. */
+/* Site system: a slate-cobalt ground, light type, one warm yellow accent.
+   One mood in light and dark; dark only deepens the ground. */
 :root {
-  --paper: #f2f3f0;
-  --ink: #15171a;
-  --muted: #676b70;
-  --card: #fbfbf9;
-  --line: rgba(21, 23, 26, 0.1);
-  --shadow: rgba(21, 23, 26, 0.2);
-  --wash: #e3ebff;
-  --accent: #2f4bc4;
+  --paper: #56628f;
+  --paper-deep: #3c4670;
+  --ink: #f6f6fb;
+  --muted: rgba(246, 246, 251, 0.72);
+  --card: #414c78;
+  --line: rgba(246, 246, 251, 0.2);
+  --shadow: rgba(10, 14, 30, 0.45);
+  --wash: rgba(255, 227, 154, 0.16);
+  --accent: #ffe39a;
+  --panel: rgba(20, 24, 44, 0.42);
+  --pill: rgba(17, 21, 36, 0.78);
   --serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --hand: "Gochi Hand", "Bradley Hand", "Segoe Print", cursive;
   --sans:
     "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
 }
 
 .dark {
-  --paper: #0f1115;
-  --ink: #e7e8ea;
-  --muted: #9a9ea5;
-  --card: #181b21;
-  --line: rgba(231, 232, 234, 0.12);
-  --shadow: rgba(0, 0, 0, 0.6);
-  --wash: rgba(157, 176, 255, 0.16);
-  --accent: #9db0ff;
+  --paper: #2a3150;
+  --paper-deep: #181c30;
+  --card: #333b5e;
 }
 
 .dark {
