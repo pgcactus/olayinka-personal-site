@@ -1,0 +1,519 @@
+/*
+ * Home. Colours come from the site tokens in index.css (--paper, --ink,
+ * --muted, --accent, --wash …), so dark mode follows the .dark class.
+ */
+
+.hm {
+  position: relative;
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  transition:
+    background-color 0.4s ease,
+    color 0.4s ease;
+}
+
+.hm-main {
+  display: grid;
+  grid-template-columns: minmax(0, 960px) minmax(0, 360px);
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 96px 90px 96px clamp(16px, 1.5vw, 40px);
+}
+
+/* Copy ---------------------------------------------------------------------- */
+
+.hm-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+  font-family: var(--serif);
+  font-size: clamp(24px, 2.5vw, 36px);
+  line-height: 1.36;
+  letter-spacing: -0.006em;
+}
+
+.hm-line {
+  margin: 0;
+  font: inherit;
+  color: var(--ink);
+}
+
+.hm-greet {
+  margin-bottom: 0.2em;
+}
+
+.hm-t,
+.hm-hint,
+.hm-door {
+  transition:
+    filter 0.35s ease,
+    opacity 0.35s ease,
+    color 0.25s ease,
+    background-color 0.25s ease;
+}
+
+/* While a card is open the rest of the copy softens. */
+.hm-copy--focus .hm-t,
+.hm-copy--focus .hm-hint,
+.hm-copy--focus .hm-door:not(.hm-door--on) {
+  filter: blur(3px);
+  opacity: 0.32;
+}
+
+.hm-doorwrap {
+  position: relative;
+  display: inline;
+}
+
+.hm-door {
+  font: inherit;
+  font-style: italic;
+  letter-spacing: inherit;
+  color: var(--accent);
+  background: none;
+  border: 0;
+  border-radius: 4px;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.13em;
+  text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.hm-door--on {
+  background: var(--wash);
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--accent);
+}
+
+.hm-hint {
+  font-style: italic;
+  color: var(--accent);
+  border-radius: 4px;
+  cursor: default;
+  text-decoration: underline dotted;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.16em;
+  text-decoration-color: color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.hm-hint:hover,
+.hm-hint--on {
+  background: var(--wash);
+  text-decoration-color: var(--accent);
+}
+
+.hm-door:focus-visible,
+.hm-hint:focus-visible,
+.hm-note:focus-visible,
+.hm-card a:focus-visible,
+.hm-card-close:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+/* Cards --------------------------------------------------------------------- */
+
+.hm-cardwrap {
+  position: absolute;
+  left: -8px;
+  bottom: 100%;
+  z-index: 5;
+  padding-bottom: 14px;
+  animation: hm-rise 0.22s ease;
+}
+
+.hm-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 310px;
+  box-sizing: border-box;
+  padding: 16px 18px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 26px 50px -18px var(--shadow);
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-size: 12px;
+  line-height: 1.55;
+  letter-spacing: 0;
+  color: var(--ink);
+  text-align: left;
+  white-space: normal;
+}
+
+.hm-card a {
+  color: var(--accent);
+}
+
+.hm-tab {
+  align-self: flex-start;
+  padding: 2px 8px;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 999px;
+}
+
+.hm-card-title {
+  font-weight: 700;
+}
+
+.hm-card-muted {
+  color: var(--muted);
+}
+
+.hm-card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.hm-covers {
+  display: flex;
+  gap: 8px;
+}
+
+.hm-covers img {
+  width: 84px;
+  height: 84px;
+  object-fit: cover;
+  border-radius: 3px;
+  background: var(--line);
+  box-shadow: 0 8px 16px -8px rgba(0, 0, 0, 0.45);
+}
+
+.hm-nato-label {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.hm-nato-input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 4px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.hm-nato-input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.hm-nato-out {
+  min-height: 36px;
+  color: var(--accent);
+}
+
+/* Only needed where cards become sheets. */
+.hm-card-close {
+  display: none;
+}
+
+/* Corner notes --------------------------------------------------------------- */
+
+.hm-note {
+  position: absolute;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.hm-theme {
+  top: 26px;
+  right: 34px;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.hm-clock {
+  left: clamp(16px, 1.5vw, 40px);
+  bottom: 26px;
+}
+
+.hm-shelf {
+  right: 34px;
+  bottom: 26px;
+}
+
+/* Drawing -------------------------------------------------------------------- */
+
+.da {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin: 0;
+}
+
+.da-svg {
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+  touch-action: none;
+}
+
+.da-svg circle {
+  fill: var(--accent);
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.da-caption {
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.da-spin,
+.da-bob,
+.da-bounce,
+.da-sway,
+.da-wave,
+.da-bar {
+  transform-box: view-box;
+}
+
+.da-spin {
+  transform-origin: 200px 200px;
+  animation: da-spin 30s linear infinite;
+}
+
+.da-spin--fast {
+  animation-duration: 3.2s;
+}
+
+.da-bob {
+  transform-origin: 200px 80px;
+  animation: da-bob 4.5s ease-in-out infinite;
+}
+
+.da-bounce {
+  transform-origin: 200px 320px;
+  animation: da-bounce 0.9s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+}
+
+.da-sway {
+  transform-origin: 200px 352px;
+  animation: da-sway 3.6s ease-in-out infinite alternate;
+}
+
+.da-wave {
+  transform-origin: 200px 350px;
+  animation: da-wave 1.1s ease-in-out infinite alternate;
+}
+
+.da-fade {
+  animation: da-fade 0.45s ease;
+}
+
+.da-bar {
+  transform-origin: 200px 200px;
+  animation: da-talk 0.9s ease-in-out infinite alternate;
+}
+
+.da-chase {
+  opacity: 0.22;
+  animation: da-chase linear infinite;
+}
+
+/* Hold still while someone is poking the drawing. */
+.da-svg:hover .da-spin,
+.da-svg:hover .da-bob,
+.da-svg:hover .da-bounce,
+.da-svg:hover .da-sway,
+.da-svg:hover .da-wave {
+  animation-play-state: paused;
+}
+
+@keyframes da-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes da-bob {
+  0%,
+  100% {
+    transform: translateY(-10px) rotate(-4deg);
+  }
+  50% {
+    transform: translateY(10px) rotate(4deg);
+  }
+}
+
+@keyframes da-bounce {
+  from {
+    transform: translateY(-46px);
+  }
+  to {
+    transform: translateY(18px) scale(1.05, 0.95);
+  }
+}
+
+@keyframes da-sway {
+  from {
+    transform: rotate(-2.5deg);
+  }
+  to {
+    transform: rotate(2.5deg);
+  }
+}
+
+@keyframes da-wave {
+  from {
+    transform: rotate(-14deg);
+  }
+  to {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes da-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes da-talk {
+  from {
+    transform: scaleY(0.5);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes da-chase {
+  0% {
+    opacity: 1;
+  }
+  30%,
+  100% {
+    opacity: 0.22;
+  }
+}
+
+@keyframes hm-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Phones: one column, drawing below, cards as a bottom sheet. */
+@media (max-width: 767px) {
+  .hm-main {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    gap: 36px;
+    padding: 84px 24px 72px;
+  }
+
+  .hm-copy {
+    font-size: 22px;
+    line-height: 1.4;
+  }
+
+  .da-svg {
+    max-width: 200px;
+  }
+
+  .hm-cardwrap {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    padding: 56px 12px 12px;
+    background: linear-gradient(to top, var(--paper) 55%, transparent);
+  }
+
+  .hm-card {
+    width: 100%;
+  }
+
+  .hm-card-close {
+    display: block;
+    align-self: flex-end;
+    min-height: 44px;
+    padding: 0;
+    font: inherit;
+    font-size: 11px;
+    color: var(--muted);
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+
+  .hm-theme {
+    top: 30px;
+    right: 24px;
+  }
+
+  .hm-clock {
+    top: 30px;
+    left: 24px;
+    bottom: auto;
+  }
+
+  .hm-shelf {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .da-spin,
+  .da-bob,
+  .da-bounce,
+  .da-sway,
+  .da-wave,
+  .da-fade,
+  .da-bar,
+  .da-chase,
+  .hm-cardwrap {
+    animation: none;
+  }
+
+  .da-chase {
+    opacity: 0.6;
+  }
+
+  .hm-copy--focus .hm-t,
+  .hm-copy--focus .hm-hint,
+  .hm-copy--focus .hm-door:not(.hm-door--on) {
+    filter: none;
+  }
+}

@@ -3,7 +3,15 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import Vinyls from "./Vinyls";
+
+const renderVinyls = () =>
+  render(
+    <ThemeProvider switchable>
+      <Vinyls />
+    </ThemeProvider>
+  );
 
 // jsdom has no layout or Web Animations, so this exercises the mobile path
 // (bottom sheet, no flying sleeve); the desktop flight is checked in a browser.
@@ -20,7 +28,7 @@ function detail() {
 
 describe("Vinyls", () => {
   it("renders every record as a button", () => {
-    render(<Vinyls />);
+    renderVinyls();
     expect(
       screen.getByRole("button", { name: "For Broken Ears by Tems" })
     ).toBeTruthy();
@@ -29,7 +37,7 @@ describe("Vinyls", () => {
 
   it("opens a record's details and closes them with Escape", async () => {
     const user = userEvent.setup();
-    render(<Vinyls />);
+    renderVinyls();
     const record = screen.getByRole("button", {
       name: "GNX by Kendrick Lamar",
     });
@@ -48,7 +56,7 @@ describe("Vinyls", () => {
 
   it("switches records and closes when the same record is chosen again", async () => {
     const user = userEvent.setup();
-    render(<Vinyls />);
+    renderVinyls();
     const gnx = screen.getByRole("button", { name: "GNX by Kendrick Lamar" });
     const blueprint = screen.getByRole("button", {
       name: "The Blueprint by Jay-Z",

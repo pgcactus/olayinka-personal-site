@@ -72,9 +72,9 @@ describe("hydration", () => {
     );
     expect(errors).toEqual([]);
     expect(document.documentElement.classList.contains("dark")).toBe(true);
-    expect(
-      container.querySelector(".theme-toggle")?.getAttribute("aria-label")
-    ).toBe("Switch to light mode");
+    expect(container.querySelector(".hm-theme")?.textContent).toBe(
+      "( day mode )"
+    );
   });
 
   it("shows a shared NATO value after hydrating", async () => {

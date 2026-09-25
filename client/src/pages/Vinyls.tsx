@@ -1,8 +1,8 @@
 /**
  * /things/vinyls — records on wall shelves.
  *
- * - Pale radial-gradient wall and white floating shelves whose top surfaces
- *   foreshorten against a fixed eye line as the page scrolls.
+ * - Stone-paper wall and floating shelves in the site's colours (light and
+ *   dark); shelf tops foreshorten against a fixed eye line as the page scrolls.
  * - 5 records per shelf from 768px, 3 below; partial shelves are centred.
  * - Desktop: choosing a record flies its sleeve out to the right-hand panel
  *   while the wall slides left; choosing again, clicking the wall or pressing
@@ -10,10 +10,10 @@
  * - Every record is a real button, and the page prerenders like the others.
  */
 
-import { CornerUpLeft } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import PageMeta from "@/components/PageMeta";
+import { useTheme } from "@/contexts/ThemeContext";
 import { VINYLS, type Vinyl } from "@/data/vinyls";
 import "./vinyls.css";
 
@@ -86,6 +86,7 @@ function detailLines(vinyl: Vinyl) {
 }
 
 export default function Vinyls() {
+  const { theme, toggleTheme } = useTheme();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const wallRef = useRef<HTMLDivElement>(null);
   const flightLayerRef = useRef<HTMLDivElement>(null);
@@ -215,11 +216,6 @@ export default function Vinyls() {
 
   return (
     <div className="vx-page" onClick={close}>
-      <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500&display=swap"
-        precedence="default"
-      />
       <PageMeta
         title="Vinyls — Olayinka Titilola"
         description="Records in my collection, with a favourite track from each."
@@ -227,18 +223,33 @@ export default function Vinyls() {
       />
 
       <header className="vx-header">
-        <h1 className="vx-tagline">Records I keep coming back to.</h1>
         <Link
           href="/"
           className="vx-home"
           onClick={event => event.stopPropagation()}
         >
-          <CornerUpLeft aria-hidden="true" className="vx-home-icon" />
-          Home
+          ← home
         </Link>
+        <button
+          type="button"
+          className="vx-theme"
+          aria-pressed={theme === "dark"}
+          onClick={event => {
+            event.stopPropagation();
+            toggleTheme?.();
+          }}
+        >
+          ( {theme === "dark" ? "day mode" : "night mode"} )
+        </button>
       </header>
 
       <main className={`vx-stage${selected ? " vx-stage--open" : ""}`}>
+        <div className="vx-heading">
+          <h1 className="vx-title">Vinyls</h1>
+          <span className="vx-count">
+            ( {VINYLS.length} records, one at a time )
+          </span>
+        </div>
         <div className="vx-wall" ref={wallRef}>
           {Array.from({ length: shelfCount(DESKTOP_COLS) }, (_, row) => (
             <div
