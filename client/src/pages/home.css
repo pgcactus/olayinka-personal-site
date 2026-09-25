@@ -248,6 +248,10 @@
   text-transform: uppercase;
   outline: none;
 }
+.hm-try input::placeholder {
+  color: var(--muted);
+  opacity: 0.6;
+}
 .hm-try output {
   min-height: 2.9em;
   font-size: 14px;

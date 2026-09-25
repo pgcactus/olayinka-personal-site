@@ -30,13 +30,13 @@ describe("Home", () => {
     document.documentElement.lang = "en";
   });
 
-  it("starts the speller on ROGER THAT", async () => {
+  it("opens the speller empty, with a hint", async () => {
     const user = userEvent.setup();
     renderHome();
     await user.click(screen.getByRole("button", { name: "small things" }));
-    expect(
-      (screen.getByLabelText("Type anything") as HTMLInputElement).value
-    ).toBe("ROGER THAT");
+    const input = screen.getByLabelText("Type anything") as HTMLInputElement;
+    expect(input.value).toBe("");
+    expect(input.placeholder).toBe("ROGER THAT");
   });
 
   it("reads drawing-only phrases as plain words", () => {

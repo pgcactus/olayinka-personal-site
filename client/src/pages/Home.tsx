@@ -142,7 +142,7 @@ export default function Home() {
   const [active, setActive] = useState<Key | null>(null);
   const [pinned, setPinned] = useState<Key | null>(null);
   const [cta, setCta] = useState<{ x: number; y: number } | null>(null);
-  const [tryValue, setTryValue] = useState(STARTER_WORD);
+  const [tryValue, setTryValue] = useState("");
   const [clock, setClock] = useState<string | null>(null);
   const [fading, setFading] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -303,6 +303,7 @@ export default function Home() {
             id="hm-try"
             ref={tryRef}
             value={tryValue}
+            placeholder={STARTER_WORD}
             maxLength={24}
             autoComplete="off"
             spellCheck={false}
