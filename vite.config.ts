@@ -18,7 +18,7 @@ const PROJECT_ROOT = import.meta.dirname;
 const SITE_URL = "https://olayinka.xyz";
 // /things/places is still prerendered (see scripts/prerender.ts) but kept out of
 // the sitemap and marked noindex while its UX is redesigned.
-const SITEMAP_ROUTES = ["/", "/things/books", "/things/vinyls", "/nato"];
+const SITEMAP_ROUTES = ["/", "/things/vinyls", "/nato"];
 
 function vitePluginSitemapRobots(): Plugin {
   return {

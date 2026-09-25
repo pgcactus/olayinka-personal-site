@@ -11,9 +11,12 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      {/* Redirect bare /things to /things/books */}
+      {/* Vinyls is the public Things landing page; Books remains archived. */}
       <Route path="/things">
-        <Redirect to="/things/books" />
+        <Redirect to="/things/vinyls" />
+      </Route>
+      <Route path="/things/books">
+        <Redirect to="/things/vinyls" />
       </Route>
       <Route path="/things/:tab" component={Things} />
       <Route path="/nato" component={Nato} />

@@ -7,7 +7,6 @@ const root = process.cwd();
 const pages = [
   ["dist/public/index.html", "Hi, I&#x27;m Olayinka."],
   ["dist/public/nato/index.html", "NATO Phonetic Alphabet"],
-  ["dist/public/things/books/index.html", "Playing to Win"],
   ["dist/public/things/vinyls/index.html", "For Broken Ears"],
   ["dist/public/things/places/index.html", "Countries I have visited"],
 ];
@@ -85,7 +84,7 @@ try {
   const routeChecks = [
     ["/", 200, "Hi, I&#x27;m Olayinka."],
     ["/nato", 200, "NATO Phonetic Alphabet"],
-    ["/things/books", 200, "Playing to Win"],
+    ["/things/books", 308, ""],
     ["/things/vinyls/", 200, "For Broken Ears"],
     ["/things/places", 200, "Countries I have visited"],
     ["/missing", 404, "Page not found."],
@@ -103,7 +102,14 @@ try {
     redirect: "manual",
   });
   assert.equal(redirect.status, 308);
-  assert.equal(redirect.headers.get("location"), "/things/books");
+  assert.equal(redirect.headers.get("location"), "/things/vinyls");
+
+  const archivedBooksRedirect = await fetch(
+    `http://127.0.0.1:${port}/things/books`,
+    { redirect: "manual" }
+  );
+  assert.equal(archivedBooksRedirect.status, 308);
+  assert.equal(archivedBooksRedirect.headers.get("location"), "/things/vinyls");
 
   const home = await fetch(`http://127.0.0.1:${port}/`);
   assert.match(

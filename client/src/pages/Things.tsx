@@ -2,7 +2,7 @@
  * Design Philosophy: Minimal Monospace — /things page
  * - Same global tokens as home: white bg, monospace, 14px, 1.75 line-height
  * - Max content width 1000px, top-aligned (not vertically centred)
- * - Public tabs: books and vinyls — the direct /things/places route is retained but hidden while its UX is redesigned.
+ * - Public tabs: vinyls — the direct /things/places route is retained but hidden while its UX is redesigned.
  * - Active tab: ice blue highlight #E0F2FE, darkens to #BAE6FD on hover
  * - Inactive tabs: muted #9CA3AF, no background
  * - Books: shelf rows, portrait covers, hover overlay, click-to-expand detail panel,
@@ -42,12 +42,7 @@ interface Book {
   note?: string;
 }
 
-const BOOKS: Book[] = (BOOKS_RESOLVED as Book[]).map((b, i) => ({
-  ...b,
-  // Mark the most recently read book as "currently reading" placeholder
-  current: i === 0,
-  note: undefined,
-}));
+const BOOKS: Book[] = BOOKS_RESOLVED as Book[];
 
 // Categories derived from data
 const BOOK_CATEGORIES = [
@@ -176,10 +171,7 @@ function BookDetailPanel({
           {book.current && (
             <div className="book-panel-current">Currently reading</div>
           )}
-          <p className="book-panel-note">
-            {book.note ??
-              "No note yet — add one to books-resolved.json to share your thoughts on this book."}
-          </p>
+          {book.note && <p className="book-panel-note">{book.note}</p>}
         </div>
       </div>
     </div>
@@ -326,7 +318,7 @@ function VinylCard({ vinyl }: { vinyl: Vinyl }) {
 // Tab metadata
 // ---------------------------------------------------------------------------
 
-const TABS: Tab[] = ["books", "vinyls"];
+const TABS: Tab[] = ["vinyls"];
 
 const TAB_META: Record<Tab, { title: string; description: string }> = {
   books: {
@@ -347,7 +339,7 @@ const TAB_META: Record<Tab, { title: string; description: string }> = {
 
 function parseTab(raw: string | undefined): Tab {
   if (raw === "vinyls" || raw === "places") return raw;
-  return "books";
+  return "vinyls";
 }
 
 // ---------------------------------------------------------------------------

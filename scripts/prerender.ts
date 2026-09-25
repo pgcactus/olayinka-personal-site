@@ -26,13 +26,7 @@ const ROOT =
   join(dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = join(ROOT, "dist", "public");
 
-const PRERENDER_ROUTES = [
-  "/",
-  "/things/books",
-  "/things/vinyls",
-  "/things/places",
-  "/nato",
-];
+const PRERENDER_ROUTES = ["/", "/things/vinyls", "/things/places", "/nato"];
 
 // Block external fetch during prerender (no network in deployment)
 globalThis.fetch = async (url: RequestInfo | URL) => {
