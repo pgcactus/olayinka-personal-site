@@ -7,7 +7,8 @@
  * - Inactive tabs: muted #9CA3AF, no background
  * - Books: shelf rows, portrait covers, hover overlay, click-to-expand detail panel,
  *          category/year filter bar, "currently reading" badge on active book
- * - Vinyls: shelf rows, square covers, hover overlay, favourite track, 30s preview on click
+ * - Vinyls: shelf rows, square covers, hover overlay, favourite track
+ *   (click-to-preview is wired up but idle until vinyl data carries previewUrl)
  * - Places: interactive SVG world map, visited countries highlighted, click tooltip, country counter
  * - Page-level fade-in on mount via CSS animation (no framer-motion)
  * - Back link top-left, 13px, #5A5A5A, fades to 60% on hover
@@ -312,7 +313,7 @@ const TAB_META: Record<Tab, { title: string; description: string }> = {
   },
   vinyls: {
     title: "Vinyls — Olayinka Titilola",
-    description: "Records in my collection, with favourite tracks and 30-second previews.",
+    description: "Records in my collection, with a favourite track from each.",
   },
   places: {
     title: "Places — Olayinka Titilola",

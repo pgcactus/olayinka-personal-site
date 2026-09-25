@@ -71,14 +71,15 @@ const WORD_ORIGINS: Record<string, string> = {
   Niner:    "Spelled 'Niner' (not 'Nine') to prevent confusion with the German 'nein' (no) in international communications.",
 };
 
-function getInitialInput(): string {
+const DEFAULT_INPUT = "HERMIONE";
+
+function getSharedInput(): string | null {
   try {
-    if (typeof window === "undefined") return "HERMIONE";
-    const params = new URLSearchParams(window.location.search);
-    const q = params.get("q");
-    if (q) return sanitise(decodeURIComponent(q));
-  } catch { /* ignore */ }
-  return "HERMIONE";
+    const q = new URLSearchParams(window.location.search).get("q");
+    return q ? sanitise(q) : null;
+  } catch {
+    return null;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -87,7 +88,7 @@ function getInitialInput(): string {
 
 export default function Nato() {
   const [mode, setMode] = useState<"forward" | "reverse">("forward");
-  const [input, setInput] = useState<string>(getInitialInput);
+  const [input, setInput] = useState<string>(DEFAULT_INPUT);
   const [reverseInput, setReverseInput] = useState<string>("");
   const [learnOpen, setLearnOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -95,8 +96,12 @@ export default function Nato() {
   const inputRef = useRef<HTMLInputElement>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Auto-focus and pre-select on mount
+  // Auto-focus and pre-select on mount. A shared ?q= value is read here, after
+  // hydration, so the first client render matches the prerendered HTML.
   useEffect(() => {
+    const shared = getSharedInput();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (shared) setInput(shared);
     const el = inputRef.current;
     if (el) { el.focus(); el.select(); }
   }, []);

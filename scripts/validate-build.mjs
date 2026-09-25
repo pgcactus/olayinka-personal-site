@@ -31,8 +31,16 @@ for (const [relativePath, expectedContent] of pages) {
     `${relativePath}: description`
   );
   assert.match(html, new RegExp(expectedContent), `${relativePath}: content`);
-  assert.doesNotMatch(html, /data-loc=|manus-runtime|__manus__|%VITE_/);
+  assert.doesNotMatch(html, /data-loc=|manus-runtime|__manus__|%VITE_|30-second previews|data:image/);
 }
+
+// React does not hoist inline scripts, so the JSON-LD must stay inside #root
+// or hydration fails.
+const homeHtml = await read("dist/public/index.html");
+assert.ok(
+  homeHtml.indexOf("application/ld+json") > homeHtml.indexOf('id="root"'),
+  "index.html: JSON-LD inside #root"
+);
 
 // Places is hidden while its UX is redesigned: reachable, but not indexed.
 const placesHtml = await read("dist/public/things/places/index.html");

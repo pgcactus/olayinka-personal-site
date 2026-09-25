@@ -1,25 +1,25 @@
 // Book cover images — bundled directly into the app by Vite.
 // No CDN, no redirects, no fetch workarounds needed.
 
-import cover01 from './01-playing-to-win.jpg';
-import cover02 from './02-score-takes-care.jpg';
-import cover03 from './03-how-to-measure.jpg';
-import cover04 from './04-thinking-in-systems.jpg';
-import cover05 from './05-human-powered.jpg';
-import cover06 from './06-inspired.jpg';
-import cover07 from './07-burmese-days.jpg';
-import cover08 from './08-1984.jpg';
-import cover09 from './09-to-kill-a-mockingbird.jpg';
-import cover10 from './10-the-odyssey.jpg';
-import cover11 from './11-dr-jekyll.jpg';
-import cover12 from './12-the-raven.jpg';
-import cover13 from './13-simply-lies.jpg';
-import cover14 from './14-the-24th-hour.jpg';
-import cover15 from './15-the-exchange.jpg';
-import cover16 from './16-how-to-kill-your-family.jpg';
-import cover17 from './17-vera-wong.jpg';
-import cover18 from './18-satsuma-complex.jpg';
-import cover19 from './19-outliers.jpg';
+import cover01 from './01-playing-to-win.webp';
+import cover02 from './02-score-takes-care.webp';
+import cover03 from './03-how-to-measure.webp';
+import cover04 from './04-thinking-in-systems.webp';
+import cover05 from './05-human-powered.webp';
+import cover06 from './06-inspired.webp';
+import cover07 from './07-burmese-days.webp';
+import cover08 from './08-1984.webp';
+import cover09 from './09-to-kill-a-mockingbird.webp';
+import cover10 from './10-the-odyssey.webp';
+import cover11 from './11-dr-jekyll.webp';
+import cover12 from './12-the-raven.webp';
+import cover13 from './13-simply-lies.webp';
+import cover14 from './14-the-24th-hour.webp';
+import cover15 from './15-the-exchange.webp';
+import cover16 from './16-how-to-kill-your-family.webp';
+import cover17 from './17-vera-wong.webp';
+import cover18 from './18-satsuma-complex.webp';
+import cover19 from './19-outliers.webp';
 
 // Keyed by book id matching books-resolved.json
 export const BOOK_COVERS: Record<string, string> = {

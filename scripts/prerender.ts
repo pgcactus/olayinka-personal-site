@@ -78,9 +78,10 @@ for (const route of PRERENDER_ROUTES) {
     createElement(Router, { ssrPath: route }, createElement(App, null))
   );
 
-  // Extract head tags from the rendered HTML using regex
-  // Matches: <title>...</title>, <meta .../>, <link .../>, <script>...</script>
-  const headTagRegex = /<(title|meta|link|script)(?:\s[^>]*)?>(?:.*?)<\/\1>|<(meta|link)(?:\s[^>]*)?\s*\/>/gi;
+  // Extract the tags React 19 hoists into <head> on the client: <title>, <meta>
+  // and <link>. Inline <script> tags (the JSON-LD) are not hoisted, so they stay
+  // in the body where hydration expects them.
+  const headTagRegex = /<title(?:\s[^>]*)?>.*?<\/title>|<(meta|link)(?:\s[^>]*)?\s*\/?>/gi;
   const headTags: string[] = [];
   let match;
   

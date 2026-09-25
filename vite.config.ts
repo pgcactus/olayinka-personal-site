@@ -127,6 +127,8 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: path.resolve(PROJECT_ROOT, "dist/public"),
       emptyOutDir: true,
+      // Read by scripts/run-prerender.mjs to resolve image URLs, then deleted.
+      manifest: true,
     },
     server: {
       port: 3000,

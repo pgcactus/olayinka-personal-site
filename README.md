@@ -43,6 +43,14 @@ Set `VITE_ANALYTICS_ENDPOINT` at runtime as well as build time: the server
 adds its origin to the Content Security Policy, and the script is blocked
 without it.
 
+## Source of truth
+
+This GitHub repository is the source of truth for the site. Changes made in
+another workspace (for example Manus) must arrive as a pull request against
+`main`, never as a direct push that replaces the repository: earlier syncs
+did that and silently reverted fixes. Protect `main` in the GitHub settings
+(Settings → Branches) by requiring a pull request and the `verify` check.
+
 ## Deployment
 
 This repository has no hosting-provider configuration or GitHub deployment
