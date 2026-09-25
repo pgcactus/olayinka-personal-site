@@ -19,23 +19,18 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import ThemeToggle from "@/components/ThemeToggle";
 import PageMeta from "@/components/PageMeta";
+import {
+  fromPhonetic,
+  getFirstInvalidWord,
+  sanitise,
+  sanitiseReverse,
+  toPhonetic,
+  uniqueWords,
+} from "@/lib/nato";
 
 // ---------------------------------------------------------------------------
 // Data
 // ---------------------------------------------------------------------------
-
-const NATO_MAP: Record<string, string> = {
-  A: "Alfa",     B: "Bravo",    C: "Charlie",  D: "Delta",
-  E: "Echo",     F: "Foxtrot",  G: "Golf",     H: "Hotel",
-  I: "India",    J: "Juliett",  K: "Kilo",     L: "Lima",
-  M: "Mike",     N: "November", O: "Oscar",    P: "Papa",
-  Q: "Quebec",   R: "Romeo",    S: "Sierra",   T: "Tango",
-  U: "Uniform",  V: "Victor",   W: "Whiskey",  X: "X-ray",
-  Y: "Yankee",   Z: "Zulu",
-  "0": "Zero",   "1": "One",    "2": "Two",    "3": "Three",
-  "4": "Four",   "5": "Fife",   "6": "Six",    "7": "Seven",
-  "8": "Eight",  "9": "Niner",
-};
 
 const WORD_ORIGINS: Record<string, string> = {
   Alfa:     "Spelled 'Alfa' (not 'Alpha') to avoid mispronunciation in languages where 'ph' sounds like 'f' is not guaranteed.",
@@ -76,84 +71,13 @@ const WORD_ORIGINS: Record<string, string> = {
   Niner:    "Spelled 'Niner' (not 'Nine') to prevent confusion with the German 'nein' (no) in international communications.",
 };
 
-// Reverse map: NATO word → letter
-const REVERSE_MAP: Record<string, string> = {
-  // Standard NATO spellings
-  ...Object.fromEntries(
-    Object.entries(NATO_MAP).map(([letter, word]) => [word.toLowerCase(), letter])
-  ),
-  // Common variants
-  alpha: "A",  // Common misspelling of Alfa
-  juliet: "J", // US spelling variant
-  juliett: "J", // Official NATO spelling
-};
-
-// Validation: check if a word is a known NATO code word
-function isValidNatoWord(word: string): boolean {
-  return word.toLowerCase() in REVERSE_MAP;
-}
-
-// Get first unrecognised word for error message
-function getFirstInvalidWord(value: string): string | null {
-  const words = value.trim().toLowerCase().split(/\s+/);
-  for (const w of words) {
-    if (w && !isValidNatoWord(w)) return w;
-  }
-  return null;
-}
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function sanitise(raw: string): string {
-  return raw.replace(/[^A-Za-z0-9 ]/g, "").toUpperCase();
-}
-
-function sanitiseReverse(raw: string): string {
-  // Allow letters, spaces and hyphens (for X-ray)
-  return raw.replace(/[^A-Za-z -]/g, "").trim();
-}
-
-function fromPhonetic(value: string): string {
-  if (!value.trim()) return "";
-  // Split on multiple spaces, treating each word as a NATO code word
-  const words = value.trim().toLowerCase().split(/\s+/).filter(w => w.length > 0);
-  return words
-    .map((w) => REVERSE_MAP[w] ?? "?")
-    .join("");
-}
-
-function toPhonetic(value: string): string {
-  if (!value.trim()) return "";
-  return value
-    .split(" ")
-    .filter((w) => w.length > 0)
-    .map((word) =>
-      word
-        .split("")
-        .map((ch) => NATO_MAP[ch] ?? ch)
-        .join(" • ")
-    )
-    .join("  /  ");
-}
-
-function uniqueWords(value: string): string[] {
-  const seen = new Set<string>();
-  for (const ch of value) {
-    const word = NATO_MAP[ch.toUpperCase()];
-    if (word) seen.add(word);
-  }
-  return Array.from(seen);
-}
-
 function getInitialInput(): string {
   try {
     if (typeof window === "undefined") return "HERMIONE";
     const params = new URLSearchParams(window.location.search);
     const q = params.get("q");
     if (q) return sanitise(decodeURIComponent(q));
-  } catch (_) { /* ignore */ }
+  } catch { /* ignore */ }
   return "HERMIONE";
 }
 
@@ -218,7 +142,7 @@ export default function Nato() {
     try {
       await navigator.clipboard.writeText(output);
       showToast("Copied to clipboard");
-    } catch (_) {
+    } catch {
       showToast("Could not copy");
     }
   }
@@ -227,12 +151,12 @@ export default function Nato() {
     const url = `${window.location.origin}/nato?q=${encodeURIComponent(input)}`;
     if (navigator.share) {
       try { await navigator.share({ title: "NATO Phonetic Alphabet", url }); }
-      catch (_) { /* user cancelled */ }
+      catch { /* user cancelled */ }
     } else {
       try {
         await navigator.clipboard.writeText(url);
         showToast("Share link copied");
-      } catch (_) {
+      } catch {
         showToast("Could not copy link");
       }
     }
@@ -245,7 +169,7 @@ export default function Nato() {
         description="Convert any word or phrase to the NATO phonetic alphabet instantly. Never say 'B as in Boy' again."
         path="/nato"
       />
-      <div className="nato-inner">
+      <main className="nato-inner">
 
         {/* Back link */}
         <Link href="/" className="nato-back">
@@ -285,7 +209,6 @@ export default function Nato() {
           onClear={handleClear}
           placeholder={mode === "forward" ? "e.g. HERMIONE" : "e.g. Alfa Bravo Charlie"}
           label={mode === "forward" ? "Enter text to convert" : "Enter NATO words"}
-          mode={mode}
         />
         <p className="nato-hint">
           {mode === "forward"
@@ -351,7 +274,7 @@ export default function Nato() {
             Olayinka ↗
           </a>
         </p>
-      </div>
+      </main>
 
       {/* Toast */}
       {toast && <div className="nato-toast">{toast}</div>}
@@ -370,10 +293,9 @@ interface NatoInputProps {
   onClear: () => void;
   placeholder?: string;
   label: string;
-  mode: "forward" | "reverse";
 }
 
-function NatoInput({ inputRef, value, onChange, onClear, placeholder, label, mode }: NatoInputProps) {
+function NatoInput({ inputRef, value, onChange, onClear, placeholder, label }: NatoInputProps) {
   return (
     <div className="nato-input-wrap">
       <label htmlFor="nato-input" className="nato-input-label">{label}</label>

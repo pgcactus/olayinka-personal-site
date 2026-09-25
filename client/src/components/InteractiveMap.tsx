@@ -66,6 +66,8 @@ const VISITED: Record<string, CountryInfo> = {
   },
 };
 
+const visitedSet = new Set(Object.keys(VISITED));
+
 // ---------------------------------------------------------------------------
 // GeoJSON types
 // ---------------------------------------------------------------------------
@@ -151,8 +153,6 @@ export default function InteractiveMap() {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const visitedSet = new Set(Object.keys(VISITED));
-
   // Fetch GeoJSON on mount
   useEffect(() => {
     fetch("/world.geojson")
@@ -194,7 +194,7 @@ export default function InteractiveMap() {
 
       setTooltip((prev) => (prev?.iso2 === iso2 ? null : { iso2, x: svgX, y: svgY }));
     },
-    [visitedSet]
+    []
   );
 
   const tooltipInfo = tooltip ? VISITED[tooltip.iso2] : null;

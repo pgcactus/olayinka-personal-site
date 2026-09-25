@@ -8,7 +8,6 @@
  */
 
 import { useState, useRef, useEffect } from "react";
-import { useLocation } from "wouter";
 
 interface Vinyl {
   id: string;
@@ -35,6 +34,8 @@ export default function VinylShelf({ vinyls }: VinylShelfProps) {
   // Detect prefers-reduced-motion
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    // Read after mount so the prerendered HTML matches the first client render.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPrefersReducedMotion(mediaQuery.matches);
     const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
     mediaQuery.addEventListener("change", handler);
@@ -80,6 +81,8 @@ export default function VinylShelf({ vinyls }: VinylShelfProps) {
   const [rowSize, setRowSize] = useState(5);
 
   useEffect(() => {
+    // Read after mount so the prerendered HTML matches the first client render.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setRowSize(getRowSize());
     const handleResize = () => setRowSize(getRowSize());
     window.addEventListener("resize", handleResize);

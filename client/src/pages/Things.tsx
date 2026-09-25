@@ -374,9 +374,10 @@ export default function Things() {
         title={meta.title}
         description={meta.description}
         path={`/things/${activeTab}`}
+        noindex={activeTab === "places"}
       />
 
-      <div className="things-content">
+      <main className="things-content">
         {/* Back link */}
         <Link href="/" className="things-back">
           &#8627; back
@@ -470,7 +471,7 @@ export default function Things() {
 
         {/* Places tab: interactive world map */}
         {activeTab === "places" && <InteractiveMap />}
-      </div>
+      </main>
     </div>
   );
 }

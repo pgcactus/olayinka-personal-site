@@ -34,8 +34,7 @@ const PRERENDER_ROUTES = [
 ];
 
 // Block external fetch during prerender (no network in deployment)
-const origFetch = globalThis.fetch;
-globalThis.fetch = async (url: RequestInfo | URL, opts?: RequestInit) => {
+globalThis.fetch = async (url: RequestInfo | URL) => {
   const urlStr = String(url);
   if (urlStr.startsWith("/")) {
     try {
@@ -52,8 +51,10 @@ globalThis.fetch = async (url: RequestInfo | URL, opts?: RequestInit) => {
 
 let tpl = readFileSync(join(DIST, "index.html"), "utf-8");
 
-// Remove the default <title> from the template so route-specific titles can be injected
+// Remove the default <title> and description from the template so route-specific
+// ones can be injected without duplicates
 tpl = tpl.replace(/<title>.*?<\/title>/i, "");
+tpl = tpl.replace(/\s*<meta name="description"[^>]*>/i, "");
 
 for (const route of PRERENDER_ROUTES) {
   // Set location globals for wouter's SSR path

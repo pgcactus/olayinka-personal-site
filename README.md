@@ -39,6 +39,9 @@ pnpm start
 
 The server reads `PORT` from the environment. Analytics are optional; copy
 `.env.example` to `.env` and set both values to enable the analytics script.
+Set `VITE_ANALYTICS_ENDPOINT` at runtime as well as build time: the server
+adds its origin to the Content Security Policy, and the script is blocked
+without it.
 
 ## Deployment
 
