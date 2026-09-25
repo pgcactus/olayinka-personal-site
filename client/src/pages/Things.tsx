@@ -7,8 +7,7 @@
  * - Inactive tabs: muted #9CA3AF, no background
  * - Books: shelf rows, portrait covers, hover overlay, click-to-expand detail panel,
  *          category/year filter bar, "currently reading" badge on active book
- * - Vinyls: shelf rows, square covers, hover overlay, favourite track
- *   (click-to-preview is wired up but idle until vinyl data carries previewUrl)
+ * - Vinyls has its own page (pages/Vinyls.tsx); the tab links to it.
  * - Places: interactive SVG world map, visited countries highlighted, click tooltip, country counter
  * - Page-level fade-in on mount via CSS animation (no framer-motion)
  * - Back link top-left, 13px, #5A5A5A, fades to 60% on hover
@@ -16,7 +15,6 @@
 
 import { useState, useRef, useEffect } from "react";
 import { BOOK_COVERS } from "@/assets/book-covers";
-import VINYLS_RESOLVED from "../data/vinyls-resolved.json";
 import BOOKS_RESOLVED from "../data/books-resolved.json";
 import { Link, useLocation, useParams } from "wouter";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -173,142 +171,6 @@ function BookDetailPanel({
           )}
           {book.note && <p className="book-panel-note">{book.note}</p>}
         </div>
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Vinyls data — pre-resolved at build time via scripts/resolve-vinyl-covers.mjs
-// ---------------------------------------------------------------------------
-
-interface Vinyl {
-  id: string;
-  title: string;
-  artist: string;
-  year: number;
-  coverUrl: string | null;
-  previewUrl?: string | null;
-  favouriteTrack?: string;
-}
-
-const VINYL_EXTRAS: Record<string, { favouriteTrack?: string }> = {
-  "for-broken-ears": { favouriteTrack: "Found" },
-  "untitled-unmastered": { favouriteTrack: "untitled 07" },
-  gnx: { favouriteTrack: "wacced out murals" },
-  iyrtitl: { favouriteTrack: "Know Yourself" },
-  "african-giant": { favouriteTrack: "Ye" },
-  "i-told-them": { favouriteTrack: "City Boys" },
-  "lungu-boy": { favouriteTrack: "Lungu Boy" },
-  wattba: { favouriteTrack: "Jumpman" },
-  "the-blueprint": { favouriteTrack: "Izzo (H.O.V.A.)" },
-  "let-god-sort-em-out": { favouriteTrack: "Birds & Bees" },
-  mbdtf: { favouriteTrack: "Runaway" },
-};
-
-const VINYLS: Vinyl[] = (VINYLS_RESOLVED as Vinyl[]).map(v => ({
-  ...v,
-  ...(VINYL_EXTRAS[v.id] ?? {}),
-}));
-
-// Responsive vinyl shelf: 5 on desktop, 3 on tablet, 2 on mobile
-function VinylShelf({ vinyls }: { vinyls: Vinyl[] }) {
-  const [itemsPerRow, setItemsPerRow] = useState(5);
-
-  useEffect(() => {
-    function updateItemsPerRow() {
-      if (typeof window === "undefined") return;
-      const width = window.innerWidth;
-      if (width < 640) setItemsPerRow(2);
-      else if (width < 1024) setItemsPerRow(3);
-      else setItemsPerRow(5);
-    }
-
-    updateItemsPerRow();
-    window.addEventListener("resize", updateItemsPerRow);
-    return () => window.removeEventListener("resize", updateItemsPerRow);
-  }, []);
-
-  const shelfRows = Array.from(
-    { length: Math.ceil(vinyls.length / itemsPerRow) },
-    (_, i) => vinyls.slice(i * itemsPerRow, i * itemsPerRow + itemsPerRow)
-  );
-
-  return (
-    <div className="shelf-section">
-      {shelfRows.map((row, rowIdx) => (
-        <div key={rowIdx} className="shelf-row">
-          {row.map(vinyl => (
-            <VinylCard key={vinyl.id} vinyl={vinyl} />
-          ))}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function VinylCard({ vinyl }: { vinyl: Vinyl }) {
-  const [hovered, setHovered] = useState(false);
-  const [playing, setPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  function handleClick() {
-    if (!vinyl.previewUrl) return;
-    if (playing) {
-      audioRef.current?.pause();
-      setPlaying(false);
-    } else {
-      if (!audioRef.current) {
-        audioRef.current = new Audio(vinyl.previewUrl);
-        audioRef.current.onended = () => setPlaying(false);
-      }
-      audioRef.current.play();
-      setPlaying(true);
-    }
-  }
-
-  // Cleanup audio on unmount
-  useEffect(() => {
-    return () => {
-      audioRef.current?.pause();
-    };
-  }, []);
-
-  return (
-    <div
-      className={`vinyl-card${hovered ? " vinyl-card--hovered" : ""}${playing ? " vinyl-card--playing" : ""}`}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onClick={handleClick}
-      role={vinyl.previewUrl ? "button" : undefined}
-      tabIndex={vinyl.previewUrl ? 0 : undefined}
-      onKeyDown={e => e.key === "Enter" && handleClick()}
-    >
-      {vinyl.coverUrl ? (
-        <img
-          src={vinyl.coverUrl}
-          alt={`${vinyl.title} by ${vinyl.artist}`}
-          className="vinyl-cover"
-          draggable={false}
-        />
-      ) : (
-        <div className="vinyl-fallback">
-          <span className="vinyl-fallback-title">{vinyl.title}</span>
-          <span className="vinyl-fallback-artist">{vinyl.artist}</span>
-        </div>
-      )}
-      {playing && (
-        <div className="vinyl-playing-indicator">&#9654; playing</div>
-      )}
-      <div
-        className={`vinyl-overlay${hovered ? " vinyl-overlay--visible" : ""}`}
-      >
-        <span>Released {vinyl.year}</span>
-        {vinyl.favouriteTrack && (
-          <span className="vinyl-fav-track">
-            &nbsp;&middot;&nbsp;{vinyl.favouriteTrack}
-          </span>
-        )}
       </div>
     </div>
   );
@@ -491,9 +353,6 @@ export default function Things() {
             </div>
           </>
         )}
-
-        {/* Vinyls tab: responsive shelf layout */}
-        {activeTab === "vinyls" && <VinylShelf vinyls={VINYLS} />}
 
         {/* Places tab: interactive world map */}
         {activeTab === "places" && <InteractiveMap />}
