@@ -20,6 +20,25 @@ const words = () =>
   [...document.querySelectorAll(".nt-word")].map(el => el.textContent);
 
 describe("Nato", () => {
+  it("starts on ROGER THAT and follows the site's language", () => {
+    window.localStorage.setItem("lang", "fr");
+    try {
+      renderNato();
+      expect(
+        screen.getByRole("heading", { name: "Alphabet phonétique OTAN" })
+      ).toBeTruthy();
+      expect(words().slice(0, 5)).toEqual([
+        "Romeo",
+        "Oscar",
+        "Golf",
+        "Echo",
+        "Romeo",
+      ]);
+    } finally {
+      window.localStorage.clear();
+    }
+  });
+
   it("turns each letter into a tile, grouped by word", () => {
     renderNato();
     fireEvent.change(screen.getByLabelText("Type anything"), {

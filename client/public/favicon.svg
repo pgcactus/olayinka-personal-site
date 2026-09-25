@@ -1,1 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🪖</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="14" fill="#3c4670"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.2">
+    <path d="M32 21 Q22 16 11 19 V45 Q22 42 32 47 Z" stroke="#f6f0e0"/>
+    <path d="M32 21 Q42 16 53 19 V45 Q42 42 32 47" stroke="#f6f0e0"/>
+    <path d="M16 31 q3 -4 6 0 t6 0" stroke="#ffe39a"/>
+    <path d="M37 27 H48 M37 32 H48 M37 37 H44" stroke="#f6f0e0" stroke-width="2.4"/>
+    <path d="M40 50 L57 15" stroke="#ffe39a"/>
+  </g>
+</svg>

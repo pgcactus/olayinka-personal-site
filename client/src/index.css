@@ -69,10 +69,6 @@
   --color-highlight-bg: #1e3a4a;
 }
 
-.dark .highlight:hover {
-  background-color: #2a5068 !important;
-}
-
 .dark .things-tab--active {
   background-color: #1e3a4a !important;
 }
@@ -99,12 +95,6 @@
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-/* Home page: each paragraph fades in with staggered delay via inline style */
-.home-para {
-  opacity: 0;
-  animation: fadeIn 320ms ease-out forwards;
 }
 
 /* Things page: whole wrapper fades in once */
@@ -140,79 +130,6 @@
 }
 
 @layer components {
-  /* Page wrapper: centred column, upper-third anchored */
-  .page-wrapper {
-    min-height: 100vh;
-    padding: 96px 48px 96px;
-  }
-
-  /* Content column */
-  .content {
-    position: relative;
-    width: 100%;
-    max-width: 640px;
-    margin: 0 auto;
-  }
-
-  /* Base paragraph */
-  .para {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: var(--font-size-base);
-    line-height: var(--line-height-base);
-    color: var(--color-body);
-  }
-
-  .para + .para {
-    margin-top: var(--para-gap);
-  }
-
-  /* First paragraph: bold, near-black */
-  .para-bold {
-    font-weight: 700;
-    color: var(--color-near-black);
-  }
-
-  /* Highlighted phrase */
-  .highlight {
-    display: inline;
-    background-color: var(--color-highlight-bg);
-    color: var(--color-near-black);
-    padding: 1px 6px;
-    border-radius: 0;
-    text-decoration: none;
-    font-family: inherit;
-    font-size: inherit;
-    line-height: inherit;
-    cursor: pointer;
-    transition: background-color 200ms ease-out;
-  }
-
-  .highlight:hover {
-    background-color: #bae6fd;
-    text-decoration: none;
-  }
-
-  .highlight:focus-visible {
-    outline: 2px solid var(--color-near-black);
-    outline-offset: 2px;
-  }
-
-  /* Mobile layout overrides */
-  @media (max-width: 639px) {
-    .page-wrapper {
-      padding: 80px 24px 96px;
-    }
-
-    .para {
-      font-size: 13px;
-    }
-
-    .para + .para {
-      margin-top: 24px;
-    }
-  }
-
   /* Theme toggle — top-right of content block */
   .theme-toggle {
     position: absolute;
@@ -232,39 +149,6 @@
 
   .theme-toggle:hover {
     color: var(--color-near-black);
-  }
-
-  /* Utility links row — Email + LinkedIn side by side, right-aligned */
-  .home-links {
-    display: flex;
-    justify-content: flex-end;
-    gap: 20px;
-    margin-top: 40px;
-  }
-
-  .linkedin-link {
-    display: block;
-    text-align: right;
-    margin-top: 0;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    line-height: var(--line-height-base);
-    color: #9ca3af;
-    text-decoration: underline;
-    text-decoration-color: #9ca3af;
-    text-underline-offset: 3px;
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    transition:
-      color 200ms ease-out,
-      text-decoration-color 200ms ease-out;
-  }
-
-  .linkedin-link:hover {
-    color: var(--color-near-black);
-    text-decoration-color: var(--color-near-black);
   }
 
   /* ------------------------------------------------------------------ */

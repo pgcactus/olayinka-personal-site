@@ -9,10 +9,14 @@
  *   (opened from the walkie-talkie's "type me" screen or a click) and a row
  *   of record covers.
  * - The copy can be switched to French; the prerendered page is English.
+ * - Only the three phrases with a panel are buttons. The others only change
+ *   the drawing, so assistive tech reads them as plain words; they can still
+ *   be focused, and tapped on a phone.
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
+import LangSwitch from "@/components/LangSwitch";
 import PageMeta from "@/components/PageMeta";
 import { VINYLS } from "@/data/vinyls";
 import {
@@ -20,10 +24,10 @@ import {
   type LineScene,
   type SubjectKey,
 } from "@/lib/line-scene";
-import { sanitise, toPhonetic } from "@/lib/nato";
+import { useLang } from "@/lib/lang";
+import { STARTER_WORD, sanitise, toPhonetic } from "@/lib/nato";
 import "./home.css";
 
-type Lang = "en" | "fr";
 type Key = Exclude<SubjectKey, "idle">;
 
 const LINKEDIN = "https://www.linkedin.com/in/olayinkaetitilola/";
@@ -33,8 +37,6 @@ const LEAVE_MS = 650;
 
 const COPY = {
   en: {
-    code: "FR",
-    switchLabel: "Translate to French",
     title: "Hi, I’m Olayinka.",
     body: [
       "Right now, I lead product work at {flatiron|Flatiron Health}.",
@@ -58,8 +60,6 @@ const COPY = {
       city ? `${t} in ${city}` : `${t} your time`,
   },
   fr: {
-    code: "EN",
-    switchLabel: "Traduire en anglais",
     title: "Bonjour, je m’appelle Olayinka.",
     body: [
       "En ce moment, je dirige le travail produit chez {flatiron|Flatiron Health}.",
@@ -95,7 +95,10 @@ const personJsonLd = {
   sameAs: [LINKEDIN, "https://github.com/pgcactus"],
 };
 
-/** "text {key|label} text" → text and phrase buttons. */
+// Phrases that open a panel; the rest only change the drawing.
+const WITH_PANEL: Key[] = ["flatiron", "things", "records"];
+
+/** "text {key|label} text" → text and phrases. */
 function Phrases({
   text,
   active,
@@ -112,16 +115,22 @@ function Phrases({
         const m = part.match(/^\{(\w+)\|([^}]+)\}$/);
         if (!m) return part;
         const key = m[1] as Key;
-        return (
+        const className = `hm-mark${active === key ? " hm-mark--on" : ""}`;
+        return WITH_PANEL.includes(key) ? (
           <button
             key={i}
             type="button"
-            className={`hm-mark${active === key ? " hm-mark--on" : ""}`}
+            className={className}
             data-key={key}
-            aria-pressed={pinned === key}
+            aria-expanded={pinned === key}
+            aria-controls="hm-panel"
           >
             {m[2]}
           </button>
+        ) : (
+          <span key={i} className={className} data-key={key} tabIndex={0}>
+            {m[2]}
+          </span>
         );
       })}
     </>
@@ -129,11 +138,11 @@ function Phrases({
 }
 
 export default function Home() {
-  const [lang, setLang] = useState<Lang>("en");
+  const lang = useLang();
   const [active, setActive] = useState<Key | null>(null);
   const [pinned, setPinned] = useState<Key | null>(null);
   const [cta, setCta] = useState<{ x: number; y: number } | null>(null);
-  const [tryValue, setTryValue] = useState("OLAYINKA");
+  const [tryValue, setTryValue] = useState("");
   const [clock, setClock] = useState<string | null>(null);
   const [fading, setFading] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -156,13 +165,6 @@ export default function Home() {
   useEffect(() => {
     sceneRef.current?.show(active ?? "idle");
   }, [active]);
-
-  useEffect(() => {
-    document.documentElement.lang = lang;
-    return () => {
-      document.documentElement.lang = "en";
-    };
-  }, [lang]);
 
   // The viewer's own time and city, filled in after hydration.
   useEffect(() => {
@@ -269,15 +271,15 @@ export default function Home() {
     }
   };
 
-  const switchLang = () => {
-    const next: Lang = lang === "en" ? "fr" : "en";
+  // Fade the words out, switch, and fade them back in.
+  const fadeSwitch = (apply: () => void) => {
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
-      setLang(next);
+      apply();
       return;
     }
     setFading(true);
     window.setTimeout(() => {
-      setLang(next);
+      apply();
       setFading(false);
     }, 250);
   };
@@ -301,6 +303,7 @@ export default function Home() {
             id="hm-try"
             ref={tryRef}
             value={tryValue}
+            placeholder={STARTER_WORD}
             maxLength={24}
             autoComplete="off"
             spellCheck={false}
@@ -343,7 +346,7 @@ export default function Home() {
     );
 
   return (
-    <div className={`hm${fading ? " hm--fading" : ""}`}>
+    <div className={`hm hm--${lang}${fading ? " hm--fading" : ""}`}>
       <PageMeta
         title="Olayinka Titilola"
         description="Product manager in London. I lead product work at Flatiron Health, build small things, collect vinyls and try to keep my plants alive."
@@ -370,24 +373,17 @@ export default function Home() {
               <path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9.75h4v11H3v-11Zm6.5 0h3.8v1.5h.06c.53-1 1.83-2.06 3.77-2.06 4.03 0 4.77 2.65 4.77 6.1v5.46h-4v-4.84c0-1.16-.02-2.64-1.61-2.64-1.61 0-1.86 1.26-1.86 2.56v4.92h-4v-11Z" />
             </svg>
           </a>
-          <button
-            type="button"
-            className="hm-round hm-lang"
-            aria-label={c.switchLabel}
-            title={c.switchLabel}
-            onClick={switchLang}
-          >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12.9 15.1 10.4 12.6l.03-.03A17.5 17.5 0 0 0 14.1 6H17V4h-7V2H8v2H1v2h11.2A15.8 15.8 0 0 1 9 11.4 15.6 15.6 0 0 1 6.7 8H4.7a17.6 17.6 0 0 0 3 4.6l-5.1 5 1.4 1.4 5-5 3.1 3.1.8-2ZM18.5 10h-2L12 22h2l1.1-3h4.8l1.1 3h2l-4.5-12Zm-2.6 7 1.6-4.3 1.6 4.3h-3.2Z" />
-            </svg>
-            <span>{c.code}</span>
-          </button>
+          <LangSwitch className="hm-round hm-lang" onSwitch={fadeSwitch} />
         </div>
       </header>
 
       <div className="hm-aside" aria-live="polite">
         {panel && (
-          <div className="hm-panel" key={`${shown}-${pinned}-${lang}`}>
+          <div
+            className="hm-panel"
+            id="hm-panel"
+            key={`${shown}-${pinned}-${lang}`}
+          >
             {panel}
           </div>
         )}

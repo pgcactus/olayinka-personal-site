@@ -13,6 +13,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import PageMeta from "@/components/PageMeta";
 import SiteHeader from "@/components/SiteHeader";
+import { useLang } from "@/lib/lang";
 import { VINYLS, type Vinyl } from "@/data/vinyls";
 import "./vinyls.css";
 
@@ -75,16 +76,35 @@ function flyFrom(el: HTMLElement, from: Box, to: Box) {
   );
 }
 
-function detailLines(vinyl: Vinyl) {
+const STRINGS = {
+  en: {
+    title: "Vinyls",
+    count: (n: number) => `( ${n} records, one at a time )`,
+    collection: "Record collection",
+    by: (title: string, artist: string) => `${title} by ${artist}`,
+    released: (year: number) => `Released ${year}.`,
+    favourite: (track: string) => `Favourite track: ${track}.`,
+  },
+  fr: {
+    title: "Vinyles",
+    count: (n: number) => `( ${n} disques, un par un )`,
+    collection: "Collection de disques",
+    by: (title: string, artist: string) => `${title}, de ${artist}`,
+    released: (year: number) => `Sorti en ${year}.`,
+    favourite: (track: string) => `Morceau préféré : ${track}.`,
+  },
+};
+type Strings = (typeof STRINGS)["en"];
+
+function detailLines(vinyl: Vinyl, t: Strings) {
   if (vinyl.note) return vinyl.note;
-  const lines = [`Released ${vinyl.year}.`];
-  if (vinyl.favouriteTrack) {
-    lines.push(`Favourite track: ${vinyl.favouriteTrack}.`);
-  }
+  const lines = [t.released(vinyl.year)];
+  if (vinyl.favouriteTrack) lines.push(t.favourite(vinyl.favouriteTrack));
   return lines.join("\n");
 }
 
 export default function Vinyls() {
+  const t = STRINGS[useLang()];
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const wallRef = useRef<HTMLDivElement>(null);
   const flightLayerRef = useRef<HTMLDivElement>(null);
@@ -227,10 +247,8 @@ export default function Vinyls() {
 
       <main className={`vx-stage${selected ? " vx-stage--open" : ""}`}>
         <div className="vx-heading">
-          <h1 className="vx-title">Vinyls</h1>
-          <span className="vx-count">
-            ( {VINYLS.length} records, one at a time )
-          </span>
+          <h1 className="vx-title">{t.title}</h1>
+          <span className="vx-count">{t.count(VINYLS.length)}</span>
         </div>
         <div className="vx-wall" ref={wallRef}>
           {Array.from({ length: shelfCount(DESKTOP_COLS) }, (_, row) => (
@@ -250,13 +268,13 @@ export default function Vinyls() {
             />
           ))}
 
-          <ul className="vx-records" aria-label="Record collection">
+          <ul className="vx-records" aria-label={t.collection}>
             {VINYLS.map(vinyl => (
               <li key={vinyl.id} className="vx-slot">
                 <button
                   type="button"
                   className="vx-record"
-                  aria-label={`${vinyl.title} by ${vinyl.artist}`}
+                  aria-label={t.by(vinyl.title, vinyl.artist)}
                   aria-expanded={vinyl.id === selectedId}
                   aria-controls="vx-detail"
                   onClick={event => {
@@ -309,14 +327,14 @@ export default function Vinyls() {
               <img
                 className="vx-panel-cover"
                 src={shown.coverUrl}
-                alt={`${shown.title} by ${shown.artist}`}
+                alt={t.by(shown.title, shown.artist)}
               />
             )}
             <div>
               <h2 className="vx-panel-title">{shown.title}</h2>
               <p className="vx-panel-artist">{shown.artist}</p>
             </div>
-            <p className="vx-panel-note">{detailLines(shown)}</p>
+            <p className="vx-panel-note">{detailLines(shown, t)}</p>
           </div>
         )}
       </aside>

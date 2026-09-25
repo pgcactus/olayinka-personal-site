@@ -2,6 +2,9 @@
  * NATO phonetic alphabet conversion, shared by the /nato page and its tests.
  */
 
+/** What the speller shows before anyone types: radio talk, like the walkie-talkie. */
+export const STARTER_WORD = "ROGER THAT";
+
 export const NATO_MAP: Record<string, string> = {
   A: "Alfa",
   B: "Bravo",
