@@ -39,6 +39,17 @@ pnpm start
 
 The server reads `PORT` from the environment. Analytics are optional; copy
 `.env.example` to `.env` and set both values to enable the analytics script.
+Set `VITE_ANALYTICS_ENDPOINT` at runtime as well as build time: the server
+adds its origin to the Content Security Policy, and the script is blocked
+without it.
+
+## Source of truth
+
+This GitHub repository is the source of truth for the site. Changes made in
+another workspace (for example Manus) must arrive as a pull request against
+`main`, never as a direct push that replaces the repository: earlier syncs
+did that and silently reverted fixes. Protect `main` in the GitHub settings
+(Settings → Branches) by requiring a pull request and the `verify` check.
 
 ## Deployment
 

@@ -66,6 +66,8 @@ const VISITED: Record<string, CountryInfo> = {
   },
 };
 
+const visitedSet = new Set(Object.keys(VISITED));
+
 // ---------------------------------------------------------------------------
 // GeoJSON types
 // ---------------------------------------------------------------------------
@@ -88,28 +90,48 @@ interface GeoCollection {
 // Projection helpers (equirectangular)
 // ---------------------------------------------------------------------------
 
-function project(lon: number, lat: number, width: number, height: number): [number, number] {
+function project(
+  lon: number,
+  lat: number,
+  width: number,
+  height: number
+): [number, number] {
   const x = ((lon + 180) / 360) * width;
   const y = ((90 - lat) / 180) * height;
   return [x, y];
 }
 
-function coordsToPath(rings: number[][][], width: number, height: number): string {
+function coordsToPath(
+  rings: number[][][],
+  width: number,
+  height: number
+): string {
   return rings
-    .map((ring) => {
+    .map(ring => {
       const pts = ring.map(([lon, lat]) => project(lon, lat, width, height));
-      return pts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(2)},${p[1].toFixed(2)}`).join(" ") + " Z";
+      return (
+        pts
+          .map(
+            (p, i) =>
+              `${i === 0 ? "M" : "L"}${p[0].toFixed(2)},${p[1].toFixed(2)}`
+          )
+          .join(" ") + " Z"
+      );
     })
     .join(" ");
 }
 
-function featureToPath(feat: GeoFeature, width: number, height: number): string {
+function featureToPath(
+  feat: GeoFeature,
+  width: number,
+  height: number
+): string {
   const { type, coordinates } = feat.geometry;
   if (type === "Polygon") {
     return coordsToPath(coordinates as number[][][], width, height);
   }
   return (coordinates as number[][][][])
-    .map((poly) => coordsToPath(poly, width, height))
+    .map(poly => coordsToPath(poly, width, height))
     .join(" ");
 }
 
@@ -151,20 +173,21 @@ export default function InteractiveMap() {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const visitedSet = new Set(Object.keys(VISITED));
-
   // Fetch GeoJSON on mount
   useEffect(() => {
     fetch("/world.geojson")
-      .then((r) => r.json())
+      .then(r => r.json())
       .then((data: GeoCollection) => setGeoData(data))
-      .catch((err) => console.error("Failed to load world map:", err));
+      .catch(err => console.error("Failed to load world map:", err));
   }, []);
 
   // Close tooltip when clicking outside
   useEffect(() => {
     function handleOutside(e: MouseEvent | TouchEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
         setTooltip(null);
       }
     }
@@ -184,17 +207,21 @@ export default function InteractiveMap() {
       const svg = svgRef.current;
       if (!svg) return;
       const rect = svg.getBoundingClientRect();
-      const clientX = "touches" in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
-      const clientY = "touches" in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
+      const clientX =
+        "touches" in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
+      const clientY =
+        "touches" in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
 
       const scaleX = MAP_W / rect.width;
       const scaleY = MAP_H / rect.height;
       const svgX = (clientX - rect.left) * scaleX;
       const svgY = (clientY - rect.top) * scaleY;
 
-      setTooltip((prev) => (prev?.iso2 === iso2 ? null : { iso2, x: svgX, y: svgY }));
+      setTooltip(prev =>
+        prev?.iso2 === iso2 ? null : { iso2, x: svgX, y: svgY }
+      );
     },
-    [visitedSet]
+    []
   );
 
   const tooltipInfo = tooltip ? VISITED[tooltip.iso2] : null;
@@ -213,7 +240,7 @@ export default function InteractiveMap() {
         <span className="map-loading-text">Loading map...</span>
         {/* Semantic fallback for prerendered HTML — visible to crawlers even before GeoJSON loads */}
         <ul className="map-visited-list" aria-label="Countries visited">
-          {Object.values(VISITED).map((c) => (
+          {Object.values(VISITED).map(c => (
             <li key={c.name}>{c.name}</li>
           ))}
         </ul>
@@ -240,7 +267,9 @@ export default function InteractiveMap() {
           // iso2 === '-99' is a sentinel in this GeoJSON for unrecognised territories;
           // treat it the same as missing so we fall back to a unique key.
           const featureKey =
-            iso2 && iso2 !== "-99" ? iso2 : feat.properties.name || `feat-${idx}`;
+            iso2 && iso2 !== "-99"
+              ? iso2
+              : feat.properties.name || `feat-${idx}`;
 
           return (
             <path
@@ -253,32 +282,51 @@ export default function InteractiveMap() {
               ]
                 .filter(Boolean)
                 .join(" ")}
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
                 handleCountryClick(e, iso2);
               }}
-              onTouchStart={(e) => handleCountryClick(e, iso2)}
+              onTouchStart={e => handleCountryClick(e, iso2)}
               role={visited ? "button" : undefined}
-              aria-label={visited ? `${feat.properties.name} — tap for details` : undefined}
+              aria-label={
+                visited
+                  ? `${feat.properties.name} — tap for details`
+                  : undefined
+              }
             />
           );
         })}
 
         {/* Tooltip */}
         {tooltip && tooltipInfo && (
-          <g transform={`translate(${tooltipX},${tooltipY})`} className="map-tooltip-group">
-            <rect width={TOOLTIP_W} height={TOOLTIP_H} rx={3} className="map-tooltip-bg" />
+          <g
+            transform={`translate(${tooltipX},${tooltipY})`}
+            className="map-tooltip-group"
+          >
+            <rect
+              width={TOOLTIP_W}
+              height={TOOLTIP_H}
+              rx={3}
+              className="map-tooltip-bg"
+            />
             <text x={12} y={22} className="map-tooltip-country">
               {tooltipInfo.name}
             </text>
             <text x={12} y={38} className="map-tooltip-capital">
               Capital: {tooltipInfo.capital}
             </text>
-            {wrapText(tooltipInfo.fact, 36).slice(0, 4).map((line, i) => (
-              <text key={i} x={12} y={58 + i * 14} className="map-tooltip-fact">
-                {line}
-              </text>
-            ))}
+            {wrapText(tooltipInfo.fact, 36)
+              .slice(0, 4)
+              .map((line, i) => (
+                <text
+                  key={i}
+                  x={12}
+                  y={58 + i * 14}
+                  className="map-tooltip-fact"
+                >
+                  {line}
+                </text>
+              ))}
           </g>
         )}
       </svg>
@@ -287,7 +335,8 @@ export default function InteractiveMap() {
         Tap a highlighted country to learn something about it.
       </p>
       <p className="map-counter">
-        <strong>{visitedSet.size}</strong> {visitedSet.size === 1 ? "country" : "countries"} visited
+        <strong>{visitedSet.size}</strong>{" "}
+        {visitedSet.size === 1 ? "country" : "countries"} visited
       </p>
     </div>
   );

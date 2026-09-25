@@ -6,7 +6,7 @@
  *
  * Uses tsx to execute TypeScript/JSX directly in Node without a separate
  * build step, avoiding the source-map WASM worker hang from vite-prerender-plugin.
- * 
+ *
  * React 19 renders head tags (title, meta, script) as JSX elements in the component tree.
  * We extract these tags from the rendered HTML and inject them into the actual <head>.
  */
@@ -21,8 +21,9 @@ import App from "../client/src/App";
 
 // PRERENDER_ROOT is set by vite.config.ts when running as a CJS bundle via esbuild.
 // Fall back to import.meta.url for direct tsx execution.
-const ROOT = process.env.PRERENDER_ROOT
-  ?? join(dirname(fileURLToPath(import.meta.url)), "..");
+const ROOT =
+  process.env.PRERENDER_ROOT ??
+  join(dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = join(ROOT, "dist", "public");
 
 const PRERENDER_ROUTES = [
@@ -34,8 +35,7 @@ const PRERENDER_ROUTES = [
 ];
 
 // Block external fetch during prerender (no network in deployment)
-const origFetch = globalThis.fetch;
-globalThis.fetch = async (url: RequestInfo | URL, opts?: RequestInit) => {
+globalThis.fetch = async (url: RequestInfo | URL) => {
   const urlStr = String(url);
   if (urlStr.startsWith("/")) {
     try {
@@ -52,8 +52,10 @@ globalThis.fetch = async (url: RequestInfo | URL, opts?: RequestInit) => {
 
 let tpl = readFileSync(join(DIST, "index.html"), "utf-8");
 
-// Remove the default <title> from the template so route-specific titles can be injected
+// Remove the default <title> and description from the template so route-specific
+// ones can be injected without duplicates
 tpl = tpl.replace(/<title>.*?<\/title>/i, "");
+tpl = tpl.replace(/\s*<meta\s+name="description"[^>]*>/i, "");
 
 for (const route of PRERENDER_ROUTES) {
   // Set location globals for wouter's SSR path
@@ -77,12 +79,14 @@ for (const route of PRERENDER_ROUTES) {
     createElement(Router, { ssrPath: route }, createElement(App, null))
   );
 
-  // Extract head tags from the rendered HTML using regex
-  // Matches: <title>...</title>, <meta .../>, <link .../>, <script>...</script>
-  const headTagRegex = /<(title|meta|link|script)(?:\s[^>]*)?>(?:.*?)<\/\1>|<(meta|link)(?:\s[^>]*)?\s*\/>/gi;
+  // Extract the tags React 19 hoists into <head> on the client: <title>, <meta>
+  // and <link>. Inline <script> tags (the JSON-LD) are not hoisted, so they stay
+  // in the body where hydration expects them.
+  const headTagRegex =
+    /<title(?:\s[^>]*)?>.*?<\/title>|<(meta|link)(?:\s[^>]*)?\s*\/?>/gi;
   const headTags: string[] = [];
   let match;
-  
+
   // Extract all head tags
   while ((match = headTagRegex.exec(html)) !== null) {
     headTags.push(match[0]);
@@ -97,15 +101,18 @@ for (const route of PRERENDER_ROUTES) {
 
   // Inject prerendered HTML into the root div, not directly in body
   let output = tpl;
-  
+
   // Inject head tags before </head>
   if (headTags.length > 0) {
     const headContent = headTags.join("\n    ");
     output = output.replace("</head>", `    ${headContent}\n  </head>`);
   }
-  
+
   // Inject prerendered HTML into the root div
-  output = output.replace(/<div id="root"><\/div>/, `<div id="root">${bodyHtml}</div>`);
+  output = output.replace(
+    /<div id="root"><\/div>/,
+    `<div id="root">${bodyHtml}</div>`
+  );
   // If root div not found, fall back to injecting after body tag
   if (!output.includes(`<div id="root">${bodyHtml}</div>`)) {
     output = output.replace(/<body([^>]*)>/, `<body$1>${bodyHtml}`);

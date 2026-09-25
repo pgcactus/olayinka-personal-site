@@ -12,11 +12,11 @@ Places is now backed by `client/src/data/places.json` and rendered as CSS-only p
 
 These scores were measured with **Lighthouse 13.4.1, Desktop preset**, against the local production build.
 
-| Route | Performance | Accessibility | Best practices | SEO |
-|---|---:|---:|---:|---:|
-| `/` | 100 | 90 | 96 | 100 |
-| `/things/vinyls` | 90 | 92 | 96 | 100 |
-| `/things/places` | 100 | 92 | 96 | 100 |
+| Route            | Performance | Accessibility | Best practices | SEO |
+| ---------------- | ----------: | ------------: | -------------: | --: |
+| `/`              |         100 |            90 |             96 | 100 |
+| `/things/vinyls` |          90 |            92 |             96 | 100 |
+| `/things/places` |         100 |            92 |             96 | 100 |
 
 The Vinyl score was raised without a design change by deferring noncritical hydration, loading only the first visible sleeve at high priority, and serving existing cover art from stable project storage. The page now retains its original shelf design and detail interactions.
 
@@ -56,11 +56,11 @@ The public custom domain still reflects the most recently published checkpoint. 
 
 ## Files changed
 
-| Area | Files |
-|---|---|
-| Header and page framing | `client/src/pages/Home.tsx`, `client/src/pages/Things.tsx`, `client/src/pages/Nato.tsx`, `client/src/index.css` |
+| Area                            | Files                                                                                                                                                                                                               |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Header and page framing         | `client/src/pages/Home.tsx`, `client/src/pages/Things.tsx`, `client/src/pages/Nato.tsx`, `client/src/index.css`                                                                                                     |
 | Static routing and prerendering | `client/src/App.tsx`, `client/src/AppServer.tsx`, `client/src/main.tsx`, `client/src/main-client.tsx`, `client/src/prerender.tsx`, `scripts/prerender.ts`, `vite.config.ts`, `server/index.ts`, `client/index.html` |
-| Metadata and performance | `client/src/components/PageMeta.tsx`, `client/src/components/ErrorBoundary.tsx`, `package.json`, `pnpm-lock.yaml` |
-| Places replacement | `client/src/data/places.json`, `client/src/pages/Things.tsx`, `client/src/index.css`; deleted `client/src/components/InteractiveMap.tsx`, `client/src/data/places.ts`, and `client/public/world.geojson` |
-| Vinyl image delivery only | `client/src/data/vinyls-resolved.json` |
-| Removed unused code | `client/src/lib/utils.ts` |
+| Metadata and performance        | `client/src/components/PageMeta.tsx`, `client/src/components/ErrorBoundary.tsx`, `package.json`, `pnpm-lock.yaml`                                                                                                   |
+| Places replacement              | `client/src/data/places.json`, `client/src/pages/Things.tsx`, `client/src/index.css`; deleted `client/src/components/InteractiveMap.tsx`, `client/src/data/places.ts`, and `client/public/world.geojson`            |
+| Vinyl image delivery only       | `client/src/data/vinyls-resolved.json`                                                                                                                                                                              |
+| Removed unused code             | `client/src/lib/utils.ts`                                                                                                                                                                                           |

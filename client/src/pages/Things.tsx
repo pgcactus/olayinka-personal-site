@@ -7,7 +7,8 @@
  * - Inactive tabs: muted #9CA3AF, no background
  * - Books: shelf rows, portrait covers, hover overlay, click-to-expand detail panel,
  *          category/year filter bar, "currently reading" badge on active book
- * - Vinyls: shelf rows, square covers, hover overlay, favourite track, 30s preview on click
+ * - Vinyls: shelf rows, square covers, hover overlay, favourite track
+ *   (click-to-preview is wired up but idle until vinyl data carries previewUrl)
  * - Places: interactive SVG world map, visited countries highlighted, click tooltip, country counter
  * - Page-level fade-in on mount via CSS animation (no framer-motion)
  * - Back link top-left, 13px, #5A5A5A, fades to 60% on hover
@@ -49,8 +50,16 @@ const BOOKS: Book[] = (BOOKS_RESOLVED as Book[]).map((b, i) => ({
 }));
 
 // Categories derived from data
-const BOOK_CATEGORIES = ["all", ...Array.from(new Set(BOOKS.map((b) => b.category)))];
-const BOOK_YEARS = ["all", ...Array.from(new Set(BOOKS.map((b) => b.read))).sort((a, b) => b - a).map(String)];
+const BOOK_CATEGORIES = [
+  "all",
+  ...Array.from(new Set(BOOKS.map(b => b.category))),
+];
+const BOOK_YEARS = [
+  "all",
+  ...Array.from(new Set(BOOKS.map(b => b.read)))
+    .sort((a, b) => b - a)
+    .map(String),
+];
 
 // ---------------------------------------------------------------------------
 // BookItem — portrait cover + caption below + click-to-expand panel
@@ -75,12 +84,14 @@ function BookItem({
       onClick={onClick}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => e.key === "Enter" && onClick()}
+      onKeyDown={e => e.key === "Enter" && onClick()}
       aria-expanded={isActive}
     >
       <div
         className="book-cover"
-        style={resolvedSrc ? { backgroundImage: `url(${resolvedSrc})` } : undefined}
+        style={
+          resolvedSrc ? { backgroundImage: `url(${resolvedSrc})` } : undefined
+        }
       >
         {resolvedSrc && (
           <img
@@ -92,9 +103,7 @@ function BookItem({
           />
         )}
         {/* Currently reading badge */}
-        {book.current && (
-          <div className="book-current-badge">reading</div>
-        )}
+        {book.current && <div className="book-current-badge">reading</div>}
         {/* Hover strip — slides up over cover only */}
         <div className="book-cover-overlay">
           Published {book.year}&nbsp;&middot;&nbsp;Read {book.read}
@@ -112,7 +121,13 @@ function BookItem({
 // BookDetailPanel — slides in below the shelf row when a book is selected
 // ---------------------------------------------------------------------------
 
-function BookDetailPanel({ book, onClose }: { book: Book; onClose: () => void }) {
+function BookDetailPanel({
+  book,
+  onClose,
+}: {
+  book: Book;
+  onClose: () => void;
+}) {
   const bundledSrc = BOOK_COVERS[book.id] ?? book.coverUrl ?? null;
   const [imgFailed, setImgFailed] = useState(false);
   const resolvedSrc = imgFailed ? null : bundledSrc;
@@ -162,7 +177,8 @@ function BookDetailPanel({ book, onClose }: { book: Book; onClose: () => void })
             <div className="book-panel-current">Currently reading</div>
           )}
           <p className="book-panel-note">
-            {book.note ?? "No note yet — add one to books-resolved.json to share your thoughts on this book."}
+            {book.note ??
+              "No note yet — add one to books-resolved.json to share your thoughts on this book."}
           </p>
         </div>
       </div>
@@ -185,20 +201,20 @@ interface Vinyl {
 }
 
 const VINYL_EXTRAS: Record<string, { favouriteTrack?: string }> = {
-  "for-broken-ears":       { favouriteTrack: "Found" },
-  "untitled-unmastered":   { favouriteTrack: "untitled 07" },
-  "gnx":                   { favouriteTrack: "wacced out murals" },
-  "iyrtitl":               { favouriteTrack: "Know Yourself" },
-  "african-giant":         { favouriteTrack: "Ye" },
-  "i-told-them":           { favouriteTrack: "City Boys" },
-  "lungu-boy":             { favouriteTrack: "Lungu Boy" },
-  "wattba":                { favouriteTrack: "Jumpman" },
-  "the-blueprint":         { favouriteTrack: "Izzo (H.O.V.A.)" },
-  "let-god-sort-em-out":   { favouriteTrack: "Birds & Bees" },
-  "mbdtf":                 { favouriteTrack: "Runaway" },
+  "for-broken-ears": { favouriteTrack: "Found" },
+  "untitled-unmastered": { favouriteTrack: "untitled 07" },
+  gnx: { favouriteTrack: "wacced out murals" },
+  iyrtitl: { favouriteTrack: "Know Yourself" },
+  "african-giant": { favouriteTrack: "Ye" },
+  "i-told-them": { favouriteTrack: "City Boys" },
+  "lungu-boy": { favouriteTrack: "Lungu Boy" },
+  wattba: { favouriteTrack: "Jumpman" },
+  "the-blueprint": { favouriteTrack: "Izzo (H.O.V.A.)" },
+  "let-god-sort-em-out": { favouriteTrack: "Birds & Bees" },
+  mbdtf: { favouriteTrack: "Runaway" },
 };
 
-const VINYLS: Vinyl[] = (VINYLS_RESOLVED as Vinyl[]).map((v) => ({
+const VINYLS: Vinyl[] = (VINYLS_RESOLVED as Vinyl[]).map(v => ({
   ...v,
   ...(VINYL_EXTRAS[v.id] ?? {}),
 }));
@@ -221,15 +237,16 @@ function VinylShelf({ vinyls }: { vinyls: Vinyl[] }) {
     return () => window.removeEventListener("resize", updateItemsPerRow);
   }, []);
 
-  const shelfRows = Array.from({ length: Math.ceil(vinyls.length / itemsPerRow) }, (_, i) =>
-    vinyls.slice(i * itemsPerRow, i * itemsPerRow + itemsPerRow)
+  const shelfRows = Array.from(
+    { length: Math.ceil(vinyls.length / itemsPerRow) },
+    (_, i) => vinyls.slice(i * itemsPerRow, i * itemsPerRow + itemsPerRow)
   );
 
   return (
     <div className="shelf-section">
       {shelfRows.map((row, rowIdx) => (
         <div key={rowIdx} className="shelf-row">
-          {row.map((vinyl) => (
+          {row.map(vinyl => (
             <VinylCard key={vinyl.id} vinyl={vinyl} />
           ))}
         </div>
@@ -273,7 +290,7 @@ function VinylCard({ vinyl }: { vinyl: Vinyl }) {
       onClick={handleClick}
       role={vinyl.previewUrl ? "button" : undefined}
       tabIndex={vinyl.previewUrl ? 0 : undefined}
-      onKeyDown={(e) => e.key === "Enter" && handleClick()}
+      onKeyDown={e => e.key === "Enter" && handleClick()}
     >
       {vinyl.coverUrl ? (
         <img
@@ -288,11 +305,17 @@ function VinylCard({ vinyl }: { vinyl: Vinyl }) {
           <span className="vinyl-fallback-artist">{vinyl.artist}</span>
         </div>
       )}
-      {playing && <div className="vinyl-playing-indicator">&#9654; playing</div>}
-      <div className={`vinyl-overlay${hovered ? " vinyl-overlay--visible" : ""}`}>
+      {playing && (
+        <div className="vinyl-playing-indicator">&#9654; playing</div>
+      )}
+      <div
+        className={`vinyl-overlay${hovered ? " vinyl-overlay--visible" : ""}`}
+      >
         <span>Released {vinyl.year}</span>
         {vinyl.favouriteTrack && (
-          <span className="vinyl-fav-track">&nbsp;&middot;&nbsp;{vinyl.favouriteTrack}</span>
+          <span className="vinyl-fav-track">
+            &nbsp;&middot;&nbsp;{vinyl.favouriteTrack}
+          </span>
         )}
       </div>
     </div>
@@ -308,15 +331,17 @@ const TABS: Tab[] = ["books", "vinyls"];
 const TAB_META: Record<Tab, { title: string; description: string }> = {
   books: {
     title: "Books — Olayinka Titilola",
-    description: "Books I have read: product strategy, systems thinking, fiction, and more.",
+    description:
+      "Books I have read: product strategy, systems thinking, fiction, and more.",
   },
   vinyls: {
     title: "Vinyls — Olayinka Titilola",
-    description: "Records in my collection, with favourite tracks and 30-second previews.",
+    description: "Records in my collection, with a favourite track from each.",
   },
   places: {
     title: "Places — Olayinka Titilola",
-    description: "Countries I have visited, mapped out with a few notes on each.",
+    description:
+      "Countries I have visited, mapped out with a few notes on each.",
   },
 };
 
@@ -348,22 +373,25 @@ export default function Things() {
   }
 
   // Filtered books
-  const filteredBooks = BOOKS.filter((b) => {
+  const filteredBooks = BOOKS.filter(b => {
     if (catFilter !== "all" && b.category !== catFilter) return false;
     if (yearFilter !== "all" && String(b.read) !== yearFilter) return false;
     return true;
   });
 
-  const selectedBook = selectedBookId ? BOOKS.find((b) => b.id === selectedBookId) ?? null : null;
+  const selectedBook = selectedBookId
+    ? (BOOKS.find(b => b.id === selectedBookId) ?? null)
+    : null;
 
   // Group filtered books into shelf rows of 5
-  const shelfRows = Array.from({ length: Math.ceil(filteredBooks.length / 5) }, (_, i) =>
-    filteredBooks.slice(i * 5, i * 5 + 5)
+  const shelfRows = Array.from(
+    { length: Math.ceil(filteredBooks.length / 5) },
+    (_, i) => filteredBooks.slice(i * 5, i * 5 + 5)
   );
 
   // Find which row the selected book is in (to insert panel after that row)
   const selectedRowIdx = selectedBookId
-    ? shelfRows.findIndex((row) => row.some((b) => b.id === selectedBookId))
+    ? shelfRows.findIndex(row => row.some(b => b.id === selectedBookId))
     : -1;
 
   const meta = TAB_META[activeTab];
@@ -374,9 +402,10 @@ export default function Things() {
         title={meta.title}
         description={meta.description}
         path={`/things/${activeTab}`}
+        noindex={activeTab === "places"}
       />
 
-      <div className="things-content">
+      <main className="things-content">
         {/* Back link */}
         <Link href="/" className="things-back">
           &#8627; back
@@ -408,22 +437,28 @@ export default function Things() {
             {/* Filter bar */}
             <div className="books-filter-bar">
               <div className="books-filter-group">
-                {BOOK_CATEGORIES.map((cat) => (
+                {BOOK_CATEGORIES.map(cat => (
                   <button
                     key={cat}
                     className={`books-filter-btn${catFilter === cat ? " books-filter-btn--active" : ""}`}
-                    onClick={() => { setCatFilter(cat); setSelectedBookId(null); }}
+                    onClick={() => {
+                      setCatFilter(cat);
+                      setSelectedBookId(null);
+                    }}
                   >
                     {cat}
                   </button>
                 ))}
               </div>
               <div className="books-filter-group">
-                {BOOK_YEARS.map((yr) => (
+                {BOOK_YEARS.map(yr => (
                   <button
                     key={yr}
                     className={`books-filter-btn${yearFilter === yr ? " books-filter-btn--active" : ""}`}
-                    onClick={() => { setYearFilter(yr); setSelectedBookId(null); }}
+                    onClick={() => {
+                      setYearFilter(yr);
+                      setSelectedBookId(null);
+                    }}
                   >
                     {yr === "all" ? "all years" : yr}
                   </button>
@@ -436,13 +471,15 @@ export default function Things() {
               {shelfRows.map((row, rowIdx) => (
                 <div key={rowIdx}>
                   <div className="shelf-row">
-                    {row.map((book) => (
+                    {row.map(book => (
                       <BookItem
                         key={book.id}
                         book={book}
                         isActive={book.id === selectedBookId}
                         onClick={() =>
-                          setSelectedBookId(book.id === selectedBookId ? null : book.id)
+                          setSelectedBookId(
+                            book.id === selectedBookId ? null : book.id
+                          )
                         }
                       />
                     ))}
@@ -464,13 +501,11 @@ export default function Things() {
         )}
 
         {/* Vinyls tab: responsive shelf layout */}
-        {activeTab === "vinyls" && (
-          <VinylShelf vinyls={VINYLS} />
-        )}
+        {activeTab === "vinyls" && <VinylShelf vinyls={VINYLS} />}
 
         {/* Places tab: interactive world map */}
         {activeTab === "places" && <InteractiveMap />}
-      </div>
+      </main>
     </div>
   );
 }
