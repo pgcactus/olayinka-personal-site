@@ -815,90 +815,6 @@
     text-overflow: ellipsis;
   }
 
-  /* ------------------------------------------------------------------ */
-  /* Vinyls on shelves                                                    */
-  /* ------------------------------------------------------------------ */
-
-  /* Vinyl cell — square, sits on shelf */
-  .vinyl-card {
-    flex: 1;
-    min-width: 0;
-    position: relative;
-    aspect-ratio: 1 / 1;
-    overflow: hidden;
-    cursor: default;
-    border-radius: 1px;
-    box-shadow:
-      2px 4px 12px rgba(0, 0, 0, 0.18),
-      -1px 0 4px rgba(0, 0, 0, 0.06);
-    transition: transform 200ms ease-out;
-  }
-
-  .vinyl-card--hovered {
-    transform: translateY(-6px);
-  }
-
-  /* Cover image — full bleed */
-  .vinyl-cover {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-
-  /* Fallback tile — dark background, monospace text */
-  .vinyl-fallback {
-    width: 100%;
-    height: 100%;
-    background: #1a1a1a;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 16px;
-    gap: 6px;
-  }
-
-  .vinyl-fallback-title {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    font-weight: 700;
-    color: #ffffff;
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .vinyl-fallback-artist {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 400;
-    color: rgba(255, 255, 255, 0.65);
-    line-height: 1.4;
-  }
-
-  /* Hover strip */
-  .vinyl-overlay {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    color: #ffffff;
-    padding: 8px 12px;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.05em;
-    transform: translateY(100%);
-    transition: transform 200ms ease-out;
-  }
-
-  .vinyl-overlay--visible {
-    transform: translateY(0);
-  }
-
   /* Mobile: reduce shelf gap */
   @media (max-width: 640px) {
     .shelf-row {
@@ -1256,33 +1172,6 @@
 
 .dark .book-panel-note {
   color: #9ca3af;
-}
-
-/* ------------------------------------------------------------------ */
-/* Vinyls: playing indicator                                            */
-/* ------------------------------------------------------------------ */
-
-.vinyl-card--playing .vinyl-cover {
-  opacity: 0.85;
-}
-
-.vinyl-playing-indicator {
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  background: rgba(0, 0, 0, 0.75);
-  color: #facc15;
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.06em;
-  padding: 2px 6px;
-  border-radius: 2px;
-  z-index: 3;
-  pointer-events: none;
-}
-
-.vinyl-fav-track {
-  font-style: italic;
 }
 
 /* ------------------------------------------------------------------ */

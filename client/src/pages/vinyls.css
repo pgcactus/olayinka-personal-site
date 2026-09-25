@@ -1,0 +1,353 @@
+/*
+ * /things/vinyls — wall shelves. Sizes derive from one unit, --vx-u (a cover's
+ * width), so the wall scales with the viewport like a fixed camera would.
+ * PANEL_WIDTH, WALL_SHIFT and PANEL_COVER in Vinyls.tsx mirror 32%, 20vw and
+ * 36vh below.
+ */
+
+.vx-page {
+  --vx-cols: 5;
+  --vx-u: min(12.9vw, 18.4vh);
+  --vx-pitch: calc(var(--vx-u) * 1.205);
+  --vx-row: calc(var(--vx-u) * 1.53);
+  --vx-wall-w: calc(var(--vx-cols) * var(--vx-pitch) + var(--vx-u) * 0.9);
+  --vx-ease: cubic-bezier(0.32, 0.72, 0, 1);
+
+  position: relative;
+  min-height: 100vh;
+  font-family: "Inter Tight", Inter, ui-sans-serif, system-ui, sans-serif;
+  color: #000;
+  -webkit-font-smoothing: antialiased;
+  isolation: isolate;
+}
+
+.vx-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(
+    130% 100% at 50% 0%,
+    #f5f5f6 0%,
+    #ebebed 45%,
+    #d9d9dc 100%
+  );
+}
+
+/* Header ------------------------------------------------------------------ */
+
+.vx-header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 10;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: max(1.75rem, calc(env(safe-area-inset-top) + 0.5rem)) 24px 0;
+  pointer-events: none;
+}
+
+.vx-tagline {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.375;
+  color: #6b7280;
+}
+
+.vx-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  line-height: 1.375;
+  color: #4b5563;
+  text-decoration: none;
+  pointer-events: auto;
+}
+
+.vx-home:hover {
+  text-decoration: underline;
+}
+
+.vx-home-icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* Wall and shelves ---------------------------------------------------------- */
+
+.vx-stage {
+  padding: max(140px, 19.5vh) 0 22vh;
+}
+
+.vx-wall {
+  --vx-origin-y: 14vh;
+  position: relative;
+  width: var(--vx-wall-w);
+  margin: 0 auto;
+  transition: transform 900ms var(--vx-ease);
+}
+
+.vx-shelf {
+  --vx-thick: max(6px, calc(var(--vx-u) * 0.065));
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  /* Drawn over the sleeves' bottom edges, so they stand behind the lip. */
+  pointer-events: none;
+  /* React sets --vx-i to the shelf's index. */
+  top: calc(var(--vx-i) * var(--vx-row) + var(--vx-u));
+  height: var(--vx-thick);
+  border-radius: 1px 1px 3px 3px;
+  background: linear-gradient(#fbfbfb, #ededee);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 calc(var(--vx-u) * 0.09) calc(var(--vx-u) * 0.12)
+      calc(var(--vx-u) * -0.04) rgba(0, 0, 0, 0.16),
+    0 calc(var(--vx-u) * 0.2) calc(var(--vx-u) * 0.3) calc(var(--vx-u) * -0.1)
+      rgba(0, 0, 0, 0.1);
+}
+
+/*
+ * Top surface, as a fixed camera would see it: the further a shelf sits below
+ * the eye line (--vx-origin-y, kept current on scroll), the more of its top
+ * shows. Its back edge is slightly narrower than the front.
+ */
+.vx-shelf::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: max(
+    0px,
+    (var(--vx-i) * var(--vx-row) + var(--vx-u) - var(--vx-origin-y)) * 0.024
+  );
+  background: linear-gradient(to top, #ffffff, #f1f1f2);
+  clip-path: polygon(1% 0, 99% 0, 100% 100%, 0 100%);
+}
+
+.vx-shelf--mobile {
+  display: none;
+}
+
+.vx-records {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: calc(var(--vx-cols) * var(--vx-pitch));
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.vx-slot {
+  display: flex;
+  justify-content: center;
+  width: var(--vx-pitch);
+  height: var(--vx-row);
+}
+
+.vx-record {
+  display: block;
+  width: var(--vx-u);
+  height: var(--vx-u);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.vx-record:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+.vx-cover {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 1px;
+  background: #cfcfd3;
+  box-shadow:
+    calc(var(--vx-u) * 0.03) calc(var(--vx-u) * 0.02) calc(var(--vx-u) * 0.06)
+      rgba(0, 0, 0, 0.28),
+    calc(var(--vx-u) * 0.12) calc(var(--vx-u) * 0.05) calc(var(--vx-u) * 0.2)
+      rgba(0, 0, 0, 0.16);
+  user-select: none;
+}
+
+.vx-cover--blank {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 2px;
+  padding: 10px;
+  font-size: 12px;
+  line-height: 1.3;
+  text-align: left;
+  color: #fff;
+  background: #2a2a2a;
+}
+
+/* Flown-out sleeve ---------------------------------------------------------- */
+
+.vx-flight-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.vx-flyer {
+  position: absolute;
+  object-fit: cover;
+  border-radius: 2px;
+  transform-origin: top left;
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.3);
+}
+
+/* Detail panel -------------------------------------------------------------- */
+
+.vx-panel {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 700ms var(--vx-ease),
+    transform 700ms var(--vx-ease);
+}
+
+.vx-panel--open {
+  opacity: 1;
+  transform: none;
+}
+
+.vx-panel-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 64px 32px 40px;
+  background: linear-gradient(
+    to top,
+    #d9d9dc,
+    rgba(217, 217, 220, 0.9) 70%,
+    transparent
+  );
+}
+
+.vx-panel--open .vx-panel-body {
+  pointer-events: auto;
+}
+
+.vx-panel-cover {
+  width: 176px;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 2px;
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.3);
+}
+
+.vx-panel-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.375;
+  color: #000;
+}
+
+.vx-panel-artist {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 1.43;
+  color: #6b7280;
+}
+
+.vx-panel-note {
+  max-width: 28rem;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.625;
+  color: #4b5563;
+  white-space: pre-line;
+}
+
+/* Mobile: three to a shelf, shelves nearly full width. */
+@media (max-width: 767px) {
+  .vx-page {
+    --vx-cols: 3;
+    --vx-u: 22.3vw;
+    --vx-wall-w: 88vw;
+  }
+
+  .vx-shelf--desktop {
+    display: none;
+  }
+
+  .vx-shelf--mobile {
+    display: block;
+  }
+}
+
+@media (min-width: 640px) {
+  .vx-header {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+
+/* Desktop: panel on the right, wall slides left to make room. */
+@media (min-width: 768px) {
+  .vx-stage--open .vx-wall {
+    transform: translateX(-20vw);
+  }
+
+  .vx-panel {
+    inset: 0 0 0 auto;
+    width: 32%;
+    transform: translateX(32px);
+  }
+
+  .vx-panel--open {
+    transform: none;
+  }
+
+  .vx-panel-body {
+    gap: 16px;
+    margin: 0 32px 0 calc(50% - 18vh);
+    padding: 58vh 0 0;
+    background: none;
+  }
+
+  .vx-panel-cover {
+    display: none;
+  }
+
+  .vx-panel-title {
+    font-size: 24px;
+  }
+
+  .vx-panel-note {
+    max-width: 36rem;
+    max-height: 34vh;
+    overflow-y: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vx-wall,
+  .vx-panel {
+    transition: none;
+  }
+}
