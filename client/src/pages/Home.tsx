@@ -353,7 +353,6 @@ export default function Home() {
         path="/"
         jsonLd={personJsonLd}
       />
-      <canvas ref={canvasRef} className="hm-scene" aria-hidden="true" />
       <span className="hm-tick hm-tick--tl" />
       <span className="hm-tick hm-tick--tr" />
       <span className="hm-tick hm-tick--bl" />
@@ -377,32 +376,38 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="hm-aside" aria-live="polite">
-        {panel && (
-          <div
-            className="hm-panel"
-            id="hm-panel"
-            key={`${shown}-${pinned}-${lang}`}
-          >
-            {panel}
-          </div>
-        )}
+      <div className="hm-stage">
+        <div className="hm-aside" aria-live="polite">
+          {panel && (
+            <div
+              className="hm-panel"
+              id="hm-panel"
+              key={`${shown}-${pinned}-${lang}`}
+            >
+              {panel}
+            </div>
+          )}
+        </div>
+        <div className="hm-art">
+          <canvas ref={canvasRef} className="hm-scene" aria-hidden="true" />
+          {cta && !pinned && (
+            <button
+              type="button"
+              className="hm-cta"
+              style={{
+                transform: `translate(${Math.round(cta.x)}px, ${Math.round(cta.y)}px) translate(-50%, -50%)`,
+              }}
+              onPointerEnter={() => window.clearTimeout(leaveRef.current)}
+              onPointerLeave={e =>
+                e.pointerType === "mouse" && !pinned && leave()
+              }
+              onClick={pinThings}
+            >
+              {c.typeMe}
+            </button>
+          )}
+        </div>
       </div>
-
-      {cta && !pinned && (
-        <button
-          type="button"
-          className="hm-cta"
-          style={{
-            transform: `translate(${Math.round(cta.x)}px, ${Math.round(cta.y)}px) translate(-50%, -50%)`,
-          }}
-          onPointerEnter={() => window.clearTimeout(leaveRef.current)}
-          onPointerLeave={e => e.pointerType === "mouse" && !pinned && leave()}
-          onClick={pinThings}
-        >
-          {c.typeMe}
-        </button>
-      )}
 
       <main
         className="hm-main"

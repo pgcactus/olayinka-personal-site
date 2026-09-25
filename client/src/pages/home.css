@@ -1,5 +1,5 @@
 /*
- * Home: one screen. A line drawing sits behind a handwritten title and copy;
+ * Home: one screen. A small line drawing sits above the title and copy;
  * the highlighted phrases change the drawing. Colours and fonts come from the
  * site tokens in index.css.
  */
@@ -7,7 +7,8 @@
 .hm {
   position: relative;
   display: grid;
-  grid-template-rows: auto 1fr auto auto;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 1fr);
   min-height: 100vh;
   min-height: 100dvh;
   box-sizing: border-box;
@@ -26,28 +27,43 @@
   );
 }
 
+/* The drawing sits in its own frame above the title, the same size and
+   place on every screen, and never behind the words. */
+.hm-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 0;
+  /* Room for a panel; short screens give some up and let it overlap the drawing. */
+  padding-top: clamp(12px, calc(100vh - 600px), 170px);
+}
+
+.hm-art {
+  position: relative;
+  flex: 1 1 120px;
+  width: min(100%, 460px);
+  max-height: clamp(170px, 34vh, 360px);
+  margin-bottom: clamp(8px, 2vh, 20px);
+}
+
 .hm-scene {
   position: absolute;
   inset: 0;
-  z-index: -2;
   display: block;
   width: 100%;
   height: 100%;
 }
 
-/* Darken the lower part so the copy reads over any drawing. */
+/* A gentle darkening towards the bottom of the page. */
 .hm::before {
   content: "";
   position: absolute;
-  inset: 38% 0 0;
+  inset: 45% 0 0;
   z-index: -1;
   pointer-events: none;
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    rgba(16, 20, 38, 0.55) 55%,
-    rgba(16, 20, 38, 0.7)
-  );
+  background: linear-gradient(to bottom, transparent, rgba(16, 20, 38, 0.45));
 }
 
 /* Print texture: fine diagonal lines and grain. */
@@ -172,13 +188,17 @@
 
 /* Panel --------------------------------------------------------------------- */
 
+/* Panels float in the slot above the drawing, so opening one never moves the page. */
 .hm-aside {
-  align-self: start;
-  justify-self: center;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 4;
   display: flex;
   justify-content: center;
+  transform: translateX(-50%);
   width: min(100%, 420px);
-  margin-top: 3vh;
+  max-width: 100%;
   transition: opacity 0.25s ease;
 }
 
