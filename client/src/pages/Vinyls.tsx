@@ -11,9 +11,8 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "wouter";
 import PageMeta from "@/components/PageMeta";
-import { useTheme } from "@/contexts/ThemeContext";
+import SiteHeader from "@/components/SiteHeader";
 import { VINYLS, type Vinyl } from "@/data/vinyls";
 import "./vinyls.css";
 
@@ -86,7 +85,6 @@ function detailLines(vinyl: Vinyl) {
 }
 
 export default function Vinyls() {
-  const { theme, toggleTheme } = useTheme();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const wallRef = useRef<HTMLDivElement>(null);
   const flightLayerRef = useRef<HTMLDivElement>(null);
@@ -222,26 +220,10 @@ export default function Vinyls() {
         path="/things/vinyls"
       />
 
-      <header className="vx-header">
-        <Link
-          href="/"
-          className="vx-home"
-          onClick={event => event.stopPropagation()}
-        >
-          ← home
-        </Link>
-        <button
-          type="button"
-          className="vx-theme"
-          aria-pressed={theme === "dark"}
-          onClick={event => {
-            event.stopPropagation();
-            toggleTheme?.();
-          }}
-        >
-          ( {theme === "dark" ? "day mode" : "night mode"} )
-        </button>
-      </header>
+      {/* Header clicks shouldn't also close an open record. */}
+      <div className="vx-chrome" onClick={event => event.stopPropagation()}>
+        <SiteHeader />
+      </div>
 
       <main className={`vx-stage${selected ? " vx-stage--open" : ""}`}>
         <div className="vx-heading">

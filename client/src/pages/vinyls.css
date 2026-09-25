@@ -15,7 +15,7 @@
 
   position: relative;
   min-height: 100vh;
-  font-family: var(--font-mono);
+  font-family: var(--sans);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
   isolation: isolate;
@@ -37,41 +37,8 @@
 
 /* Header ------------------------------------------------------------------ */
 
-.vx-header {
-  position: fixed;
-  inset: 0 0 auto;
-  z-index: 10;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  padding: max(1.75rem, calc(env(safe-area-inset-top) + 0.5rem)) 24px 0;
-  pointer-events: none;
-}
-
-.vx-home,
-.vx-theme {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.06em;
-  line-height: 1.4;
-  color: var(--muted);
-  text-decoration: none;
-  background: none;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-  pointer-events: auto;
-}
-
-.vx-home:hover,
-.vx-theme:hover {
-  color: var(--accent);
-}
-
-.vx-home:focus-visible,
-.vx-theme:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 4px;
+.vx-chrome {
+  display: contents;
 }
 
 .vx-heading {
@@ -86,13 +53,14 @@
   margin: 0;
   font-family: var(--serif);
   font-weight: 400;
-  font-size: clamp(28px, 2.8vw, 40px);
-  letter-spacing: -0.01em;
+  font-size: clamp(34px, 3.4vw, 48px);
+  letter-spacing: -0.005em;
 }
 
 .vx-count {
-  font-size: 10.5px;
-  letter-spacing: 0.06em;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
   color: var(--muted);
 }
 
@@ -290,15 +258,15 @@
 .vx-panel-title {
   margin: 0;
   font-family: var(--serif);
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 400;
-  line-height: 1.25;
+  line-height: 1.15;
   color: var(--ink);
 }
 
 .vx-panel-artist {
   margin: 4px 0 0;
-  font-size: 12px;
+  font-size: 13.5px;
   line-height: 1.5;
   color: var(--muted);
 }
@@ -306,8 +274,8 @@
 .vx-panel-note {
   max-width: 28rem;
   margin: 0;
-  font-size: 12.5px;
-  line-height: 1.7;
+  font-size: 14.5px;
+  line-height: 1.6;
   color: var(--ink);
   white-space: pre-line;
 }
@@ -326,13 +294,6 @@
 
   .vx-shelf--mobile {
     display: block;
-  }
-}
-
-@media (min-width: 640px) {
-  .vx-header {
-    padding-left: 40px;
-    padding-right: 40px;
   }
 }
 
@@ -364,7 +325,7 @@
   }
 
   .vx-panel-title {
-    font-size: 32px;
+    font-size: 40px;
   }
 
   .vx-panel-note {

@@ -278,6 +278,39 @@ export function buildHand(): Dot[] {
   return out;
 }
 
+const GLYPHS: Record<string, string[]> = {
+  "0": [".###.", "#...#", "#..##", "#.#.#", "##..#", "#...#", ".###."],
+  "4": ["...#.", "..##.", ".#.#.", "#..#.", "#####", "...#.", "...#."],
+};
+
+/** A dot-matrix sign: `text` lit up on a faint grid, like a departures board. */
+export function buildSign(text: string): Dot[] {
+  const pitch = 16;
+  const cols = text.length * 6 - 1;
+  const x0 = 200 - ((cols - 1) * pitch) / 2;
+  const y0 = 200 - 3 * pitch;
+  const lit = new Set<string>();
+  [...text].forEach((ch, i) => {
+    GLYPHS[ch]?.forEach((row, r) =>
+      [...row].forEach((cell, c) => {
+        if (cell === "#") lit.add(`${i * 6 + c},${r}`);
+      })
+    );
+  });
+  const out: Dot[] = [];
+  for (let r = -4; r <= 10; r++) {
+    for (let c = -2; c <= cols + 1; c++) {
+      const x = round(x0 + c * pitch);
+      const y = y0 + r * pitch;
+      if (x < 8 || x > 392 || y < 8 || y > 392) continue;
+      out.push(
+        lit.has(`${c},${r}`) ? { x, y, r: 6, o: 1 } : { x, y, r: 1.7, o: 0.25 }
+      );
+    }
+  }
+  return out;
+}
+
 /** How far a dot is pushed away from a pointer at (px, py), in viewBox units. */
 export function repel(
   x: number,

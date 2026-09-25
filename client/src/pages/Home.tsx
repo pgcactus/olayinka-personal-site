@@ -37,7 +37,7 @@ const ART: Record<Key | "idle", [Drawing, string]> = {
   hello: ["hand", "hello there"],
   flatiron: ["building", "the day job"],
   things: ["wave", "alfa, bravo, over"],
-  records: ["recordFast", "33⅓, for real now"],
+  records: ["recordFast", "needle down"],
   plants: ["plant", "still alive, mostly"],
   plane: ["chute", "falling, on purpose"],
   tennis: ["ball", "love all"],

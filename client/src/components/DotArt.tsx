@@ -6,9 +6,12 @@
  * The push is applied straight to the circles' transforms, so pointer moves
  * never re-render React. While the pointer is over a drawing its motion
  * pauses, so the dots under it stay put.
+ *
+ * "record" and "recordFast" share one spinning group: switching between them
+ * eases the playback rate up or down, so the record never jumps.
  */
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   buildBall,
   buildBuilding,
@@ -17,11 +20,13 @@ import {
   buildPlant,
   buildRecord,
   buildRunner,
+  buildSign,
   buildTrack,
   buildWave,
   repel,
   type Dot,
 } from "@/lib/dot-art";
+import "./dot-art.css";
 
 export type Drawing =
   | "record"
@@ -32,21 +37,26 @@ export type Drawing =
   | "ball"
   | "track"
   | "plant"
-  | "hand";
+  | "hand"
+  | "sign404";
 
 const RUNNER_PERIOD = 2.8;
+/** How much faster "recordFast" turns than the idle record. */
+const SPIN_BOOST = 4;
+const SPIN_EASE_MS = 900;
 const record = buildRecord();
 
 const DRAWINGS: Record<Drawing, { dots: Dot[]; motion: string }> = {
   record: { dots: record, motion: "da-spin" },
-  recordFast: { dots: record, motion: "da-spin da-spin--fast" },
+  recordFast: { dots: record, motion: "da-spin" },
   wave: { dots: [], motion: "" },
-  building: { dots: buildBuilding(), motion: "da-fade" },
+  building: { dots: buildBuilding(), motion: "" },
   chute: { dots: buildChute(), motion: "da-bob" },
   ball: { dots: buildBall(), motion: "da-bounce" },
   track: { dots: buildTrack(), motion: "" },
   plant: { dots: buildPlant(), motion: "da-sway" },
   hand: { dots: buildHand(), motion: "da-wave" },
+  sign404: { dots: buildSign("404"), motion: "" },
 };
 const WAVE = buildWave();
 const RUNNER = buildRunner(RUNNER_PERIOD);
@@ -71,6 +81,24 @@ export default function DotArt({
   const pointer = useRef<{ x: number; y: number } | null>(null);
   const [poked, setPoked] = useState(false);
   const { dots, motion } = DRAWINGS[drawing];
+  const groupKey = drawing === "recordFast" ? "record" : drawing;
+
+  useEffect(() => {
+    const spin = groupRef.current?.getAnimations?.()[0];
+    if (!spin) return;
+    const from = spin.playbackRate;
+    const to = drawing === "recordFast" ? SPIN_BOOST : 1;
+    if (from === to) return;
+    const start = performance.now();
+    let raf = 0;
+    const step = (t: number) => {
+      const k = Math.min(1, (t - start) / SPIN_EASE_MS);
+      spin.playbackRate = from + (to - from) * (1 - (1 - k) ** 3);
+      if (k < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [drawing]);
 
   const apply = () => {
     frame.current = 0;
@@ -139,17 +167,19 @@ export default function DotArt({
         onPointerMove={onPointerMove}
         onPointerLeave={onPointerLeave}
       >
-        <g key={drawing} ref={groupRef} className={motion}>
-          {dots.map((d, i) => (
-            <circle
-              key={i}
-              data-layer="group"
-              cx={d.x}
-              cy={d.y}
-              r={d.r}
-              opacity={d.o}
-            />
-          ))}
+        <g key={groupKey} className="da-enter">
+          <g ref={groupRef} className={motion}>
+            {dots.map((d, i) => (
+              <circle
+                key={i}
+                data-layer="group"
+                cx={d.x}
+                cy={d.y}
+                r={d.r}
+                opacity={d.o}
+              />
+            ))}
+          </g>
         </g>
         {drawing === "wave" &&
           WAVE.map((col, i) => (

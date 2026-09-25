@@ -75,8 +75,12 @@ export function sanitise(raw: string): string {
 }
 
 export function sanitiseReverse(raw: string): string {
-  // Allow letters, spaces and hyphens (for X-ray)
-  return raw.replace(/[^A-Za-z -]/g, "").trim();
+  // Allow letters, spaces and hyphens (for X-ray). A trailing space is kept
+  // so the next word can be typed.
+  return raw
+    .replace(/[^A-Za-z -]/g, "")
+    .replace(/ {2,}/g, " ")
+    .trimStart();
 }
 
 export function fromPhonetic(value: string): string {

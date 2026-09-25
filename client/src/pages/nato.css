@@ -1,0 +1,307 @@
+/* /nato. Colours and fonts come from the site tokens in index.css. */
+
+.nt {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: 760px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: max(120px, 14vh) 24px 96px;
+}
+
+.nt-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nt-title {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(38px, 4.4vw, 60px);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.005em;
+}
+
+.nt-sub {
+  margin: 0;
+  font-size: 16px;
+  color: var(--muted);
+}
+
+/* Mode switch: a pill with a thumb that slides between the two options. */
+.nt-modes {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  align-self: flex-start;
+  padding: 3px;
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+  border-radius: 999px;
+}
+
+.nt-thumb {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  background: var(--card);
+  border-radius: 999px;
+  box-shadow: 0 2px 8px -2px var(--shadow);
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.nt-modes--reverse .nt-thumb {
+  transform: translateX(100%);
+}
+
+.nt-modes button {
+  position: relative;
+  padding: 7px 16px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.nt-modes button[aria-pressed="true"] {
+  color: var(--ink);
+}
+
+.nt-label {
+  display: block;
+  margin-bottom: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.nt-inputrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--line);
+  transition: border-color 0.2s ease;
+}
+
+.nt-inputrow:focus-within {
+  border-color: var(--accent);
+}
+
+.nt-input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 0 12px;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  outline: none;
+  caret-color: var(--accent);
+}
+
+.nt-input--forward {
+  font-family: var(--font-mono);
+  font-size: clamp(22px, 2.6vw, 30px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.nt-input--reverse {
+  font-family: var(--sans);
+  font-size: clamp(20px, 2.2vw, 26px);
+}
+
+.nt-input::placeholder {
+  color: color-mix(in srgb, var(--muted) 55%, transparent);
+}
+
+.nt-clear {
+  flex: none;
+  padding: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.nt-clear:hover {
+  color: var(--ink);
+}
+
+/* Tiles -------------------------------------------------------------------- */
+
+.nt-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 28px;
+}
+
+.nt-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.nt-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 64px;
+  padding: 10px 14px 12px;
+  color: var(--ink);
+  text-align: left;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  cursor: pointer;
+  animation: nt-pop 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) var(--nt-delay, 0ms)
+    backwards;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.nt-tile:hover,
+.nt-tile--on {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+}
+
+.nt-tile--on {
+  background: var(--wash);
+}
+
+.nt-letter {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+.nt-word {
+  font-family: var(--serif);
+  font-size: 26px;
+  line-height: 1.1;
+}
+
+.nt-origin {
+  min-height: 3em;
+  max-width: 36rem;
+  margin: -8px 0 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.nt-origin strong {
+  font-weight: 600;
+}
+
+.nt-muted {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.nt-result {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(40px, 5vw, 64px);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  word-break: break-all;
+}
+
+.nt-error {
+  margin: -12px 0 0;
+  font-size: 14px;
+  color: #b3261e;
+}
+
+.dark .nt-error {
+  color: #f2b8b5;
+}
+
+.nt-actions {
+  display: flex;
+  gap: 20px;
+}
+
+.nt-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  z-index: 40;
+  padding: 8px 16px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--paper);
+  background: var(--ink);
+  border-radius: 999px;
+  transform: translateX(-50%);
+  animation: nt-toast 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.nt-modes button:focus-visible,
+.nt-clear:focus-visible,
+.nt-tile:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@keyframes nt-pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+}
+
+@keyframes nt-toast {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+}
+
+@media (max-width: 767px) {
+  .nt {
+    gap: 24px;
+    padding-top: 96px;
+  }
+
+  .nt-tile {
+    min-width: 0;
+    padding: 8px 10px 10px;
+  }
+
+  .nt-word {
+    font-size: 21px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nt-tile,
+  .nt-toast {
+    animation: none;
+  }
+
+  .nt-thumb {
+    transition: none;
+  }
+}
