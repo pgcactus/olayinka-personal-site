@@ -12,7 +12,7 @@
 
 .nf-art {
   position: relative;
-  width: min(100%, 520px);
+  width: min(100%, 320px);
   aspect-ratio: 16 / 10;
 }
 
