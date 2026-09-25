@@ -9,7 +9,6 @@ const __dirname = path.dirname(__filename);
 const HTML_ROUTES = new Map([
   ["/", "index.html"],
   ["/nato", "nato/index.html"],
-  ["/things/books", "things/books/index.html"],
   ["/things/vinyls", "things/vinyls/index.html"],
   ["/things/places", "things/places/index.html"],
 ]);
@@ -71,7 +70,10 @@ async function startServer() {
   });
 
   app.get("/things", (_request, response) => {
-    response.redirect(308, "/things/books");
+    response.redirect(308, "/things/vinyls");
+  });
+  app.get("/things/books", (_request, response) => {
+    response.redirect(308, "/things/vinyls");
   });
 
   for (const [route, fileName] of HTML_ROUTES) {
