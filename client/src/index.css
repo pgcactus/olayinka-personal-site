@@ -25,7 +25,8 @@
   --color-near-black: #1a1a1a;
   --color-body: #5a5a5a;
   --color-highlight-bg: #e0f2fe;
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Menlo, Consolas, monospace;
+  --font-mono:
+    "JetBrains Mono", "Fira Code", "SF Mono", Menlo, Consolas, monospace;
   --font-size-base: 14px;
   --line-height-base: 1.75;
   --para-gap: 28px;
@@ -66,8 +67,14 @@
  * --------------------------------------------------------------------------- */
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Home page: each paragraph fades in with staggered delay via inline style */
@@ -226,7 +233,9 @@
     border: none;
     padding: 0;
     cursor: pointer;
-    transition: color 200ms ease-out, text-decoration-color 200ms ease-out;
+    transition:
+      color 200ms ease-out,
+      text-decoration-color 200ms ease-out;
   }
 
   .linkedin-link:hover {
@@ -712,14 +721,16 @@
 
   /* The physical shelf ledge */
   .shelf-row::after {
-    content: '';
+    content: "";
     position: absolute;
     left: -8px;
     right: -8px;
     bottom: -10px;
     height: 10px;
     background: #ffffff;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.13), 0 2px 4px rgba(0, 0, 0, 0.07);
+    box-shadow:
+      0 6px 18px rgba(0, 0, 0, 0.13),
+      0 2px 4px rgba(0, 0, 0, 0.07);
     border-radius: 1px;
   }
 
@@ -744,7 +755,9 @@
     background-position: center;
     background-color: #2a2a2a;
     border-radius: 1px;
-    box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.18), -1px 0 4px rgba(0,0,0,0.06);
+    box-shadow:
+      2px 4px 12px rgba(0, 0, 0, 0.18),
+      -1px 0 4px rgba(0, 0, 0, 0.06);
     transition: transform 200ms ease-out;
   }
 
@@ -766,7 +779,9 @@
     font-family: var(--font-mono);
     transform: translateY(100%);
     opacity: 0;
-    transition: transform 200ms ease-out, opacity 250ms ease-out 60ms;
+    transition:
+      transform 200ms ease-out,
+      opacity 250ms ease-out 60ms;
   }
 
   .book-item:hover .book-cover-overlay {
@@ -813,7 +828,9 @@
     overflow: hidden;
     cursor: default;
     border-radius: 1px;
-    box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.18), -1px 0 4px rgba(0,0,0,0.06);
+    box-shadow:
+      2px 4px 12px rgba(0, 0, 0, 0.18),
+      -1px 0 4px rgba(0, 0, 0, 0.06);
     transition: transform 200ms ease-out;
   }
 
@@ -911,7 +928,7 @@
 .map-loading-text {
   font-family: var(--font-mono);
   font-size: 12px;
-  color: #9CA3AF;
+  color: #9ca3af;
   letter-spacing: 0.05em;
 }
 
@@ -937,23 +954,23 @@
 }
 
 .map-country {
-  fill: #D1D5DB;
+  fill: #d1d5db;
   stroke: #fff;
   stroke-width: 0.5;
   transition: fill 150ms ease;
 }
 
 .map-country--visited {
-  fill: #FACC15;
+  fill: #facc15;
   cursor: pointer;
 }
 
 .map-country--visited:hover {
-  fill: #EAB308;
+  fill: #eab308;
 }
 
 .map-country--active {
-  fill: #CA8A04;
+  fill: #ca8a04;
 }
 
 /* Tooltip */
@@ -963,35 +980,35 @@
 
 .map-tooltip-bg {
   fill: rgba(15, 15, 15, 0.88);
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35));
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
 }
 
 .map-tooltip-country {
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
-  fill: #FFFFFF;
+  fill: #ffffff;
   letter-spacing: 0.04em;
 }
 
 .map-tooltip-capital {
   font-family: var(--font-mono);
   font-size: 9.5px;
-  fill: #FACC15;
+  fill: #facc15;
   letter-spacing: 0.03em;
 }
 
 .map-tooltip-fact {
   font-family: var(--font-mono);
   font-size: 9px;
-  fill: #D1D5DB;
+  fill: #d1d5db;
   letter-spacing: 0.02em;
 }
 
 .map-hint {
   font-family: var(--font-mono);
   font-size: 11px;
-  color: #9CA3AF;
+  color: #9ca3af;
   text-align: center;
   margin-top: 0.75rem;
   letter-spacing: 0.04em;
@@ -1000,19 +1017,19 @@
 /* Dark mode map adjustments */
 .dark .map-country {
   fill: #374151;
-  stroke: #1F2937;
+  stroke: #1f2937;
 }
 
 .dark .map-country--visited {
-  fill: #FACC15;
+  fill: #facc15;
 }
 
 .dark .map-country--visited:hover {
-  fill: #EAB308;
+  fill: #eab308;
 }
 
 .dark .map-country--active {
-  fill: #CA8A04;
+  fill: #ca8a04;
 }
 
 /* ------------------------------------------------------------------ */
@@ -1038,41 +1055,43 @@
   font-size: 10px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #9CA3AF;
+  color: #9ca3af;
   background: none;
   border: 1px solid transparent;
   padding: 3px 8px;
   border-radius: 3px;
   cursor: pointer;
-  transition: color 150ms, border-color 150ms;
+  transition:
+    color 150ms,
+    border-color 150ms;
 }
 
 .books-filter-btn:hover {
   color: var(--color-near-black);
-  border-color: #D1D5DB;
+  border-color: #d1d5db;
 }
 
 .books-filter-btn--active {
   color: var(--color-near-black);
-  border-color: #9CA3AF;
-  background: #F3F4F6;
+  border-color: #9ca3af;
+  background: #f3f4f6;
 }
 
 .dark .books-filter-btn--active {
-  background: #1F2937;
-  border-color: #6B7280;
-  color: #F9FAFB;
+  background: #1f2937;
+  border-color: #6b7280;
+  color: #f9fafb;
 }
 
 .dark .books-filter-btn:hover {
-  color: #F9FAFB;
-  border-color: #6B7280;
+  color: #f9fafb;
+  border-color: #6b7280;
 }
 
 .books-empty {
   font-family: var(--font-mono);
   font-size: 12px;
-  color: #9CA3AF;
+  color: #9ca3af;
   padding: 24px 0;
 }
 
@@ -1084,8 +1103,8 @@
   position: absolute;
   top: 6px;
   left: 6px;
-  background: #FACC15;
-  color: #1A1A1A;
+  background: #facc15;
+  color: #1a1a1a;
   font-family: var(--font-mono);
   font-size: 8px;
   font-weight: 700;
@@ -1102,7 +1121,7 @@
 /* ------------------------------------------------------------------ */
 
 .book-item--active .book-cover {
-  outline: 2px solid #FACC15;
+  outline: 2px solid #facc15;
   outline-offset: 2px;
 }
 
@@ -1112,17 +1131,23 @@
 
 .book-panel {
   position: relative;
-  background: #F9FAFB;
-  border-top: 1px solid #E5E7EB;
-  border-bottom: 1px solid #E5E7EB;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
   padding: 20px 24px;
   margin: 4px 0 12px;
   animation: panelSlideIn 200ms ease-out;
 }
 
 @keyframes panelSlideIn {
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .dark .book-panel {
@@ -1136,7 +1161,7 @@
   right: 16px;
   font-family: var(--font-mono);
   font-size: 12px;
-  color: #9CA3AF;
+  color: #9ca3af;
   background: none;
   border: none;
   cursor: pointer;
@@ -1163,7 +1188,7 @@
   aspect-ratio: 2/3;
   object-fit: cover;
   border-radius: 2px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .book-panel-info {
@@ -1180,20 +1205,20 @@
 }
 
 .dark .book-panel-title {
-  color: #F9FAFB;
+  color: #f9fafb;
 }
 
 .book-panel-author {
   font-family: var(--font-mono);
   font-size: 11px;
-  color: #6B7280;
+  color: #6b7280;
   margin-bottom: 8px;
 }
 
 .book-panel-meta {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: #9CA3AF;
+  color: #9ca3af;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   margin-bottom: 8px;
@@ -1204,13 +1229,13 @@
 }
 
 .book-panel-dot {
-  color: #D1D5DB;
+  color: #d1d5db;
 }
 
 .book-panel-current {
   display: inline-block;
-  background: #FACC15;
-  color: #1A1A1A;
+  background: #facc15;
+  color: #1a1a1a;
   font-family: var(--font-mono);
   font-size: 9px;
   font-weight: 700;
@@ -1224,13 +1249,13 @@
 .book-panel-note {
   font-family: var(--font-mono);
   font-size: 12px;
-  color: #6B7280;
+  color: #6b7280;
   line-height: 1.65;
   margin: 0;
 }
 
 .dark .book-panel-note {
-  color: #9CA3AF;
+  color: #9ca3af;
 }
 
 /* ------------------------------------------------------------------ */
@@ -1245,8 +1270,8 @@
   position: absolute;
   top: 6px;
   left: 6px;
-  background: rgba(0,0,0,0.75);
-  color: #FACC15;
+  background: rgba(0, 0, 0, 0.75);
+  color: #facc15;
   font-family: var(--font-mono);
   font-size: 9px;
   letter-spacing: 0.06em;
@@ -1274,35 +1299,38 @@
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.05em;
-  color: #9CA3AF;
+  color: #9ca3af;
   background: none;
   border: 1px solid transparent;
   padding: 4px 10px;
   border-radius: 3px;
   cursor: pointer;
-  transition: color 150ms, border-color 150ms, background 150ms;
+  transition:
+    color 150ms,
+    border-color 150ms,
+    background 150ms;
 }
 
 .nato-mode-btn:hover {
   color: var(--color-near-black);
-  border-color: #D1D5DB;
+  border-color: #d1d5db;
 }
 
 .nato-mode-btn--active {
   color: var(--color-near-black);
-  border-color: #9CA3AF;
-  background: #F3F4F6;
+  border-color: #9ca3af;
+  background: #f3f4f6;
 }
 
 .dark .nato-mode-btn--active {
-  background: #1F2937;
-  border-color: #6B7280;
-  color: #F9FAFB;
+  background: #1f2937;
+  border-color: #6b7280;
+  color: #f9fafb;
 }
 
 .dark .nato-mode-btn:hover {
-  color: #F9FAFB;
-  border-color: #6B7280;
+  color: #f9fafb;
+  border-color: #6b7280;
 }
 
 /* ------------------------------------------------------------------ */
@@ -1312,7 +1340,7 @@
 .map-counter {
   font-family: var(--font-mono);
   font-size: 11px;
-  color: #9CA3AF;
+  color: #9ca3af;
   text-align: center;
   margin-top: 4px;
   letter-spacing: 0.05em;
@@ -1323,5 +1351,5 @@
 }
 
 .dark .map-counter strong {
-  color: #F9FAFB;
+  color: #f9fafb;
 }

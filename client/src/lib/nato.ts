@@ -3,26 +3,55 @@
  */
 
 export const NATO_MAP: Record<string, string> = {
-  A: "Alfa",     B: "Bravo",    C: "Charlie",  D: "Delta",
-  E: "Echo",     F: "Foxtrot",  G: "Golf",     H: "Hotel",
-  I: "India",    J: "Juliett",  K: "Kilo",     L: "Lima",
-  M: "Mike",     N: "November", O: "Oscar",    P: "Papa",
-  Q: "Quebec",   R: "Romeo",    S: "Sierra",   T: "Tango",
-  U: "Uniform",  V: "Victor",   W: "Whiskey",  X: "X-ray",
-  Y: "Yankee",   Z: "Zulu",
-  "0": "Zero",   "1": "One",    "2": "Two",    "3": "Three",
-  "4": "Four",   "5": "Fife",   "6": "Six",    "7": "Seven",
-  "8": "Eight",  "9": "Niner",
+  A: "Alfa",
+  B: "Bravo",
+  C: "Charlie",
+  D: "Delta",
+  E: "Echo",
+  F: "Foxtrot",
+  G: "Golf",
+  H: "Hotel",
+  I: "India",
+  J: "Juliett",
+  K: "Kilo",
+  L: "Lima",
+  M: "Mike",
+  N: "November",
+  O: "Oscar",
+  P: "Papa",
+  Q: "Quebec",
+  R: "Romeo",
+  S: "Sierra",
+  T: "Tango",
+  U: "Uniform",
+  V: "Victor",
+  W: "Whiskey",
+  X: "X-ray",
+  Y: "Yankee",
+  Z: "Zulu",
+  "0": "Zero",
+  "1": "One",
+  "2": "Two",
+  "3": "Three",
+  "4": "Four",
+  "5": "Fife",
+  "6": "Six",
+  "7": "Seven",
+  "8": "Eight",
+  "9": "Niner",
 };
 
 // Reverse map: NATO word → letter
 export const REVERSE_MAP: Record<string, string> = {
   // Standard NATO spellings
   ...Object.fromEntries(
-    Object.entries(NATO_MAP).map(([letter, word]) => [word.toLowerCase(), letter])
+    Object.entries(NATO_MAP).map(([letter, word]) => [
+      word.toLowerCase(),
+      letter,
+    ])
   ),
   // Common variants
-  alpha: "A",  // Common misspelling of Alfa
+  alpha: "A", // Common misspelling of Alfa
   juliet: "J", // US spelling variant
   juliett: "J", // Official NATO spelling
 };
@@ -53,21 +82,23 @@ export function sanitiseReverse(raw: string): string {
 export function fromPhonetic(value: string): string {
   if (!value.trim()) return "";
   // Split on multiple spaces, treating each word as a NATO code word
-  const words = value.trim().toLowerCase().split(/\s+/).filter(w => w.length > 0);
-  return words
-    .map((w) => REVERSE_MAP[w] ?? "?")
-    .join("");
+  const words = value
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(w => w.length > 0);
+  return words.map(w => REVERSE_MAP[w] ?? "?").join("");
 }
 
 export function toPhonetic(value: string): string {
   if (!value.trim()) return "";
   return value
     .split(" ")
-    .filter((w) => w.length > 0)
-    .map((word) =>
+    .filter(w => w.length > 0)
+    .map(word =>
       word
         .split("")
-        .map((ch) => NATO_MAP[ch] ?? ch)
+        .map(ch => NATO_MAP[ch] ?? ch)
         .join(" • ")
     )
     .join("  /  ");

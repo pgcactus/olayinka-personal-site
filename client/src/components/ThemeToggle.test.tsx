@@ -24,11 +24,15 @@ describe("ThemeToggle", () => {
       </ThemeProvider>
     );
 
-    await user.click(screen.getByRole("button", { name: "Switch to dark mode" }));
+    await user.click(
+      screen.getByRole("button", { name: "Switch to dark mode" })
+    );
     expect(document.documentElement.classList.contains("dark")).toBe(true);
     expect(window.localStorage.getItem("theme")).toBe("dark");
 
-    await user.click(screen.getByRole("button", { name: "Switch to light mode" }));
+    await user.click(
+      screen.getByRole("button", { name: "Switch to light mode" })
+    );
     expect(document.documentElement.classList.contains("dark")).toBe(false);
     expect(window.localStorage.getItem("theme")).toBe("light");
   });

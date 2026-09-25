@@ -8,7 +8,9 @@ import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import App from "./App";
 
 beforeAll(() => {
-  (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+  (
+    globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
+  ).IS_REACT_ACT_ENVIRONMENT = true;
   window.scrollTo = () => undefined;
 });
 
@@ -32,9 +34,11 @@ async function hydrateRoute(url: string, visitorState?: () => void) {
 
   // React reports attribute mismatches only through console.error.
   const errors: unknown[] = [];
-  const consoleError = vi.spyOn(console, "error").mockImplementation(message => {
-    if (/hydrat/i.test(String(message))) errors.push(message);
-  });
+  const consoleError = vi
+    .spyOn(console, "error")
+    .mockImplementation(message => {
+      if (/hydrat/i.test(String(message))) errors.push(message);
+    });
   try {
     await act(async () => {
       hydrateRoot(container, <App />, {

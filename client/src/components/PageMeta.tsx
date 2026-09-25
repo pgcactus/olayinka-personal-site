@@ -9,14 +9,20 @@ const OG_IMAGE = `${SITE_URL}/og.png`;
 const SITE_NAME = "Olayinka Titilola";
 
 interface PageMetaProps {
-  title: string;           // Full <title> string, e.g. "Olayinka Titilola" or "NATO alphabet — Olayinka Titilola"
+  title: string; // Full <title> string, e.g. "Olayinka Titilola" or "NATO alphabet — Olayinka Titilola"
   description: string;
-  path: string;            // e.g. "/" or "/nato"
+  path: string; // e.g. "/" or "/nato"
   noindex?: boolean;
   jsonLd?: object;
 }
 
-export default function PageMeta({ title, description, path, noindex, jsonLd }: PageMetaProps) {
+export default function PageMeta({
+  title,
+  description,
+  path,
+  noindex,
+  jsonLd,
+}: PageMetaProps) {
   const url = `${SITE_URL}${path}`;
   return (
     <>
@@ -42,9 +48,7 @@ export default function PageMeta({ title, description, path, noindex, jsonLd }: 
 
       {/* JSON-LD */}
       {jsonLd && (
-        <script type="application/ld+json">
-          {JSON.stringify(jsonLd)}
-        </script>
+        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       )}
     </>
   );

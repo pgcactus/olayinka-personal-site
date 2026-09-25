@@ -39,9 +39,7 @@ function Highlight({ children, href, external }: HighlightProps) {
     );
   }
 
-  return (
-    <span className="highlight">{children}</span>
-  );
+  return <span className="highlight">{children}</span>;
 }
 
 const personJsonLd = {
@@ -81,7 +79,10 @@ const paragraphs = [
       <>
         Outside of work, I build small things, like{" "}
         <Highlight href="/nato">NATO Phonetic Alphabet</Highlight> and{" "}
-        <Highlight href="https://github.com/pgcactus/basketball-companion" external>
+        <Highlight
+          href="https://github.com/pgcactus/basketball-companion"
+          external
+        >
           Basketball Companion
         </Highlight>
         .
@@ -94,9 +95,9 @@ const paragraphs = [
     style: { animationDelay: "240ms" },
     content: (
       <>
-        I&apos;d happily skydive for a clean reset, play tennis, or do a
-        quick 5K. A slow afternoon with friends is usually the better version
-        of a weekend.
+        I&apos;d happily skydive for a clean reset, play tennis, or do a quick
+        5K. A slow afternoon with friends is usually the better version of a
+        weekend.
       </>
     ),
   },
@@ -107,7 +108,8 @@ const paragraphs = [
     content: (
       <>
         I&apos;m also collecting{" "}
-        <Highlight href="/things/vinyls">vinyls</Highlight>, one record at a time.
+        <Highlight href="/things/vinyls">vinyls</Highlight>, one record at a
+        time.
       </>
     ),
   },
@@ -128,22 +130,24 @@ export default function Home() {
         <ThemeToggle className="home-fade-in" />
 
         {/* First paragraph as h1 */}
-        <h1 className="para para-bold home-para" style={{ animationDelay: "0ms" }}>
+        <h1
+          className="para para-bold home-para"
+          style={{ animationDelay: "0ms" }}
+        >
           Hi, I&apos;m Olayinka.
         </h1>
 
-        {paragraphs.map((para) => (
-          <p
-            key={para.key}
-            className={para.className}
-            style={para.style}
-          >
+        {paragraphs.map(para => (
+          <p key={para.key} className={para.className} style={para.style}>
             {para.content}
           </p>
         ))}
 
         {/* Utility links — bottom-right of content block */}
-        <div className="home-links home-para" style={{ animationDelay: "400ms" }}>
+        <div
+          className="home-links home-para"
+          style={{ animationDelay: "400ms" }}
+        >
           <a
             href="https://www.linkedin.com/in/olayinkaetitilola/"
             target="_blank"
