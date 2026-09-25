@@ -5,7 +5,7 @@ import path from "node:path";
 
 const root = process.cwd();
 const pages = [
-  ["dist/public/index.html", "Hi, I&#x27;m Olayinka."],
+  ["dist/public/index.html", "Right now, I lead product work at"],
   ["dist/public/nato/index.html", "NATO Phonetic Alphabet"],
   ["dist/public/things/vinyls/index.html", "For Broken Ears"],
   ["dist/public/things/places/index.html", "Countries I have visited"],
@@ -82,7 +82,7 @@ try {
   await waitForServer();
 
   const routeChecks = [
-    ["/", 200, "Hi, I&#x27;m Olayinka."],
+    ["/", 200, "Right now, I lead product work at"],
     ["/nato", 200, "NATO Phonetic Alphabet"],
     ["/things/books", 308, ""],
     ["/things/vinyls/", 200, "For Broken Ears"],

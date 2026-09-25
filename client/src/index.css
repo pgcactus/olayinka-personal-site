@@ -33,6 +33,30 @@
   --content-max-width: 640px;
 }
 
+/* Site system (home and vinyls): stone paper, cool ink, one cobalt accent. */
+:root {
+  --paper: #f2f3f0;
+  --ink: #15171a;
+  --muted: #676b70;
+  --card: #fbfbf9;
+  --line: rgba(21, 23, 26, 0.1);
+  --shadow: rgba(21, 23, 26, 0.2);
+  --wash: #e3ebff;
+  --accent: #2f4bc4;
+  --serif: "Newsreader", Georgia, "Times New Roman", serif;
+}
+
+.dark {
+  --paper: #0f1115;
+  --ink: #e7e8ea;
+  --muted: #9a9ea5;
+  --card: #181b21;
+  --line: rgba(231, 232, 234, 0.12);
+  --shadow: rgba(0, 0, 0, 0.6);
+  --wash: rgba(157, 176, 255, 0.16);
+  --accent: #9db0ff;
+}
+
 .dark {
   --background: #0f0f0f;
   --foreground: #a0a0a0;
