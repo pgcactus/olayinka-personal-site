@@ -7,3 +7,12 @@ try {
 } catch {
   // Use the default light theme when browser storage is unavailable.
 }
+
+// The same for a stored language, so assistive tech hears the right one.
+try {
+  if (window.localStorage.getItem("lang") === "fr") {
+    document.documentElement.lang = "fr";
+  }
+} catch {
+  // Keep English.
+}

@@ -13,8 +13,10 @@
 import { useEffect, useRef, useState } from "react";
 import PageMeta from "@/components/PageMeta";
 import SiteHeader from "@/components/SiteHeader";
+import { useLang } from "@/lib/lang";
 import {
   NATO_MAP,
+  STARTER_WORD,
   fromPhonetic,
   getFirstInvalidWord,
   sanitise,
@@ -84,9 +86,114 @@ const WORD_ORIGINS: Record<string, string> = {
     "Spelled 'Niner' (not 'Nine') to prevent confusion with the German 'nein' (no) in international communications.",
 };
 
-const DEFAULT_INPUT = "HERMIONE";
-const FALLBACK_ORIGIN =
-  "A word chosen for its clear, unambiguous pronunciation in radio communications.";
+// French versions of the word stories. Worth a native speaker's read.
+const WORD_ORIGINS_FR: Record<string, string> = {
+  Alfa: "Écrit « Alfa » et non « Alpha », car le « ph » ne se prononce pas « f » dans toutes les langues.",
+  Bravo:
+    "Emprunté à l’italien et à l’espagnol, où c’est un cri d’éloge, bien distinct des autres mots en B.",
+  Charlie:
+    "Un prénom anglais courant, choisi pour sa prononciation nette dans toutes les langues.",
+  Delta:
+    "La lettre grecque, déjà utilisée en sciences et en aviation bien avant l’alphabet OTAN.",
+  Echo: "D’après la nymphe grecque Écho : un mot distinct, sans groupe de consonnes trompeur.",
+  Foxtrot:
+    "Une danse de salon du début du XXe siècle, choisie pour ses deux syllabes franches.",
+  Golf: "Le sport : son G dur et sa voyelle brève ne ressemblent à aucune autre lettre.",
+  Hotel:
+    "Un mot connu partout, identique ou presque dans des dizaines de langues.",
+  India:
+    "Pour la lettre I, un nom de pays familier aux militaires du monde entier.",
+  Juliett:
+    "Écrit avec deux t pour que les francophones ne laissent pas tomber la finale.",
+  Kilo: "Du grec « khilioi » (mille), déjà un préfixe universel du système métrique.",
+  Lima: "La capitale du Pérou : un nom court, connu partout, qui finit sur une voyelle nette.",
+  Mike: "Un prénom anglais courant, choisi pour son unique syllabe et son M sans ambiguïté.",
+  November:
+    "Le nom du mois, écrit et prononcé de façon proche dans la plupart des langues européennes.",
+  Oscar:
+    "Un prénom connu, choisi pour ses voyelles ouvertes et son O bien net au début.",
+  Papa: "Signifie « père » dans beaucoup de langues : l’un des mots les plus compris de l’alphabet.",
+  Quebec:
+    "La province canadienne, choisie pour le Q car peu de mots courants commencent par Q.",
+  Romeo:
+    "Le célèbre personnage de Shakespeare, choisi pour son R roulé et ses voyelles claires.",
+  Sierra:
+    "« Chaîne de montagnes » en espagnol, choisi pour son S net et sa notoriété.",
+  Tango:
+    "La danse argentine, choisie pour son T fort et une orthographe commune à beaucoup de langues.",
+  Uniform:
+    "Choisi car il commence par le son « you », qui représente clairement la lettre U.",
+  Victor:
+    "Un prénom courant qui évoque la victoire, avec un V net et deux syllabes simples.",
+  Whiskey:
+    "L’alcool : le « Wh » du début est l’une des façons les plus claires de dire le W.",
+  "X-ray":
+    "L’un des rares mots en X connus partout, choix évident pour une lettre peu fournie.",
+  Yankee:
+    "Surnom américain des habitants des États-Unis, connu partout et net sur le Y.",
+  Zulu: "Le peuple et la langue d’Afrique du Sud, pour finir l’alphabet sur un mot connu de tous.",
+  Zero: "Le mot anglais pour 0, pour ne pas le confondre avec la lettre O.",
+  One: "Parfois prononcé « Wun » ; le mot simple garde l’annonce des chiffres claire.",
+  Two: "Parfois prononcé « Too » pour éviter la confusion avec « to » ou « too » à la radio.",
+  Three:
+    "Le mot standard, choisi pour son « Th » qui le distingue des autres chiffres.",
+  Four: "Un mot simple avec un F bien distinct.",
+  Fife: "Écrit « Fife » et non « Five » pour que le V ne soit pas pris pour un B dans le bruit radio.",
+  Six: "Court, net et sans risque de confusion avec les autres chiffres.",
+  Seven: "Deux syllabes claires et un S fort, facile à distinguer de « six ».",
+  Eight: "Le son « ay » du début le détache clairement des autres chiffres.",
+  Niner:
+    "Écrit « Niner » et non « Nine » pour éviter la confusion avec l’allemand « nein » (non).",
+};
+
+const STRINGS = {
+  en: {
+    title: "NATO Phonetic Alphabet",
+    sub: "Never say ‘B as in Boy’ again.",
+    mode: "Conversion mode",
+    forward: "word → NATO",
+    reverse: "NATO → word",
+    typeAnything: "Type anything",
+    typeWords: "Type NATO words, separated by spaces",
+    clear: "( clear )",
+    tileLabel: (letter: string, word: string) => `${letter} for ${word}`,
+    hint: "( hover or tap a word for its story )",
+    fallback:
+      "A word chosen for its clear, unambiguous pronunciation in radio communications.",
+    invalid: (w: string) =>
+      `‘${w}’ isn’t a NATO word. Try Alfa, Bravo or Charlie.`,
+    copy: "( copy )",
+    share: "( share )",
+    copied: "copied",
+    copyFailed: "could not copy",
+    linkCopied: "link copied",
+    linkFailed: "could not copy the link",
+    origins: WORD_ORIGINS,
+  },
+  fr: {
+    title: "Alphabet phonétique OTAN",
+    sub: "Ne dites plus jamais « B comme Bateau ».",
+    mode: "Sens de conversion",
+    forward: "mot → OTAN",
+    reverse: "OTAN → mot",
+    typeAnything: "Tapez n’importe quoi",
+    typeWords: "Tapez des mots OTAN, séparés par des espaces",
+    clear: "( effacer )",
+    tileLabel: (letter: string, word: string) => `${letter} pour ${word}`,
+    hint: "( survolez ou touchez un mot pour son histoire )",
+    fallback:
+      "Un mot choisi pour sa prononciation claire et sans ambiguïté à la radio.",
+    invalid: (w: string) =>
+      `« ${w} » n’est pas un mot OTAN. Essayez Alfa, Bravo ou Charlie.`,
+    copy: "( copier )",
+    share: "( partager )",
+    copied: "copié",
+    copyFailed: "copie impossible",
+    linkCopied: "lien copié",
+    linkFailed: "impossible de copier le lien",
+    origins: WORD_ORIGINS_FR,
+  },
+};
 
 type Mode = "forward" | "reverse";
 
@@ -116,7 +223,8 @@ function toTiles(value: string) {
 
 export default function Nato() {
   const [mode, setMode] = useState<Mode>("forward");
-  const [input, setInput] = useState(DEFAULT_INPUT);
+  const t = STRINGS[useLang()];
+  const [input, setInput] = useState(STARTER_WORD);
   const [reverseInput, setReverseInput] = useState("");
   const [picked, setPicked] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -178,9 +286,9 @@ export default function Nato() {
   async function handleCopy() {
     try {
       await navigator.clipboard.writeText(output);
-      showToast("copied");
+      showToast(t.copied);
     } catch {
-      showToast("could not copy");
+      showToast(t.copyFailed);
     }
   }
 
@@ -196,9 +304,9 @@ export default function Nato() {
     }
     try {
       await navigator.clipboard.writeText(url);
-      showToast("link copied");
+      showToast(t.linkCopied);
     } catch {
-      showToast("could not copy the link");
+      showToast(t.linkFailed);
     }
   }
 
@@ -213,14 +321,14 @@ export default function Nato() {
 
       <main className="nt">
         <div className="nt-heading">
-          <h1 className="nt-title">NATO Phonetic Alphabet</h1>
-          <p className="nt-sub">Never say ‘B as in Boy’ again.</p>
+          <h1 className="nt-title">{t.title}</h1>
+          <p className="nt-sub">{t.sub}</p>
         </div>
 
         <div
           className={`nt-modes nt-modes--${mode}`}
           role="group"
-          aria-label="Conversion mode"
+          aria-label={t.mode}
         >
           <span className="nt-thumb" aria-hidden="true" />
           <button
@@ -228,20 +336,20 @@ export default function Nato() {
             aria-pressed={forward}
             onClick={() => switchMode("forward")}
           >
-            word → NATO
+            {t.forward}
           </button>
           <button
             type="button"
             aria-pressed={!forward}
             onClick={() => switchMode("reverse")}
           >
-            NATO → word
+            {t.reverse}
           </button>
         </div>
 
         <div className="nt-field">
           <label htmlFor="nato-input" className="nt-label">
-            {forward ? "Type anything" : "Type NATO words, separated by spaces"}
+            {forward ? t.typeAnything : t.typeWords}
           </label>
           <div className="nt-inputrow">
             <input
@@ -251,7 +359,7 @@ export default function Nato() {
               type="text"
               value={value}
               onChange={handleChange}
-              placeholder={forward ? "HERMIONE" : "Alfa Bravo Charlie"}
+              placeholder={forward ? STARTER_WORD : "Alfa Bravo Charlie"}
               spellCheck={false}
               autoComplete="off"
               autoCorrect="off"
@@ -259,7 +367,7 @@ export default function Nato() {
             />
             {value && (
               <button type="button" className="nt-clear" onClick={handleClear}>
-                ( clear )
+                {t.clear}
               </button>
             )}
           </div>
@@ -280,7 +388,7 @@ export default function Nato() {
                           "--nt-delay": `${Math.min(tile.index, 12) * 28}ms`,
                         } as React.CSSProperties
                       }
-                      aria-label={`${tile.letter} for ${tile.word}`}
+                      aria-label={t.tileLabel(tile.letter, tile.word)}
                       aria-pressed={picked === tile.word}
                       onMouseEnter={() => setPicked(tile.word)}
                       onFocus={() => setPicked(tile.word)}
@@ -296,13 +404,10 @@ export default function Nato() {
             <p className="nt-origin" aria-live="polite">
               {picked ? (
                 <>
-                  <strong>{picked}.</strong>{" "}
-                  {WORD_ORIGINS[picked] ?? FALLBACK_ORIGIN}
+                  <strong>{picked}.</strong> {t.origins[picked] ?? t.fallback}
                 </>
               ) : (
-                <span className="nt-muted">
-                  ( hover or tap a word for its story )
-                </span>
+                <span className="nt-muted">{t.hint}</span>
               )}
             </p>
           </>
@@ -315,18 +420,18 @@ export default function Nato() {
         )}
         {invalid && (
           <p className="nt-error" role="alert">
-            ‘{invalid}’ isn’t a NATO word. Try Alfa, Bravo or Charlie.
+            {t.invalid(invalid)}
           </p>
         )}
 
         {output && (
           <div className="nt-actions">
             <button type="button" className="site-note" onClick={handleCopy}>
-              ( copy )
+              {t.copy}
             </button>
             {forward && (
               <button type="button" className="site-note" onClick={handleShare}>
-                ( share )
+                {t.share}
               </button>
             )}
           </div>

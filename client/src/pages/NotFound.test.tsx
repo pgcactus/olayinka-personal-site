@@ -22,8 +22,6 @@ describe("NotFound", () => {
         .getByRole("link", { name: "see the vinyls →" })
         .getAttribute("href")
     ).toBe("/things/vinyls");
-    expect(document.querySelectorAll(".da-svg circle").length).toBeGreaterThan(
-      100
-    );
+    expect(document.querySelector(".nf-art canvas")).toBeTruthy();
   });
 });

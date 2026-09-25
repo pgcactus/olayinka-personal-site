@@ -327,6 +327,11 @@
   animation: hm-arrive 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.9s backwards;
 }
 
+/* The French greeting is longer; keep it to two lines clear of the drawing. */
+.hm--fr .hm-title {
+  font-size: clamp(48px, 6.2vw, 96px);
+}
+
 .hm-copy {
   max-width: 44rem;
   margin: 0;

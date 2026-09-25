@@ -25,6 +25,26 @@ function renderHome() {
 const panel = () => document.querySelector(".hm-panel");
 
 describe("Home", () => {
+  afterEach(() => {
+    window.localStorage.clear();
+    document.documentElement.lang = "en";
+  });
+
+  it("starts the speller on ROGER THAT", async () => {
+    const user = userEvent.setup();
+    renderHome();
+    await user.click(screen.getByRole("button", { name: "small things" }));
+    expect(
+      (screen.getByLabelText("Type anything") as HTMLInputElement).value
+    ).toBe("ROGER THAT");
+  });
+
+  it("reads drawing-only phrases as plain words", () => {
+    renderHome();
+    expect(screen.queryByRole("button", { name: "tennis" })).toBeNull();
+    expect(screen.getByText("tennis").getAttribute("tabindex")).toBe("0");
+  });
+
   it("greets and links to LinkedIn", () => {
     renderHome();
     expect(
@@ -55,14 +75,14 @@ describe("Home", () => {
     const things = screen.getByRole("button", { name: "small things" });
 
     await user.click(things);
-    expect(things.getAttribute("aria-pressed")).toBe("true");
+    expect(things.getAttribute("aria-expanded")).toBe("true");
     fireEvent.change(screen.getByLabelText("Type anything"), {
       target: { value: "ab!" },
     });
     expect(screen.getByText("Alfa • Bravo")).toBeTruthy();
 
     fireEvent.keyDown(document, { key: "Escape" });
-    expect(things.getAttribute("aria-pressed")).toBe("false");
+    expect(things.getAttribute("aria-expanded")).toBe("false");
     expect(panel()).toBeNull();
   });
 

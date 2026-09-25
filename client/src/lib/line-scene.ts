@@ -32,7 +32,8 @@ export type SubjectKey =
   | "plants"
   | "plane"
   | "tennis"
-  | "run";
+  | "run"
+  | "lost";
 
 const TAU = Math.PI * 2;
 
@@ -89,7 +90,7 @@ const stadium = (c: V, a: number, r: number, n = 18): V[] => {
 const S = (pts: V[], col: V): Stroke => ({ pts, col });
 
 // ---- the drawings, sized against each other
-const SUBJECTS: Record<SubjectKey, Subject> = {
+const SUBJECTS = {
   // An open notebook with a pen resting on it.
   idle: {
     place: [0, 1.15, 0],
@@ -585,6 +586,49 @@ const SUBJECTS: Record<SubjectKey, Subject> = {
       return s;
     })(),
   },
+} as Record<SubjectKey, Subject>;
+
+// The 404 page: the same notebook with its right page torn out, the page
+// floating loose above it.
+SUBJECTS.lost = {
+  place: [-0.35, 0.95, 0],
+  scale: 1.5,
+  tilt: [0.75, 0, 0],
+  strokes: (() => {
+    const left: V[] = [
+      [0, 0, 1.3],
+      [-1.0, 0.22, 1.3],
+      [-2.1, 0.12, 1.3],
+      [-2.1, 0.12, -1.3],
+      [-1.0, 0.22, -1.3],
+      [0, 0, -1.3],
+    ];
+    // A torn edge: zigzag down the right page where it was ripped out.
+    const torn: V[] = [
+      [0, 0, 1.3],
+      [0.6, 0.14, 1.3],
+    ];
+    for (let k = 0; k <= 12; k++) {
+      const z = 1.3 - (k / 12) * 2.6;
+      torn.push([0.6 + (k % 2 ? 0.18 : 0), 0.14, z]);
+    }
+    torn.push([0, 0, -1.3]);
+    const loose: V[] = [
+      [0.9, 1.4, 1.0],
+      [2.4, 1.9, 0.9],
+      [2.6, 1.8, -1.2],
+      [1.1, 1.3, -1.1],
+      [0.9, 1.4, 1.0],
+    ];
+    return [
+      S(poly(left, false, 8), INK.cream),
+      S(line([0, 0, -1.3], [0, 0, 1.3], 12), INK.cream),
+      S(poly(torn, false, 4), INK.cream),
+      S(poly(loose, false, 10), INK.yellow),
+      S(line([1.3, 1.55, 0.4], [2.2, 1.85, 0.35], 8), INK.stone),
+      S(line([1.35, 1.5, -0.1], [2.0, 1.72, -0.15], 8), INK.stone),
+    ];
+  })(),
 };
 
 // Gentle motions only, so each drawing stays readable while it moves:
@@ -603,6 +647,12 @@ const MOTION: Record<SubjectKey, (t: number) => V> = {
   ],
   tennis: t => [0, 0, -t * 1.2, Math.abs(Math.sin(t * 2.4)) * 0.9 - 0.2],
   run: t => [0, Math.sin(t * 0.25) * 0.2, 0, 0],
+  lost: t => [
+    0,
+    Math.sin(t * 0.35) * 0.3,
+    Math.sin(t * 0.7) * 0.03,
+    Math.sin(t * 0.9) * 0.08,
+  ],
 };
 
 // Where the walkie-talkie's screen is, in its own drawing space.
@@ -667,11 +717,16 @@ export interface LineScene {
 /**
  * Starts drawing on `canvas`, sized to its parent. `onCta` receives where the
  * walkie-talkie's screen is (page pixels within the parent) while it's shown,
- * or null otherwise.
+ * or null otherwise. `rest` is what the line draws when nothing is shown.
+ *
+ * To go easy on batteries it draws nothing while off screen or in a hidden
+ * tab, runs at half rate once a drawing has settled, and with reduced motion
+ * only redraws when something changes.
  */
 export function createLineScene(
   canvas: HTMLCanvasElement,
-  onCta: (pos: { x: number; y: number } | null) => void
+  onCta: (pos: { x: number; y: number } | null) => void = () => undefined,
+  rest: SubjectKey = "idle"
 ): LineScene {
   const ctx = canvas.getContext("2d");
   const stage = canvas.parentElement;
@@ -765,11 +820,7 @@ export function createLineScene(
     return { y: 1.1 - (fit - 1) * 0.55, z: 11 * fit };
   }
 
-  const state = {
-    from: "idle" as SubjectKey,
-    to: "idle" as SubjectKey,
-    morph: 1,
-  };
+  const state = { from: rest, to: rest, morph: 1 };
   const tilt = { x: 0, y: 0 };
   const pointer = { nx: 0, ny: 0 };
   const proj: { x: number; y: number; z: number; col: V; join: boolean }[] =
@@ -779,6 +830,9 @@ export function createLineScene(
   let last = performance.now();
   let frame = 0;
   let ctaShown = false;
+  let visible = true;
+  let dirty = true;
+  let skip = false;
 
   function draw(dt: number) {
     drawIn = Math.min(1, drawIn + dt / 2.2);
@@ -857,17 +911,23 @@ export function createLineScene(
   function loop(now: number) {
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
-    if (!still()) t += dt;
-    if (!document.hidden) {
-      tilt.x += (pointer.nx - tilt.x) * Math.min(1, dt * 3);
-      tilt.y += (pointer.ny - tilt.y) * Math.min(1, dt * 3);
-      if (state.morph < 1) state.morph = Math.min(1, state.morph + dt / 1.4);
-      draw(dt);
-    }
     frame = requestAnimationFrame(loop);
+    if (document.hidden || !visible) return;
+    if (!still()) t += dt;
+    tilt.x += (pointer.nx - tilt.x) * Math.min(1, dt * 3);
+    tilt.y += (pointer.ny - tilt.y) * Math.min(1, dt * 3);
+    if (state.morph < 1) state.morph = Math.min(1, state.morph + dt / 1.4);
+    const settled = state.morph >= 1 && (still() || drawIn >= 1);
+    if (still() && settled && !dirty) return;
+    // Once settled, the gentle motion looks the same at half the frame rate.
+    skip = settled && !skip;
+    if (skip && !dirty) return;
+    dirty = false;
+    draw(still() ? 1 : dt * (settled ? 2 : 1));
   }
 
   const onMove = (e: PointerEvent) => {
+    dirty = true;
     const box = stage.getBoundingClientRect();
     pointer.nx = ((e.clientX - box.left) / box.width - 0.5) * 2;
     pointer.ny = ((e.clientY - box.top) / box.height - 0.5) * 2;
@@ -878,9 +938,17 @@ export function createLineScene(
   };
   stage.addEventListener("pointermove", onMove);
   stage.addEventListener("pointerleave", onLeave);
-  const observer = new ResizeObserver(resize);
+  const observer = new ResizeObserver(() => {
+    resize();
+    dirty = true;
+  });
   observer.observe(stage);
   resize();
+  const seen = new IntersectionObserver(([entry]) => {
+    visible = entry.isIntersecting;
+    dirty = true;
+  });
+  seen.observe(canvas);
 
   // Prepare the other drawings while the browser is idle.
   const idle =
@@ -891,15 +959,18 @@ export function createLineScene(
   frame = requestAnimationFrame(loop);
 
   return {
-    show(key) {
+    show(target) {
+      const key = target === "idle" ? rest : target;
       if (key === state.to) return;
       state.from = state.morph < 0.5 ? state.from : state.to;
       state.to = key;
       state.morph = still() ? 1 : 0;
+      dirty = true;
     },
     destroy() {
       cancelAnimationFrame(frame);
       observer.disconnect();
+      seen.disconnect();
       stage.removeEventListener("pointermove", onMove);
       stage.removeEventListener("pointerleave", onLeave);
     },
