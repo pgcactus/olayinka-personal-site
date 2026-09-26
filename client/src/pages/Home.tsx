@@ -210,23 +210,33 @@ export default function Home() {
     if (pinned === "things") tryRef.current?.focus();
   }, [pinned]);
 
+  // Escape dismisses any open panel, hovered or pinned, and hands focus back
+  // to the phrase that opened it rather than dropping it on the page.
+  const shownKey = pinned ?? active;
+  useEffect(() => {
+    if (!shownKey) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (document.activeElement?.closest(".hm-panel, .hm-cta"))
+        document
+          .querySelector<HTMLElement>(`.hm-mark[data-key="${shownKey}"]`)
+          ?.focus({ preventScroll: true });
+      close();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [shownKey, close]);
+
   useEffect(() => {
     if (!pinned) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
-    };
     const onDown = (e: PointerEvent) => {
       if (
         !(e.target as Element | null)?.closest(".hm-mark, .hm-panel, .hm-cta")
       )
         close();
     };
-    document.addEventListener("keydown", onKey);
     document.addEventListener("pointerdown", onDown);
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.removeEventListener("pointerdown", onDown);
-    };
+    return () => document.removeEventListener("pointerdown", onDown);
   }, [pinned, close]);
 
   const keyOf = (target: EventTarget | null) =>

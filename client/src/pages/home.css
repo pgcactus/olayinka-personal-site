@@ -321,7 +321,9 @@
   top: 0;
   left: 0;
   z-index: 3;
-  padding: 3px 7px;
+  /* 24px tall at least, the WCAG 2.2 minimum target size. */
+  min-height: 24px;
+  padding: 3px 8px;
   border: 1px solid rgba(182, 242, 164, 0.6);
   border-radius: 4px;
   background: rgba(20, 34, 24, 0.85);

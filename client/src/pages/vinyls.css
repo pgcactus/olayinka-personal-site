@@ -19,6 +19,8 @@
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
   isolation: isolate;
+  /* Solid fallback under the gradient, so contrast checks see the real ground. */
+  background-color: var(--paper-deep);
 }
 
 .vx-page::before {
