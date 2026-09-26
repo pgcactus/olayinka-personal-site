@@ -1,5 +1,5 @@
 /*
- * Shared pieces of the site system: page shell, header and small notes.
+ * Shared pieces of the site system: page shell, header and round buttons.
  * Colours and fonts come from the tokens in index.css.
  */
 
@@ -26,58 +26,62 @@
   inset: 0 0 auto;
   z-index: 10;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  padding: max(26px, calc(env(safe-area-inset-top) + 8px)) 34px 0;
+  gap: 16px;
+  padding: max(28px, env(safe-area-inset-top)) clamp(16px, 3vw, 44px) 0;
   pointer-events: none;
 }
-
-.site-note {
+.site-header > * {
   pointer-events: auto;
-  padding: 0;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  line-height: 1.4;
-  color: var(--muted);
-  text-decoration: none;
-  background: none;
+}
+
+/* Round header buttons, the same on every page. */
+.site-round {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 11px;
+  box-sizing: border-box;
   border: 0;
+  border-radius: 999px;
+  background: var(--pill);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-decoration: none;
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: transform 0.2s ease;
+}
+.site-round--icon {
+  width: 36px;
+  padding: 0;
+}
+.site-round svg {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  fill: currentColor;
+}
+.site-round:hover {
+  transform: translateY(-1px);
+}
+.site-round:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 
 .site-actions {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 8px;
 }
 
-.site-lang {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.site-lang svg {
-  width: 12px;
-  height: 12px;
-  fill: currentColor;
-}
-
-.site-note:hover {
-  color: var(--ink);
-}
-
-.site-note:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 4px;
-  border-radius: 2px;
-}
-
-@media (max-width: 767px) {
+@media (max-width: 640px) {
   .site-header {
-    padding-left: 24px;
-    padding-right: 24px;
+    padding-top: max(20px, env(safe-area-inset-top));
   }
 }

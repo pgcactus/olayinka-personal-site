@@ -30,6 +30,26 @@ describe("Home", () => {
     document.documentElement.lang = "en";
   });
 
+  it("shows a different favourite track on the next visit", async () => {
+    renderHome();
+    const first = await screen.findByText(/now listening to:/);
+    const pick = window.localStorage.getItem("listening");
+    expect(first.closest("a")?.getAttribute("href")).toBe("/things/vinyls");
+    cleanup();
+    renderHome();
+    await screen.findByText(/now listening to:/);
+    expect(window.localStorage.getItem("listening")).not.toBe(pick);
+  });
+
+  it("keeps a card open while the mouse is on it", async () => {
+    const user = userEvent.setup();
+    renderHome();
+    await user.hover(screen.getByRole("button", { name: "Flatiron Health" }));
+    await user.hover(panel()!);
+    await act(() => new Promise(r => setTimeout(r, 700)));
+    expect(panel()).not.toBeNull();
+  });
+
   it("opens the speller empty, with a hint", async () => {
     const user = userEvent.setup();
     renderHome();
@@ -62,7 +82,11 @@ describe("Home", () => {
     const flatiron = screen.getByRole("button", { name: "Flatiron Health" });
 
     await user.hover(flatiron);
-    expect(screen.getByText(/identity and access/)).toBeTruthy();
+    expect(
+      screen
+        .getByRole("link", { name: /flatironhealth\.co\.uk/ })
+        .getAttribute("href")
+    ).toBe("https://flatironhealth.co.uk/");
 
     await user.unhover(flatiron);
     await act(() => new Promise(r => setTimeout(r, 700)));
