@@ -241,7 +241,7 @@
 .nt-error {
   margin: -12px 0 0;
   font-size: 14px;
-  color: #f2b8b5;
+  color: var(--danger);
 }
 
 .nt-actions {

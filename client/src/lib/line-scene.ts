@@ -37,12 +37,14 @@ export type SubjectKey =
 
 const TAU = Math.PI * 2;
 
+// Cream and yellow match the page's --ink and --accent, so the drawing reads
+// as the same pen as the words.
 const INK = {
-  cream: [0.96, 0.94, 0.88],
+  cream: [0.965, 0.965, 0.984],
   skin: [0.95, 0.78, 0.64],
   shirt: [0.98, 0.93, 0.84],
   stone: [0.95, 0.9, 0.8],
-  yellow: [1, 0.86, 0.5],
+  yellow: [1, 0.89, 0.604],
   red: [1, 0.62, 0.6],
   green: [0.7, 0.92, 0.72],
   terracotta: [1, 0.74, 0.6],
