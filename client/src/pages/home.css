@@ -236,6 +236,12 @@
   font-size: 11.5px;
   letter-spacing: 0.04em;
 }
+.hm-panel p a {
+  font: inherit;
+  letter-spacing: normal;
+  white-space: nowrap;
+  text-underline-offset: 3px;
+}
 
 .hm-tag {
   padding: 2px 9px;

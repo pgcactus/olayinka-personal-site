@@ -45,7 +45,8 @@ const COPY = {
     ],
     flatiron: [
       "day job",
-      "Healthtech putting real-world data to work on cancer research and care. I work on identity and access.",
+      "Healthtech putting real-world data to work on cancer research and care.",
+      "See how we do that here:",
     ],
     things: ["small things", "A NATO alphabet speller."],
     typeMe: "type me",
@@ -67,7 +68,8 @@ const COPY = {
     ],
     flatiron: [
       "au quotidien",
-      "Une healthtech qui met les données de vie réelle au service de la recherche et des soins contre le cancer. Je travaille sur l’identité et les accès.",
+      "Une healthtech qui met les données de vie réelle au service de la recherche et des soins contre le cancer.",
+      "Découvrez comment ici :",
     ],
     things: ["petites choses", "Un outil d’épellation OTAN."],
     typeMe: "écrivez-moi",
@@ -312,7 +314,16 @@ export default function Home() {
     panel = (
       <>
         <span className="hm-tag">{c.flatiron[0]}</span>
-        <p>{c.flatiron[1]}</p>
+        <p>
+          {c.flatiron[1]} {c.flatiron[2]}{" "}
+          <a
+            href="https://flatironhealth.co.uk/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            flatironhealth.co.uk ↗
+          </a>
+        </p>
       </>
     );
   else if (shown === "things" && pinned === "things")
@@ -406,6 +417,12 @@ export default function Home() {
               className="hm-panel"
               id="hm-panel"
               key={`${shown}-${pinned}-${lang}`}
+              // Moving the mouse onto a card keeps it open, so its links
+              // can be reached.
+              onPointerEnter={() => window.clearTimeout(leaveRef.current)}
+              onPointerLeave={e =>
+                e.pointerType === "mouse" && !pinned && leave()
+              }
             >
               {panel}
             </div>

@@ -41,6 +41,15 @@ describe("Home", () => {
     expect(window.localStorage.getItem("listening")).not.toBe(pick);
   });
 
+  it("keeps a card open while the mouse is on it", async () => {
+    const user = userEvent.setup();
+    renderHome();
+    await user.hover(screen.getByRole("button", { name: "Flatiron Health" }));
+    await user.hover(panel()!);
+    await act(() => new Promise(r => setTimeout(r, 700)));
+    expect(panel()).not.toBeNull();
+  });
+
   it("opens the speller empty, with a hint", async () => {
     const user = userEvent.setup();
     renderHome();
@@ -73,7 +82,11 @@ describe("Home", () => {
     const flatiron = screen.getByRole("button", { name: "Flatiron Health" });
 
     await user.hover(flatiron);
-    expect(screen.getByText(/identity and access/)).toBeTruthy();
+    expect(
+      screen
+        .getByRole("link", { name: /flatironhealth\.co\.uk/ })
+        .getAttribute("href")
+    ).toBe("https://flatironhealth.co.uk/");
 
     await user.unhover(flatiron);
     await act(() => new Promise(r => setTimeout(r, 700)));
