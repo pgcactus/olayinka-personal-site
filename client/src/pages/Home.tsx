@@ -149,6 +149,9 @@ export default function Home() {
   const sceneRef = useRef<LineScene | null>(null);
   const leaveRef = useRef(0);
   const tryRef = useRef<HTMLInputElement>(null);
+  // How the visitor last reached for the page, so a tap does not throw up the
+  // phone keyboard before they have asked to type.
+  const inputRef = useRef<"touch" | "other">("other");
   const c = COPY[lang];
 
   useEffect(() => {
@@ -207,7 +210,23 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (pinned === "things") tryRef.current?.focus();
+    const onPointer = (e: PointerEvent) => {
+      inputRef.current = e.pointerType === "touch" ? "touch" : "other";
+    };
+    const onKey = () => {
+      inputRef.current = "other";
+    };
+    document.addEventListener("pointerdown", onPointer, true);
+    document.addEventListener("keydown", onKey, true);
+    return () => {
+      document.removeEventListener("pointerdown", onPointer, true);
+      document.removeEventListener("keydown", onKey, true);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (pinned === "things" && inputRef.current !== "touch")
+      tryRef.current?.focus();
   }, [pinned]);
 
   // Escape dismisses any open panel, hovered or pinned, and hands focus back

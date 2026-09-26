@@ -272,7 +272,8 @@
   background: rgba(255, 255, 255, 0.08);
   color: var(--ink);
   font-family: var(--font-mono);
-  font-size: 15px;
+  /* 16px keeps iOS Safari from zooming the page when the field is tapped. */
+  font-size: 16px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   outline: none;
@@ -472,6 +473,17 @@
   }
   .hm-note {
     letter-spacing: 0.16em;
+  }
+  /* A tighter card on phones, so it covers less of the drawing. */
+  .hm-panel {
+    gap: 8px;
+    padding: 10px 14px 12px;
+  }
+  .hm-try {
+    gap: 6px;
+  }
+  .hm-try output {
+    min-height: 1.45em;
   }
 }
 
