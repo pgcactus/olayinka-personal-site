@@ -135,13 +135,9 @@
   gap: 16px;
 }
 
-.hm-name {
-  font-size: 14px;
-  letter-spacing: 0.06em;
-}
-
 .hm-actions {
   display: flex;
+  margin-left: auto;
   align-items: center;
   gap: 8px;
 }
@@ -183,6 +179,7 @@
 .hm-mark:focus-visible,
 .hm-cta:focus-visible,
 .hm-panel a:focus-visible,
+.hm-listening a:focus-visible,
 .hm-try input:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
@@ -348,7 +345,9 @@
   flex-direction: column;
   align-items: center;
   gap: 14px;
-  padding-bottom: 4vh;
+  /* Screens taller than the content lift the words off the bottom, so the
+     drawing and words sit nearer the middle. */
+  padding-bottom: max(4vh, calc((100vh - 700px) * 0.5));
   text-align: center;
 }
 
@@ -427,8 +426,28 @@
 
 .hm-footer {
   display: flex;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
+}
+
+.hm-listening {
+  margin: 0;
+  min-width: 0;
+}
+.hm-listening a {
+  color: inherit;
+  text-decoration: none;
+}
+.hm-listening-track {
+  color: var(--accent);
+  text-transform: none;
+  letter-spacing: 0.04em;
+}
+.hm-listening a:hover .hm-listening-track,
+.hm-listening a:focus-visible .hm-listening-track {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .hm-note {
@@ -463,13 +482,19 @@
   }
   .hm-main {
     gap: 12px;
-    padding-bottom: 2vh;
+    padding-bottom: max(2vh, calc((100vh - 700px) * 0.5));
   }
   .hm-title {
     font-size: 56px;
   }
+  .hm--fr .hm-title {
+    font-size: 40px;
+  }
   .hm-copy {
     font-size: 21px;
+  }
+  .hm--fr .hm-copy {
+    font-size: 19px;
   }
   .hm-note {
     letter-spacing: 0.16em;
@@ -499,5 +524,16 @@
   .hm-title,
   .hm-copy {
     transition: none;
+  }
+}
+
+/* On short phones the speller card would cover most of the drawing, so the
+   drawing steps back while it is open. */
+@media (max-width: 640px) and (max-height: 760px) {
+  .hm-scene {
+    transition: opacity 0.3s ease;
+  }
+  .hm--typing .hm-scene {
+    opacity: 0;
   }
 }

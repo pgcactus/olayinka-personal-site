@@ -18,7 +18,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import LangSwitch from "@/components/LangSwitch";
 import PageMeta from "@/components/PageMeta";
-import { VINYLS } from "@/data/vinyls";
+import { VINYLS, type Vinyl } from "@/data/vinyls";
 import {
   createLineScene,
   type LineScene,
@@ -56,8 +56,7 @@ const COPY = {
       `${VINYLS.length} records, one at a time`,
       "see the wall →",
     ],
-    time: (t: string, city: string) =>
-      city ? `${t} in ${city}` : `${t} your time`,
+    listening: "now listening to:",
   },
   fr: {
     title: "Bonjour, je m’appelle Olayinka.",
@@ -79,11 +78,12 @@ const COPY = {
       `${VINYLS.length} disques, un par un`,
       "voir le mur →",
     ],
-    time: (t: string) => `${t}, heure locale`,
+    listening: "en écoute :",
   },
 };
 
 const COVERS = VINYLS.filter(v => v.coverUrl).slice(0, 5);
+const TRACKS = VINYLS.filter(v => v.favouriteTrack);
 
 const personJsonLd = {
   "@context": "https://schema.org",
@@ -143,7 +143,7 @@ export default function Home() {
   const [pinned, setPinned] = useState<Key | null>(null);
   const [cta, setCta] = useState<{ x: number; y: number } | null>(null);
   const [tryValue, setTryValue] = useState("");
-  const [clock, setClock] = useState<string | null>(null);
+  const [track, setTrack] = useState<Vinyl | null>(null);
   const [fading, setFading] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sceneRef = useRef<LineScene | null>(null);
@@ -169,33 +169,26 @@ export default function Home() {
     sceneRef.current?.show(active ?? "idle");
   }, [active]);
 
-  // The viewer's own time and city, filled in after hydration.
+  // A different favourite track from the shelf on each visit, picked after
+  // hydration so the server render stays stable.
   useEffect(() => {
-    const tick = () => {
-      const time = new Date().toLocaleTimeString(
-        lang === "fr" ? "fr-FR" : "en-GB",
-        {
-          hour: "2-digit",
-          minute: "2-digit",
-        }
-      );
-      let city = "";
-      try {
-        const zone = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
-        if (zone.includes("/") && !zone.startsWith("Etc/"))
-          city = zone.split("/").pop()!.replace(/_/g, " ");
-      } catch {
-        /* no time zone */
-      }
-      setClock(COPY[lang].time(time, city));
-    };
-    const first = window.setTimeout(tick, 0);
-    const timer = window.setInterval(tick, 15000);
-    return () => {
-      window.clearTimeout(first);
-      window.clearInterval(timer);
-    };
-  }, [lang]);
+    let last: string | null = null;
+    try {
+      last = window.localStorage.getItem("listening");
+    } catch {
+      /* storage unavailable */
+    }
+    const pool = TRACKS.filter(v => v.id !== last);
+    const pick = pool[Math.floor(Math.random() * pool.length)] ?? TRACKS[0];
+    if (!pick) return;
+    try {
+      window.localStorage.setItem("listening", pick.id);
+    } catch {
+      /* storage unavailable */
+    }
+    const t = window.setTimeout(() => setTrack(pick), 0);
+    return () => window.clearTimeout(t);
+  }, []);
 
   const close = useCallback(() => {
     window.clearTimeout(leaveRef.current);
@@ -375,7 +368,9 @@ export default function Home() {
     );
 
   return (
-    <div className={`hm hm--${lang}${fading ? " hm--fading" : ""}`}>
+    <div
+      className={`hm hm--${lang}${fading ? " hm--fading" : ""}${pinned === "things" ? " hm--typing" : ""}`}
+    >
       <PageMeta
         title="Olayinka Titilola"
         description="Product manager in London. I lead product work at Flatiron Health, build small things, collect vinyls and try to keep my plants alive."
@@ -388,7 +383,6 @@ export default function Home() {
       <span className="hm-tick hm-tick--br" />
 
       <header className="hm-header">
-        <span className="hm-name">Olayinka Titilola</span>
         <div className="hm-actions">
           <a
             className="hm-round hm-round--icon"
@@ -458,7 +452,18 @@ export default function Home() {
       </main>
 
       <footer className="hm-footer">
-        <span className="hm-note">{clock ?? " "}</span>
+        <p className="hm-note hm-listening">
+          {track ? (
+            <Link href="/things/vinyls">
+              {c.listening}{" "}
+              <span className="hm-listening-track">
+                {track.favouriteTrack} · {track.artist}
+              </span>
+            </Link>
+          ) : (
+            " "
+          )}
+        </p>
       </footer>
     </div>
   );

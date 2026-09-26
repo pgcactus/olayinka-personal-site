@@ -30,6 +30,17 @@ describe("Home", () => {
     document.documentElement.lang = "en";
   });
 
+  it("shows a different favourite track on the next visit", async () => {
+    renderHome();
+    const first = await screen.findByText(/now listening to:/);
+    const pick = window.localStorage.getItem("listening");
+    expect(first.closest("a")?.getAttribute("href")).toBe("/things/vinyls");
+    cleanup();
+    renderHome();
+    await screen.findByText(/now listening to:/);
+    expect(window.localStorage.getItem("listening")).not.toBe(pick);
+  });
+
   it("opens the speller empty, with a hint", async () => {
     const user = userEvent.setup();
     renderHome();
