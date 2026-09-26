@@ -210,23 +210,33 @@ export default function Home() {
     if (pinned === "things") tryRef.current?.focus();
   }, [pinned]);
 
+  // Escape dismisses any open panel, hovered or pinned, and hands focus back
+  // to the phrase that opened it rather than dropping it on the page.
+  const shownKey = pinned ?? active;
+  useEffect(() => {
+    if (!shownKey) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (document.activeElement?.closest(".hm-panel, .hm-cta"))
+        document
+          .querySelector<HTMLElement>(`.hm-mark[data-key="${shownKey}"]`)
+          ?.focus({ preventScroll: true });
+      close();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [shownKey, close]);
+
   useEffect(() => {
     if (!pinned) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
-    };
     const onDown = (e: PointerEvent) => {
       if (
         !(e.target as Element | null)?.closest(".hm-mark, .hm-panel, .hm-cta")
       )
         close();
     };
-    document.addEventListener("keydown", onKey);
     document.addEventListener("pointerdown", onDown);
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.removeEventListener("pointerdown", onDown);
-    };
+    return () => document.removeEventListener("pointerdown", onDown);
   }, [pinned, close]);
 
   const keyOf = (target: EventTarget | null) =>
@@ -353,7 +363,6 @@ export default function Home() {
         path="/"
         jsonLd={personJsonLd}
       />
-      <canvas ref={canvasRef} className="hm-scene" aria-hidden="true" />
       <span className="hm-tick hm-tick--tl" />
       <span className="hm-tick hm-tick--tr" />
       <span className="hm-tick hm-tick--bl" />
@@ -377,32 +386,38 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="hm-aside" aria-live="polite">
-        {panel && (
-          <div
-            className="hm-panel"
-            id="hm-panel"
-            key={`${shown}-${pinned}-${lang}`}
-          >
-            {panel}
-          </div>
-        )}
+      <div className="hm-stage">
+        <div className="hm-aside" aria-live="polite">
+          {panel && (
+            <div
+              className="hm-panel"
+              id="hm-panel"
+              key={`${shown}-${pinned}-${lang}`}
+            >
+              {panel}
+            </div>
+          )}
+        </div>
+        <div className="hm-art">
+          <canvas ref={canvasRef} className="hm-scene" aria-hidden="true" />
+          {cta && !pinned && (
+            <button
+              type="button"
+              className="hm-cta"
+              style={{
+                transform: `translate(${Math.round(cta.x)}px, ${Math.round(cta.y)}px) translate(-50%, -50%)`,
+              }}
+              onPointerEnter={() => window.clearTimeout(leaveRef.current)}
+              onPointerLeave={e =>
+                e.pointerType === "mouse" && !pinned && leave()
+              }
+              onClick={pinThings}
+            >
+              {c.typeMe}
+            </button>
+          )}
+        </div>
       </div>
-
-      {cta && !pinned && (
-        <button
-          type="button"
-          className="hm-cta"
-          style={{
-            transform: `translate(${Math.round(cta.x)}px, ${Math.round(cta.y)}px) translate(-50%, -50%)`,
-          }}
-          onPointerEnter={() => window.clearTimeout(leaveRef.current)}
-          onPointerLeave={e => e.pointerType === "mouse" && !pinned && leave()}
-          onClick={pinThings}
-        >
-          {c.typeMe}
-        </button>
-      )}
 
       <main
         className="hm-main"

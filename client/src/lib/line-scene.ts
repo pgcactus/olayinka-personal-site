@@ -13,8 +13,8 @@ interface Stroke {
   col: V;
 }
 interface Subject {
-  place?: V;
-  scale?: number;
+  /** How much of the frame the drawing fills, relative to the others. */
+  size?: number;
   tilt?: V;
   strokes: Stroke[];
 }
@@ -93,8 +93,7 @@ const S = (pts: V[], col: V): Stroke => ({ pts, col });
 const SUBJECTS = {
   // An open notebook with a pen resting on it.
   idle: {
-    place: [0, 1.15, 0],
-    scale: 0.8,
+    size: 1,
     tilt: [0.75, 0, 0],
     strokes: (() => {
       const page = (d: number): V[] => [
@@ -155,8 +154,7 @@ const SUBJECTS = {
   },
   // The Flatiron: a wedge with floor lines across its two front faces.
   flatiron: {
-    place: [0, -0.1, 0],
-    scale: 0.72,
+    size: 0.95,
     tilt: [0, 0.55, 0],
     strokes: (() => {
       const P = [
@@ -192,8 +190,7 @@ const SUBJECTS = {
   },
   // A walkie-talkie: body, antenna, screen with a signal, speaker slots.
   things: {
-    place: [0, -0.55, 0],
-    scale: 0.62,
+    size: 0.78,
     tilt: [0, -0.3, 0],
     strokes: [
       S(
@@ -275,7 +272,7 @@ const SUBJECTS = {
   },
   // Two sleeves, a record and a front sleeve.
   records: {
-    place: [0, -0.2, 0],
+    size: 1,
     strokes: [
       S(
         poly(
@@ -327,8 +324,7 @@ const SUBJECTS = {
   },
   // A pot with a stem and five leaves.
   plants: {
-    place: [0, 0.55, 0],
-    scale: 0.58,
+    size: 0.85,
     strokes: [
       S(circleXZ([0, -1.9, 0], 0.85, 0, TAU, 36), INK.terracotta),
       S(line([0.85, -1.9, 0], [1.2, -0.1, 0], 12), INK.terracotta),
@@ -435,7 +431,7 @@ const SUBJECTS = {
   },
   // A parachute: scalloped canopy, panel seams, cords and a small figure.
   plane: {
-    place: [0, -0.1, 0],
+    size: 0.95,
     strokes: (() => {
       const s: Stroke[] = [];
       const top = 4.1;
@@ -508,7 +504,7 @@ const SUBJECTS = {
   },
   // A tennis ball with its seam, spinning and bouncing.
   tennis: {
-    place: [0, 0.9, 0],
+    size: 0.55,
     strokes: (() => {
       const R = 0.95;
       const c = [0, 1.1, 0];
@@ -541,7 +537,7 @@ const SUBJECTS = {
   },
   // A running track with four lanes, a start line and a tiny runner.
   run: {
-    place: [0, 0.9, 0],
+    size: 0.9,
     tilt: [1.0, 0, 0],
     strokes: (() => {
       const lanes = [0.6, 0.78, 0.96, 1.14];
@@ -591,8 +587,7 @@ const SUBJECTS = {
 // The 404 page: the same notebook with its right page torn out, the page
 // floating loose above it.
 SUBJECTS.lost = {
-  place: [-0.35, 0.95, 0],
-  scale: 1.5,
+  size: 1,
   tilt: [0.75, 0, 0],
   strokes: (() => {
     const left: V[] = [
@@ -654,6 +649,12 @@ const MOTION: Record<SubjectKey, (t: number) => V> = {
     Math.sin(t * 0.9) * 0.08,
   ],
 };
+
+// Drawings fill this share of the canvas's shorter side; the bounce and bob
+// in MOTION are scaled by LIFT; DEPTH sets how strong the perspective is.
+const FILL = 0.86;
+const LIFT = 0.3;
+const DEPTH = 7;
 
 // Where the walkie-talkie's screen is, in its own drawing space.
 const THINGS_SCREEN = [0, 1.75, 0.42];
@@ -738,7 +739,8 @@ export function createLineScene(
   const N = window.innerWidth < 640 ? 1500 : 2200;
 
   // Join strokes into one line, resample evenly to N points, centre it.
-  const paths: Partial<Record<SubjectKey, { pts: Point[]; c: V }>> = {};
+  const paths: Partial<Record<SubjectKey, { pts: Point[]; c: V; sc: number }>> =
+    {};
   function path(key: SubjectKey) {
     const hit = paths[key];
     if (hit) return hit;
@@ -776,10 +778,23 @@ export function createLineScene(
     const lo = [0, 1, 2].map(j => Math.min(...out.map(q => q.p[j])));
     const hi = [0, 1, 2].map(j => Math.max(...out.map(q => q.p[j])));
     const c = lo.map((x, j) => (x + hi[j]) / 2);
-    const sc = SUBJECTS[key].scale ?? 1;
+    // Scale every drawing to the same frame: its widest or tallest extent,
+    // as seen at its resting tilt, becomes its relative size.
+    const base = SUBJECTS[key].tilt ?? [0, 0, 0];
+    const R0 = mul(rotY(base[1]), mul(rotZ(base[2]), rotX(base[0])));
+    let extent = 0;
+    for (const q of out) {
+      const r = apply(
+        R0,
+        q.p.map((x, j) => x - c[j])
+      );
+      extent = Math.max(extent, Math.abs(r[0]), Math.abs(r[1]));
+    }
+    const sc = (SUBJECTS[key].size ?? 1) / Math.max(extent, 1e-6);
     const result = {
       pts: out.map(q => ({ ...q, p: q.p.map((x, j) => (x - c[j]) * sc) })),
       c,
+      sc,
     };
     paths[key] = result;
     return result;
@@ -796,12 +811,7 @@ export function createLineScene(
         mul(rotZ(m[2] + base[2]), rotX(m[0] + base[0]))
       )
     );
-    const c = path(key).c;
-    const place = s.place ?? [0, 0, 0];
-    return {
-      R,
-      off: [c[0] + place[0], c[1] + place[1] + m[3], c[2] + place[2]],
-    };
+    return { R, off: [0, m[3] * LIFT, 0] };
   }
 
   let W = 0;
@@ -815,9 +825,12 @@ export function createLineScene(
     canvas.width = Math.round(W * dpr);
     canvas.height = Math.round(H * dpr);
   }
-  function camera() {
-    const fit = Math.max(1, 0.9 / (W / Math.max(1, H)));
-    return { y: 1.1 - (fit - 1) * 0.55, z: 11 * fit };
+  // Every drawing is centred in the canvas and sized to its shorter side,
+  // with a little perspective for depth.
+  function project(w: V) {
+    const k = (Math.min(W, H) / 2) * FILL;
+    const persp = DEPTH / (DEPTH - w[2]);
+    return { x: W / 2 + w[0] * k * persp, y: H / 2 - w[1] * k * persp };
   }
 
   const state = { from: rest, to: rest, morph: 1 };
@@ -841,8 +854,6 @@ export function createLineScene(
     const k0 = state.morph;
     const fA = frameOf(state.from, t, tilt);
     const fB = frameOf(state.to, t, tilt);
-    const cam = camera();
-    const f = H / 2 / Math.tan((15 * Math.PI) / 180);
     const n = still() ? N : Math.max(2, Math.floor(N * ease(drawIn)));
     for (let i = 0; i < n; i++) {
       const a = A[i];
@@ -852,10 +863,10 @@ export function createLineScene(
       const pa = add(apply(fA.R, a.p), fA.off);
       const pb = add(apply(fB.R, b.p), fB.off);
       const w = [0, 1, 2].map(j => lerp(pa[j], pb[j], k));
-      const z = cam.z - w[2];
+      const at = project(w);
       proj[i] = {
-        x: W / 2 + (w[0] * f) / z,
-        y: H / 2 - ((w[1] - cam.y) * f) / z,
+        x: at.x,
+        y: at.y,
         z: w[2],
         col: k < 0.5 ? a.col : b.col,
         join: k < 0.5 ? a.join : b.join,
@@ -864,14 +875,8 @@ export function createLineScene(
 
     if (state.to === "things" && k0 >= 0.95) {
       const P = path("things");
-      const sc = SUBJECTS.things.scale ?? 1;
-      const lp = THINGS_SCREEN.map((x, j) => (x - P.c[j]) * sc);
-      const wp = add(apply(fB.R, lp), fB.off);
-      const z = cam.z - wp[2];
-      onCta({
-        x: W / 2 + (wp[0] * f) / z,
-        y: H / 2 - ((wp[1] - cam.y) * f) / z,
-      });
+      const lp = THINGS_SCREEN.map((x, j) => (x - P.c[j]) * P.sc);
+      onCta(project(add(apply(fB.R, lp), fB.off)));
       ctaShown = true;
     } else if (ctaShown) {
       onCta(null);
@@ -882,11 +887,11 @@ export function createLineScene(
     ctx!.clearRect(0, 0, W, H);
     ctx!.lineCap = "round";
     ctx!.lineJoin = "round";
-    const width = Math.min(1.2, Math.max(0.8, W / 1300));
+    const width = Math.min(1.15, Math.max(0.85, Math.min(W, H) / 420));
     let i = 1;
     while (i < n) {
       const p = proj[i];
-      const depth = Math.max(0, Math.min(1, (p.z + 2) / 4));
+      const depth = Math.max(0, Math.min(1, (p.z + 1) / 2));
       ctx!.beginPath();
       ctx!.moveTo(proj[i - 1].x, proj[i - 1].y);
       let j = i;
@@ -929,8 +934,10 @@ export function createLineScene(
   const onMove = (e: PointerEvent) => {
     dirty = true;
     const box = stage.getBoundingClientRect();
-    pointer.nx = ((e.clientX - box.left) / box.width - 0.5) * 2;
-    pointer.ny = ((e.clientY - box.top) / box.height - 0.5) * 2;
+    // Clamped, since a panel above the frame also reports its pointer here.
+    const clamp = (v: number) => Math.max(-1, Math.min(1, v));
+    pointer.nx = clamp(((e.clientX - box.left) / box.width - 0.5) * 2);
+    pointer.ny = clamp(((e.clientY - box.top) / box.height - 0.5) * 2);
   };
   const onLeave = () => {
     pointer.nx = 0;
