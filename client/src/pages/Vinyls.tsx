@@ -3,7 +3,8 @@
  *
  * - Stone-paper wall and floating shelves in the site's colours (light and
  *   dark); shelf tops foreshorten against a fixed eye line as the page scrolls.
- * - 5 records per shelf from 768px, 3 below; partial shelves are centred.
+ * - 4 records per shelf from 768px, 3 below; a partial last shelf starts on
+ *   the left. Each sleeve has its title and artist beneath the shelf.
  * - Desktop: choosing a record flies its sleeve out to the right-hand panel
  *   while the wall slides left; choosing again, clicking the wall or pressing
  *   Escape sends it back. Mobile: a bottom sheet slides up instead.
@@ -26,7 +27,7 @@ const WALL_SHIFT = 0.2;
 const PANEL_COVER = 0.36;
 const PANEL_COVER_TOP = 0.18;
 
-const DESKTOP_COLS = 5;
+const DESKTOP_COLS = 4;
 const MOBILE_COLS = 3;
 const shelfCount = (cols: number) => Math.ceil(VINYLS.length / cols);
 
@@ -79,7 +80,7 @@ function flyFrom(el: HTMLElement, from: Box, to: Box) {
 const STRINGS = {
   en: {
     title: "Vinyls",
-    count: (n: number) => `( ${n} records, one at a time )`,
+    count: (n: number) => `${n} records, one at a time`,
     collection: "Record collection",
     by: (title: string, artist: string) => `${title} by ${artist}`,
     released: (year: number) => `Released ${year}.`,
@@ -87,7 +88,7 @@ const STRINGS = {
   },
   fr: {
     title: "Vinyles",
-    count: (n: number) => `( ${n} disques, un par un )`,
+    count: (n: number) => `${n} disques, un par un`,
     collection: "Collection de disques",
     by: (title: string, artist: string) => `${title}, de ${artist}`,
     released: (year: number) => `Sorti en ${year}.`,
@@ -300,6 +301,11 @@ export default function Vinyls() {
                     </span>
                   )}
                 </button>
+                {/* The button's label already names the record. */}
+                <span className="vx-caption" aria-hidden="true">
+                  <span className="vx-caption-title">{vinyl.title}</span>
+                  <span className="vx-caption-artist">{vinyl.artist}</span>
+                </span>
               </li>
             ))}
           </ul>

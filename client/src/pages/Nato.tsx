@@ -155,15 +155,15 @@ const STRINGS = {
     reverse: "NATO → word",
     typeAnything: "Type anything",
     typeWords: "Type NATO words, separated by spaces",
-    clear: "( clear )",
+    clear: "clear",
     tileLabel: (letter: string, word: string) => `${letter} for ${word}`,
-    hint: "( hover or tap a word for its story )",
+    hint: "hover or tap a word for its story",
     fallback:
       "A word chosen for its clear, unambiguous pronunciation in radio communications.",
     invalid: (w: string) =>
       `‘${w}’ isn’t a NATO word. Try Alfa, Bravo or Charlie.`,
-    copy: "( copy )",
-    share: "( share )",
+    copy: "copy",
+    share: "share",
     copied: "copied",
     copyFailed: "could not copy",
     linkCopied: "link copied",
@@ -178,15 +178,15 @@ const STRINGS = {
     reverse: "OTAN → mot",
     typeAnything: "Tapez n’importe quoi",
     typeWords: "Tapez des mots OTAN, séparés par des espaces",
-    clear: "( effacer )",
+    clear: "effacer",
     tileLabel: (letter: string, word: string) => `${letter} pour ${word}`,
-    hint: "( survolez ou touchez un mot pour son histoire )",
+    hint: "survolez ou touchez un mot pour son histoire",
     fallback:
       "Un mot choisi pour sa prononciation claire et sans ambiguïté à la radio.",
     invalid: (w: string) =>
       `« ${w} » n’est pas un mot OTAN. Essayez Alfa, Bravo ou Charlie.`,
-    copy: "( copier )",
-    share: "( partager )",
+    copy: "copier",
+    share: "partager",
     copied: "copié",
     copyFailed: "copie impossible",
     linkCopied: "lien copié",
@@ -235,8 +235,10 @@ export default function Nato() {
     const shared = getSharedInput();
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (shared) setInput(shared);
+    // Ready to type over the starter word, except on touch screens, where
+    // focusing would throw up the keyboard before anyone asks for it.
     const el = inputRef.current;
-    if (el) {
+    if (el && window.matchMedia?.("(hover: hover)").matches) {
       el.focus();
       el.select();
     }
@@ -377,7 +379,10 @@ export default function Nato() {
           <>
             <div className="nt-tiles">
               {tiles.map(group => (
-                <div className="nt-group" key={group[0].index}>
+                <div
+                  className={`nt-group${group.length > 7 ? " nt-group--long" : ""}`}
+                  key={group[0].index}
+                >
                   {group.map(tile => (
                     <button
                       type="button"
@@ -401,6 +406,14 @@ export default function Nato() {
                 </div>
               ))}
             </div>
+            <div className="nt-actions">
+              <button type="button" className="nt-link" onClick={handleCopy}>
+                {t.copy}
+              </button>
+              <button type="button" className="nt-link" onClick={handleShare}>
+                {t.share}
+              </button>
+            </div>
             <p className="nt-origin" aria-live="polite">
               {picked ? (
                 <>
@@ -414,27 +427,21 @@ export default function Nato() {
         )}
 
         {!forward && output && (
-          <p className="nt-result" aria-live="polite">
-            {output}
-          </p>
+          <>
+            <p className="nt-result" aria-live="polite">
+              {output}
+            </p>
+            <div className="nt-actions">
+              <button type="button" className="nt-link" onClick={handleCopy}>
+                {t.copy}
+              </button>
+            </div>
+          </>
         )}
         {invalid && (
           <p className="nt-error" role="alert">
             {t.invalid(invalid)}
           </p>
-        )}
-
-        {output && (
-          <div className="nt-actions">
-            <button type="button" className="site-note" onClick={handleCopy}>
-              {t.copy}
-            </button>
-            {forward && (
-              <button type="button" className="site-note" onClick={handleShare}>
-                {t.share}
-              </button>
-            )}
-          </div>
         )}
       </main>
 

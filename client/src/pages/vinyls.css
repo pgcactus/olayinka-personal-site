@@ -6,8 +6,8 @@
  */
 
 .vx-page {
-  --vx-cols: 5;
-  --vx-u: min(12.9vw, 18.4vh);
+  --vx-cols: 4;
+  --vx-u: min(14.5vw, 18.4vh);
   --vx-pitch: calc(var(--vx-u) * 1.205);
   --vx-row: calc(var(--vx-u) * 1.53);
   --vx-wall-w: calc(var(--vx-cols) * var(--vx-pitch) + var(--vx-u) * 0.9);
@@ -115,9 +115,11 @@
   left: 0;
   right: 0;
   bottom: 100%;
-  height: max(
+  /* Capped, so shelves low on a tall page don't turn into deep ledges. */
+  height: clamp(
     0px,
-    (var(--vx-i) * var(--vx-row) + var(--vx-u) - var(--vx-origin-y)) * 0.024
+    (var(--vx-i) * var(--vx-row) + var(--vx-u) - var(--vx-origin-y)) * 0.024,
+    3px
   );
   background: linear-gradient(
     to top,
@@ -135,7 +137,7 @@
   position: relative;
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   width: calc(var(--vx-cols) * var(--vx-pitch));
   margin: 0 auto;
   padding: 0;
@@ -144,9 +146,36 @@
 
 .vx-slot {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   width: var(--vx-pitch);
   height: var(--vx-row);
+}
+
+/* Title and artist, printed under the shelf like a label. */
+.vx-caption {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: var(--vx-u);
+  margin-top: calc(var(--vx-u) * 0.065 + max(8px, var(--vx-u) * 0.08));
+  line-height: 1.3;
+  text-align: left;
+}
+.vx-caption > span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.vx-caption-title {
+  font-size: 12.5px;
+  color: var(--ink);
+}
+.vx-caption-artist {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
 }
 
 .vx-record {
@@ -287,7 +316,16 @@
   .vx-page {
     --vx-cols: 3;
     --vx-u: 22.3vw;
+    --vx-row: calc(var(--vx-u) * 1.95);
     --vx-wall-w: 88vw;
+  }
+
+  .vx-caption > .vx-caption-title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    font-size: 12px;
+    white-space: normal;
   }
 
   .vx-shelf--desktop {

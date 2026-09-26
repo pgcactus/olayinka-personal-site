@@ -142,40 +142,6 @@
   gap: 8px;
 }
 
-.hm-round {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  height: 36px;
-  padding: 0 11px;
-  box-sizing: border-box;
-  border: 0;
-  border-radius: 999px;
-  background: var(--pill);
-  color: var(--ink);
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  text-decoration: none;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-.hm-round--icon {
-  width: 36px;
-  padding: 0;
-}
-.hm-round svg {
-  flex: none;
-  width: 15px;
-  height: 15px;
-  fill: currentColor;
-}
-.hm-round:hover {
-  transform: translateY(-1px);
-}
-
-.hm-round:focus-visible,
 .hm-mark:focus-visible,
 .hm-cta:focus-visible,
 .hm-panel a:focus-visible,
