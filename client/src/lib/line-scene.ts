@@ -934,8 +934,10 @@ export function createLineScene(
   const onMove = (e: PointerEvent) => {
     dirty = true;
     const box = stage.getBoundingClientRect();
-    pointer.nx = ((e.clientX - box.left) / box.width - 0.5) * 2;
-    pointer.ny = ((e.clientY - box.top) / box.height - 0.5) * 2;
+    // Clamped, since a panel above the frame also reports its pointer here.
+    const clamp = (v: number) => Math.max(-1, Math.min(1, v));
+    pointer.nx = clamp(((e.clientX - box.left) / box.width - 0.5) * 2);
+    pointer.ny = clamp(((e.clientY - box.top) / box.height - 0.5) * 2);
   };
   const onLeave = () => {
     pointer.nx = 0;

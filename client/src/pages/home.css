@@ -37,15 +37,17 @@
   justify-content: flex-end;
   min-height: 0;
   /* Room for a panel; short screens give some up and let it overlap the drawing. */
-  padding-top: clamp(12px, calc(100vh - 600px), 170px);
+  padding-top: clamp(12px, calc(100vh - 620px), 170px);
+  --art: clamp(96px, 17vh, 180px);
+  --art-gap: clamp(8px, 2vh, 20px);
 }
 
 .hm-art {
   position: relative;
-  flex: 1 1 96px;
+  flex: none;
   width: min(100%, 320px);
-  max-height: clamp(110px, 20vh, 190px);
-  margin-bottom: clamp(8px, 2vh, 20px);
+  height: var(--art);
+  margin-bottom: var(--art-gap);
 }
 
 .hm-scene {
@@ -188,18 +190,25 @@
 
 /* Panel --------------------------------------------------------------------- */
 
-/* Panels float in the slot above the drawing, so opening one never moves the page. */
+/* Panels float in the slot above the drawing, so opening one never moves the
+   page. One too tall for the slot starts at the top and overlaps the drawing. */
 .hm-aside {
   position: absolute;
   top: 0;
+  bottom: calc(var(--art) + var(--art-gap));
   left: 50%;
   z-index: 4;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: safe flex-end;
+  align-items: center;
+  width: min(100vw - 32px, 420px);
   transform: translateX(-50%);
-  width: min(100%, 420px);
-  max-width: 100%;
+  pointer-events: none;
   transition: opacity 0.25s ease;
+}
+.hm-aside > * {
+  pointer-events: auto;
 }
 
 .hm-panel {
@@ -282,10 +291,13 @@
 .hm-covers {
   display: flex;
   gap: 8px;
+  max-width: 100%;
 }
 .hm-covers img {
-  width: 64px;
-  height: 64px;
+  flex: 0 1 64px;
+  min-width: 0;
+  aspect-ratio: 1;
+  height: auto;
   object-fit: cover;
   border-radius: 3px;
   background: var(--line);
