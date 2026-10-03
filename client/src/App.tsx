@@ -5,22 +5,23 @@ import ScrollReset from "./components/ScrollReset";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import Nato from "./pages/Nato";
-import Things from "./pages/Things";
 import Vinyls from "./pages/Vinyls";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      {/* Vinyls is the public Things landing page; Books remains archived. */}
+      {/* Vinyls is the only Things page; Books and Places are retired. */}
       <Route path="/things">
         <Redirect to="/things/vinyls" />
       </Route>
       <Route path="/things/books">
         <Redirect to="/things/vinyls" />
       </Route>
+      <Route path="/things/places">
+        <Redirect to="/things/vinyls" />
+      </Route>
       <Route path="/things/vinyls" component={Vinyls} />
-      <Route path="/things/:tab" component={Things} />
       <Route path="/nato" component={Nato} />
       <Route component={NotFound} />
     </Switch>

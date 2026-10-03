@@ -58,7 +58,7 @@ describe("hydration", () => {
     window.localStorage.clear();
   });
 
-  it.each(["/", "/nato", "/things/places", "/things/vinyls", "/missing"])(
+  it.each(["/", "/nato", "/things/vinyls", "/missing"])(
     "hydrates %s without a mismatch",
     async route => {
       const { errors } = await hydrateRoute(route);

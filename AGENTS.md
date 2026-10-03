@@ -15,6 +15,10 @@ and then hydrated.
 - `/things/vinyls`: the record wall.
 - Anything else: the 404 page, with its own drawing.
 
+`/things/books` and `/things/places` are retired and redirect (308) to
+`/things/vinyls`. The book data and covers are kept in `client/src/data` and
+`client/src/assets/book-covers` but nothing renders them.
+
 ## How it ships
 
 The owner deploys with Manus, which syncs from `main` on GitHub and
@@ -47,7 +51,8 @@ Everything takes its colours and fonts from tokens on `:root` in
   high so small labels pass 4.5:1 on the lightest background.
 - `--accent` `#ffe39a`: links and highlights. `--danger`: error text.
 - `--card`, `--panel`, `--pill`, `--line`: surfaces and borders.
-- `.dark` only deepens the paper.
+- `.dark` only deepens the paper. No page has a theme toggle since the
+  Things page was retired; whether dark mode stays is an open item.
 - Fonts: `--hand` (Gochi Hand) for page titles and home copy, `--sans` (Geist)
   for body, `--font-mono` (Geist Mono) for labels and buttons, `--serif`
   (Instrument Serif) for the big words on NATO cards and the vinyl panel.
@@ -123,5 +128,5 @@ no-break space before `:`. The French has not had a native-speaker review.
 - "plants", "skydive", "tennis" and "5K" change the drawing but have no
   card. Either give them one-line cards (needs facts from the owner) or take
   them out of the tab order.
-- The decorative "+" corner marks on home (`hm-tick`) are likely to be
-  removed.
+- Dark mode: remove it, or add a toggle to the shared header
+  (`components/ThemeToggle.tsx` is unused for now).

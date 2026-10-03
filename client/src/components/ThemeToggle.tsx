@@ -1,6 +1,6 @@
 /**
- * Shared moon/sun theme toggle button.
- * Used on Home, Things, and Nato pages.
+ * Moon/sun theme toggle button. Not on any page at the moment: it lived on
+ * the retired Things page, and whether dark mode stays is still open.
  */
 
 import { useTheme } from "@/contexts/ThemeContext";

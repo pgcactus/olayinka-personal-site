@@ -8,7 +8,6 @@ const pages = [
   ["dist/public/index.html", "Right now, I lead product work at"],
   ["dist/public/nato/index.html", "NATO Phonetic Alphabet"],
   ["dist/public/things/vinyls/index.html", "For Broken Ears"],
-  ["dist/public/things/places/index.html", "Countries I have visited"],
 ];
 
 function occurrences(value, fragment) {
@@ -44,9 +43,7 @@ assert.ok(
   "index.html: JSON-LD inside #root"
 );
 
-// Places is hidden while its UX is redesigned: reachable, but not indexed.
-const placesHtml = await read("dist/public/things/places/index.html");
-assert.match(placesHtml, /<meta name="robots" content="noindex"/);
+// Places is retired: it redirects and stays out of the sitemap.
 const sitemap = await read("dist/public/sitemap.xml");
 assert.doesNotMatch(sitemap, /things\/places/, "sitemap: places");
 
@@ -86,7 +83,7 @@ try {
     ["/nato", 200, "NATO Phonetic Alphabet"],
     ["/things/books", 308, ""],
     ["/things/vinyls/", 200, "For Broken Ears"],
-    ["/things/places", 200, "Countries I have visited"],
+    ["/things/places", 308, ""],
     ["/missing", 404, "Page not found."],
   ];
 
@@ -104,12 +101,17 @@ try {
   assert.equal(redirect.status, 308);
   assert.equal(redirect.headers.get("location"), "/things/vinyls");
 
-  const archivedBooksRedirect = await fetch(
-    `http://127.0.0.1:${port}/things/books`,
-    { redirect: "manual" }
-  );
-  assert.equal(archivedBooksRedirect.status, 308);
-  assert.equal(archivedBooksRedirect.headers.get("location"), "/things/vinyls");
+  for (const retired of ["/things/books", "/things/places"]) {
+    const response = await fetch(`http://127.0.0.1:${port}${retired}`, {
+      redirect: "manual",
+    });
+    assert.equal(response.status, 308, `${retired}: status`);
+    assert.equal(
+      response.headers.get("location"),
+      "/things/vinyls",
+      `${retired}: location`
+    );
+  }
 
   const home = await fetch(`http://127.0.0.1:${port}/`);
   assert.match(
