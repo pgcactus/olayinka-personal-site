@@ -4,6 +4,7 @@
 
 # Build outputs
 dist/
+ui-screenshots/
 build/
 *.dist
 

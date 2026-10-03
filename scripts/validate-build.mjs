@@ -47,6 +47,21 @@ assert.ok(
 const sitemap = await read("dist/public/sitemap.xml");
 assert.doesNotMatch(sitemap, /things\/places/, "sitemap: places");
 
+// Each page shares its own preview image.
+for (const [page, image] of [
+  ["dist/public/index.html", "/og.png"],
+  ["dist/public/nato/index.html", "/og-nato.png"],
+  ["dist/public/things/vinyls/index.html", "/og-vinyls.png"],
+]) {
+  const html = await read(page);
+  assert.match(
+    html,
+    new RegExp(`property="og:image" content="https://olayinka.xyz${image}"`),
+    `${page}: og:image`
+  );
+  await read(`dist/public${image}`);
+}
+
 const notFoundHtml = await read("dist/public/404.html");
 assert.match(notFoundHtml, /Page not found\./);
 assert.match(notFoundHtml, /<meta name="robots" content="noindex"/);

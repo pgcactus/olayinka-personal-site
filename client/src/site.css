@@ -85,3 +85,10 @@
     padding-top: max(20px, env(safe-area-inset-top));
   }
 }
+
+/* A short cross-fade between pages (see lib/transition-location.ts). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 220ms;
+  animation-timing-function: ease;
+}

@@ -164,6 +164,8 @@ const STRINGS = {
       `‘${w}’ isn’t a NATO word. Try Alfa, Bravo or Charlie.`,
     copy: "copy",
     share: "share",
+    listen: "listen",
+    stop: "stop",
     copied: "copied",
     copyFailed: "could not copy",
     linkCopied: "link copied",
@@ -187,6 +189,8 @@ const STRINGS = {
       `« ${w} » n’est pas un mot OTAN. Essayez Alfa, Bravo ou Charlie.`,
     copy: "copier",
     share: "partager",
+    listen: "écouter",
+    stop: "arrêter",
     copied: "copié",
     copyFailed: "copie impossible",
     linkCopied: "lien copié",
@@ -230,6 +234,10 @@ export default function Nato() {
   const [toast, setToast] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Read-aloud uses the browser's own speech, so it only appears where that
+  // exists, and only after hydration so the server render stays the same.
+  const [canSpeak, setCanSpeak] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
 
   useEffect(() => {
     const shared = getSharedInput();
@@ -249,6 +257,41 @@ export default function Nato() {
       if (toastTimer.current) clearTimeout(toastTimer.current);
     };
   }, []);
+
+  useEffect(() => {
+    if (!("speechSynthesis" in window)) return;
+    const t = window.setTimeout(() => setCanSpeak(true), 0);
+    return () => {
+      window.clearTimeout(t);
+      window.speechSynthesis.cancel();
+    };
+  }, []);
+
+  function stopSpeaking() {
+    window.speechSynthesis.cancel();
+    setSpeaking(false);
+  }
+
+  // Speaks the words one at a time, lighting up each card and its story as
+  // it is read. The NATO words are English, so the voice is too.
+  function handleListen() {
+    if (speaking) return stopSpeaking();
+    const words = tiles.flat().map(tile => tile.word);
+    if (!words.length) return;
+    window.speechSynthesis.cancel();
+    words.forEach((word, i) => {
+      const say = new SpeechSynthesisUtterance(word);
+      say.lang = "en-GB";
+      say.rate = 0.9;
+      say.onstart = () => setPicked(word);
+      if (i === words.length - 1) {
+        say.onend = () => setSpeaking(false);
+        say.onerror = () => setSpeaking(false);
+      }
+      window.speechSynthesis.speak(say);
+    });
+    setSpeaking(true);
+  }
 
   function showToast(message: string) {
     setToast(message);
@@ -271,6 +314,7 @@ export default function Nato() {
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     if (forward) {
+      if (speaking) stopSpeaking();
       setInput(sanitise(event.target.value));
       setPicked(null);
     } else {
@@ -279,6 +323,7 @@ export default function Nato() {
   }
 
   function handleClear() {
+    if (speaking) stopSpeaking();
     if (forward) setInput("");
     else setReverseInput("");
     setPicked(null);
@@ -318,6 +363,7 @@ export default function Nato() {
         title="NATO alphabet — Olayinka Titilola"
         description="Convert any word or phrase to the NATO phonetic alphabet instantly. Never say 'B as in Boy' again."
         path="/nato"
+        image="/og-nato.png"
       />
       <SiteHeader />
 
@@ -413,6 +459,16 @@ export default function Nato() {
               <button type="button" className="nt-link" onClick={handleShare}>
                 {t.share}
               </button>
+              {canSpeak && (
+                <button
+                  type="button"
+                  className="nt-link"
+                  aria-pressed={speaking}
+                  onClick={handleListen}
+                >
+                  {speaking ? t.stop : t.listen}
+                </button>
+              )}
             </div>
             <p className="nt-origin" aria-live="polite">
               {picked ? (
