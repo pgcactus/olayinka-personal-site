@@ -55,18 +55,27 @@
   letter-spacing: 0.04em;
 }
 
-.nf-links a {
+.nf-links a,
+.nf-links button {
+  padding: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
   color: var(--accent);
   text-decoration: underline;
   text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
   text-underline-offset: 0.2em;
 }
 
-.nf-links a:hover {
+.nf-links a:hover,
+.nf-links button:hover {
   text-decoration-color: var(--accent);
 }
 
-.nf-links a:focus-visible {
+.nf-links a:focus-visible,
+.nf-links button:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 4px;
 }
