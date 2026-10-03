@@ -18,16 +18,17 @@ export interface Vinyl {
 }
 
 const VINYL_EXTRAS: Record<string, Pick<Vinyl, "favouriteTrack" | "note">> = {
-  "for-broken-ears": { favouriteTrack: "Found" },
+  // Favourite tracks are left out where the one on file was not on the album.
+  "for-broken-ears": {},
   "untitled-unmastered": { favouriteTrack: "untitled 07" },
   gnx: { favouriteTrack: "wacced out murals" },
   iyrtitl: { favouriteTrack: "Know Yourself" },
-  "african-giant": { favouriteTrack: "Ye" },
+  "african-giant": {},
   "i-told-them": { favouriteTrack: "City Boys" },
-  "lungu-boy": { favouriteTrack: "Lungu Boy" },
+  "lungu-boy": {},
   wattba: { favouriteTrack: "Jumpman" },
   "the-blueprint": { favouriteTrack: "Izzo (H.O.V.A.)" },
-  "let-god-sort-em-out": { favouriteTrack: "Birds & Bees" },
+  "let-god-sort-em-out": {},
   mbdtf: { favouriteTrack: "Runaway" },
 };
 

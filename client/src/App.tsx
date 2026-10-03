@@ -2,7 +2,6 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch, Redirect } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ScrollReset from "./components/ScrollReset";
-import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import Nato from "./pages/Nato";
 import Vinyls from "./pages/Vinyls";
@@ -31,10 +30,8 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="light" switchable>
-        <ScrollReset />
-        <Router />
-      </ThemeProvider>
+      <ScrollReset />
+      <Router />
     </ErrorBoundary>
   );
 }

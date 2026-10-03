@@ -51,8 +51,7 @@ Everything takes its colours and fonts from tokens on `:root` in
   high so small labels pass 4.5:1 on the lightest background.
 - `--accent` `#ffe39a`: links and highlights. `--danger`: error text.
 - `--card`, `--panel`, `--pill`, `--line`: surfaces and borders.
-- `.dark` only deepens the paper. No page has a theme toggle since the
-  Things page was retired; whether dark mode stays is an open item.
+- One palette only: there is no light or dark mode.
 - Fonts: `--hand` (Gochi Hand) for page titles and home copy, `--sans` (Geist)
   for body, `--font-mono` (Geist Mono) for labels and buttons, `--serif`
   (Instrument Serif) for the big words on NATO cards and the vinyl panel.
@@ -110,7 +109,7 @@ no-break space before `:`. The French has not had a native-speaker review.
 ## Gotchas
 
 - The CSP is `script-src 'self'`, so no inline scripts.
-  `public/theme-init.js` is external for that reason.
+  `public/lang-init.js` is external for that reason.
 - Album covers come from Apple's mzstatic CDN, resolved at build time into
   `client/src/data/vinyls-resolved.json`. Favourite tracks and notes live in
   `client/src/data/vinyls.ts`.
@@ -122,11 +121,12 @@ no-break space before `:`. The French has not had a native-speaker review.
 
 ## Open items
 
-- Confirm "Birds & Bees" is the right favourite track for Clipse's
-  _Let God Sort Em Out_ (`client/src/data/vinyls.ts`).
+- Favourite tracks for _For Broken Ears_, _African Giant_, _Lungu Boy_ and
+  _Let God Sort Em Out_ were removed because the ones on file were not on
+  those albums. Add the owner's real picks in `client/src/data/vinyls.ts`
+  (each must be a track on that album).
+- "plants", "skydive", "tennis" and "5K" change the drawing but have no card,
+  so they are out of the tab order. If the owner supplies a fact for each,
+  give them one-line cards like Flatiron's (English and French) and add them
+  to `WITH_PANEL` in `client/src/pages/Home.tsx`.
 - Not yet tested on a real iPhone or with a screen reader (VoiceOver/NVDA).
-- "plants", "skydive", "tennis" and "5K" change the drawing but have no
-  card. Either give them one-line cards (needs facts from the owner) or take
-  them out of the tab order.
-- Dark mode: remove it, or add a toggle to the shared header
-  (`components/ThemeToggle.tsx` is unused for now).

@@ -54,7 +54,6 @@ async function hydrateRoute(url: string, visitorState?: () => void) {
 describe("hydration", () => {
   afterEach(() => {
     document.body.innerHTML = "";
-    document.documentElement.classList.remove("dark");
     window.localStorage.clear();
   });
 
@@ -65,17 +64,6 @@ describe("hydration", () => {
       expect(errors).toEqual([]);
     }
   );
-
-  it("applies a stored dark theme after hydrating", async () => {
-    const { container, errors } = await hydrateRoute("/", () =>
-      window.localStorage.setItem("theme", "dark")
-    );
-    expect(errors).toEqual([]);
-    expect(document.documentElement.classList.contains("dark")).toBe(true);
-    expect(container.querySelector(".hm-title")?.textContent).toBe(
-      "Hi, I’m Olayinka."
-    );
-  });
 
   it("shows a shared NATO value after hydrating", async () => {
     const { container, errors } = await hydrateRoute("/nato?q=abc");

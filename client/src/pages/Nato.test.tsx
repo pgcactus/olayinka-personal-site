@@ -3,17 +3,12 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
-import { ThemeProvider } from "@/contexts/ThemeContext";
 import Nato from "./Nato";
 
 afterEach(cleanup);
 
 function renderNato() {
-  return render(
-    <ThemeProvider switchable>
-      <Nato />
-    </ThemeProvider>
-  );
+  return render(<Nato />);
 }
 
 const words = () =>
