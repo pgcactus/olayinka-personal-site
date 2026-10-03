@@ -151,11 +151,19 @@ export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sceneRef = useRef<LineScene | null>(null);
   const leaveRef = useRef(0);
+  const fadeRef = useRef(0);
   const tryRef = useRef<HTMLInputElement>(null);
   // How the visitor last reached for the page, so a tap does not throw up the
   // phone keyboard before they have asked to type.
   const inputRef = useRef<"touch" | "other">("other");
   const c = COPY[lang];
+
+  useEffect(() => {
+    return () => {
+      window.clearTimeout(leaveRef.current);
+      window.clearTimeout(fadeRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -298,12 +306,14 @@ export default function Home() {
 
   // Fade the words out, switch, and fade them back in.
   const fadeSwitch = (apply: () => void) => {
+    window.clearTimeout(fadeRef.current);
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
       apply();
+      setFading(false);
       return;
     }
     setFading(true);
-    window.setTimeout(() => {
+    fadeRef.current = window.setTimeout(() => {
       apply();
       setFading(false);
     }, 250);

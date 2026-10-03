@@ -963,7 +963,11 @@ export function createLineScene(
   const idle =
     window.requestIdleCallback ??
     ((fn: () => void) => window.setTimeout(fn, 100));
-  (Object.keys(SUBJECTS) as SubjectKey[]).forEach(k => idle(() => path(k)));
+  const cancelIdle =
+    window.cancelIdleCallback ?? ((id: number) => window.clearTimeout(id));
+  const idleTasks = (Object.keys(SUBJECTS) as SubjectKey[]).map(k =>
+    idle(() => path(k))
+  );
 
   frame = requestAnimationFrame(loop);
 
@@ -977,6 +981,7 @@ export function createLineScene(
       dirty = true;
     },
     destroy() {
+      idleTasks.forEach(cancelIdle);
       cancelAnimationFrame(frame);
       observer.disconnect();
       seen.disconnect();

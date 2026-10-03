@@ -18,6 +18,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 const STORAGE_KEY = "theme";
 const listeners = new Set<() => void>();
+let fallback: Theme | null = null;
 
 function subscribe(listener: () => void) {
   listeners.add(listener);
@@ -29,13 +30,14 @@ function subscribe(listener: () => void) {
 function readStoredTheme(): Theme | null {
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY);
-    return stored === "dark" || stored === "light" ? stored : null;
+    return stored === "dark" || stored === "light" ? stored : fallback;
   } catch {
-    return null;
+    return fallback;
   }
 }
 
 function storeTheme(theme: Theme) {
+  fallback = theme;
   try {
     window.localStorage.setItem(STORAGE_KEY, theme);
   } catch {
