@@ -38,12 +38,14 @@
   --paper: #56628f;
   --paper-deep: #3c4670;
   --ink: #f6f6fb;
-  --muted: rgba(246, 246, 251, 0.72);
+  /* 0.86 keeps small grey text at 4.5:1 on the lightest part of --paper. */
+  --muted: rgba(246, 246, 251, 0.86);
   --card: #414c78;
   --line: rgba(246, 246, 251, 0.2);
   --shadow: rgba(10, 14, 30, 0.45);
   --wash: rgba(255, 227, 154, 0.16);
   --accent: #ffe39a;
+  --danger: #ffd9d5;
   --panel: rgba(20, 24, 44, 0.42);
   --pill: rgba(17, 21, 36, 0.78);
   --serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;
