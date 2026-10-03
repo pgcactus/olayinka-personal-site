@@ -3,15 +3,9 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { ThemeProvider } from "@/contexts/ThemeContext";
 import Vinyls from "./Vinyls";
 
-const renderVinyls = () =>
-  render(
-    <ThemeProvider switchable>
-      <Vinyls />
-    </ThemeProvider>
-  );
+const renderVinyls = () => render(<Vinyls />);
 
 // jsdom has no layout or Web Animations, so this exercises the mobile path
 // (bottom sheet, no flying sleeve); the desktop flight is checked in a browser.

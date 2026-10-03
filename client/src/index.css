@@ -1,8 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -16,15 +14,10 @@
 
 :root {
   --radius: 0rem;
-  --background: #ffffff;
-  --foreground: #5a5a5a;
-  --border: #e5e5e5;
-  --ring: #e0f2fe;
-
-  /* Site-specific tokens */
-  --color-near-black: #1a1a1a;
-  --color-body: #5a5a5a;
-  --color-highlight-bg: #e0f2fe;
+  --background: var(--paper-deep);
+  --foreground: var(--ink);
+  --border: var(--line);
+  --ring: var(--accent);
   --font-mono: "Geist Mono", "SF Mono", Menlo, Consolas, monospace;
   --font-size-base: 14px;
   --line-height-base: 1.75;
@@ -33,7 +26,7 @@
 }
 
 /* Site system: a slate-cobalt ground, light type, one warm yellow accent.
-   One mood in light and dark; dark only deepens the ground. */
+   One palette, no light or dark modes. */
 :root {
   --paper: #56628f;
   --paper-deep: #3c4670;
@@ -55,22 +48,6 @@
   color-scheme: dark;
 }
 
-.dark {
-  --paper: #2a3150;
-  --paper-deep: #181c30;
-  --card: #333b5e;
-}
-
-.dark {
-  --background: #0f0f0f;
-  --foreground: #a0a0a0;
-  --border: #2a2a2a;
-  --ring: #1e3a4a;
-  --color-near-black: #f0f0f0;
-  --color-body: #a0a0a0;
-  --color-highlight-bg: #1e3a4a;
-}
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -81,8 +58,8 @@
   body {
     margin: 0;
     padding: 0;
-    background-color: var(--background);
-    color: var(--color-body);
+    background-color: var(--paper-deep);
+    color: var(--ink);
     font-family: var(--font-mono);
     font-size: var(--font-size-base);
     line-height: var(--line-height-base);
@@ -94,28 +71,5 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-  }
-}
-
-@layer components {
-  /* Theme toggle — top-right of content block */
-  .theme-toggle {
-    position: absolute;
-    top: 0;
-    right: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #9ca3af;
-    background: none;
-    border: none;
-    padding: 2px;
-    cursor: pointer;
-    transition: color 200ms ease-out;
-    line-height: 0;
-  }
-
-  .theme-toggle:hover {
-    color: var(--color-near-black);
   }
 }
