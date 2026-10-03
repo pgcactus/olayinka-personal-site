@@ -16,8 +16,7 @@ and then hydrated.
 - Anything else: the 404 page, with its own drawing.
 
 `/things/books` and `/things/places` are retired and redirect (308) to
-`/things/vinyls`. The book data and covers are kept in `client/src/data` and
-`client/src/assets/book-covers` but nothing renders them.
+`/things/vinyls`. Their code and data were removed; git history has them.
 
 ## How it ships
 
@@ -52,9 +51,9 @@ Everything takes its colours and fonts from tokens on `:root` in
 - `--accent` `#ffe39a`: links and highlights. `--danger`: error text.
 - `--card`, `--panel`, `--pill`, `--line`: surfaces and borders.
 - One palette only: there is no light or dark mode.
-- Fonts: `--hand` (Gochi Hand) for page titles and home copy, `--sans` (Geist)
-  for body, `--font-mono` (Geist Mono) for labels and buttons, `--serif`
-  (Instrument Serif) for the big words on NATO cards and the vinyl panel.
+- Fonts: `--hand` (Gochi Hand) for page titles, home copy, NATO card words and
+  the vinyl panel title; `--sans` (Geist) for body; `--font-mono` (Geist Mono)
+  for labels and buttons. Three families only.
 
 Shared pieces live in `client/src/site.css`: the page shell, the fixed
 header and the round header buttons (`.site-round`). Every page uses the same
@@ -108,6 +107,8 @@ no-break space before `:`. The French has not had a native-speaker review.
 
 ## Gotchas
 
+- If the app crashes, `components/ErrorBoundary.tsx` shows a calm page in the
+  site's style. Never render error details or stack traces to visitors.
 - The CSP is `script-src 'self'`, so no inline scripts.
   `public/lang-init.js` is external for that reason.
 - Album covers come from Apple's mzstatic CDN, resolved at build time into
