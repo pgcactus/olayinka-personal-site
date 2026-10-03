@@ -131,7 +131,9 @@ function Phrases({
             {m[2]}
           </button>
         ) : (
-          <span key={i} className={className} data-key={key} tabIndex={0}>
+          // Phrases without a card only change the drawing, which assistive
+          // tech skips, so they stay out of the tab order.
+          <span key={i} className={className} data-key={key}>
             {m[2]}
           </span>
         );

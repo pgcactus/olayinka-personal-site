@@ -9,17 +9,12 @@ import {
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
-import { ThemeProvider } from "@/contexts/ThemeContext";
 import Home from "./Home";
 
 afterEach(cleanup);
 
 function renderHome() {
-  return render(
-    <ThemeProvider switchable>
-      <Home />
-    </ThemeProvider>
-  );
+  return render(<Home />);
 }
 
 const panel = () => document.querySelector(".hm-panel");
@@ -59,10 +54,10 @@ describe("Home", () => {
     expect(input.placeholder).toBe("ROGER THAT");
   });
 
-  it("reads drawing-only phrases as plain words", () => {
+  it("keeps drawing-only phrases as plain words, out of the tab order", () => {
     renderHome();
     expect(screen.queryByRole("button", { name: "tennis" })).toBeNull();
-    expect(screen.getByText("tennis").getAttribute("tabindex")).toBe("0");
+    expect(screen.getByText("tennis").hasAttribute("tabindex")).toBe(false);
   });
 
   it("greets and links to LinkedIn", () => {
