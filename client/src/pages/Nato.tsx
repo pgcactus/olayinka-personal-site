@@ -363,6 +363,7 @@ export default function Nato() {
         title="NATO alphabet — Olayinka Titilola"
         description="Convert any word or phrase to the NATO phonetic alphabet instantly. Never say 'B as in Boy' again."
         path="/nato"
+        image="/og-nato.png"
       />
       <SiteHeader />
 

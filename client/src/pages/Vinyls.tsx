@@ -239,6 +239,7 @@ export default function Vinyls() {
         title="Vinyls — Olayinka Titilola"
         description="Records in my collection, with a favourite track from each."
         path="/things/vinyls"
+        image="/og-vinyls.png"
       />
 
       {/* Header clicks shouldn't also close an open record. */}

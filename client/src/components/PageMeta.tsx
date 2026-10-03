@@ -5,7 +5,6 @@
  */
 
 const SITE_URL = "https://olayinka.xyz";
-const OG_IMAGE = `${SITE_URL}/og.png`;
 const SITE_NAME = "Olayinka Titilola";
 
 interface PageMetaProps {
@@ -14,6 +13,8 @@ interface PageMetaProps {
   path: string; // e.g. "/" or "/nato"
   noindex?: boolean;
   jsonLd?: object;
+  /** Share image in client/public, 1200×630. Defaults to the home one. */
+  image?: string;
 }
 
 export default function PageMeta({
@@ -22,8 +23,10 @@ export default function PageMeta({
   path,
   noindex,
   jsonLd,
+  image = "/og.png",
 }: PageMetaProps) {
   const url = `${SITE_URL}${path}`;
+  const imageUrl = `${SITE_URL}${image}`;
   return (
     <>
       <title>{title}</title>
@@ -36,7 +39,7 @@ export default function PageMeta({
       <meta property="og:url" content={url} />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
-      <meta property="og:image" content={OG_IMAGE} />
+      <meta property="og:image" content={imageUrl} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
 
@@ -44,7 +47,7 @@ export default function PageMeta({
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={OG_IMAGE} />
+      <meta name="twitter:image" content={imageUrl} />
 
       {/* JSON-LD */}
       {jsonLd && (
