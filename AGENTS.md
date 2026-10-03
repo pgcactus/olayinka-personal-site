@@ -36,7 +36,15 @@ pnpm check          # tsc --noEmit
 pnpm test           # vitest + jsdom
 pnpm build          # client to dist/public, server to dist/index.js
 pnpm test:build     # validates the built HTML, routes, 404s and headers
+pnpm test:ui        # browser checks: layout at 8 sizes × 2 languages, axe
 ```
+
+`test:ui` needs Chromium (`pnpm exec playwright install chromium`; in a
+sandbox with Chromium elsewhere, set `CHROMIUM_PATH`). It fails if a page
+scrolls sideways, home doesn't fit one screen (from 667px tall), the drawing
+or header overlaps the title, opening a card moves the page, or axe reports a
+WCAG 2.2 AA violation. Screenshots land in `ui-screenshots/` (uploaded as a CI
+artifact); still look at them.
 
 CI (`verify`) runs all of these plus `pnpm audit`. Run them all before pushing.
 
