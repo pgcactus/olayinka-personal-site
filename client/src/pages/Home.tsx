@@ -399,10 +399,6 @@ export default function Home() {
         path="/"
         jsonLd={personJsonLd}
       />
-      <span className="hm-tick hm-tick--tl" />
-      <span className="hm-tick hm-tick--tr" />
-      <span className="hm-tick hm-tick--bl" />
-      <span className="hm-tick hm-tick--br" />
 
       <header className="hm-header">
         <div className="hm-actions">

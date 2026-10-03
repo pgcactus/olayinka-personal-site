@@ -10,7 +10,6 @@ const HTML_ROUTES = new Map([
   ["/", "index.html"],
   ["/nato", "nato/index.html"],
   ["/things/vinyls", "things/vinyls/index.html"],
-  ["/things/places", "things/places/index.html"],
 ]);
 
 function analyticsOrigin() {
@@ -72,9 +71,12 @@ async function startServer() {
   app.get("/things", (_request, response) => {
     response.redirect(308, "/things/vinyls");
   });
-  app.get("/things/books", (_request, response) => {
-    response.redirect(308, "/things/vinyls");
-  });
+  // Retired pages point to the vinyls wall.
+  for (const retired of ["/things/books", "/things/places"]) {
+    app.get(retired, (_request, response) => {
+      response.redirect(308, "/things/vinyls");
+    });
+  }
 
   for (const [route, fileName] of HTML_ROUTES) {
     app.get(

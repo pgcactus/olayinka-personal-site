@@ -62,5 +62,6 @@ Before releasing:
 2. Commit the changes and push `main` to GitHub.
 3. If the host watches `main`, wait for its build to complete. Otherwise,
    trigger a deployment in the hosting provider.
-4. Confirm that `/`, `/nato`, `/things/books`, `/things/vinyls`,
-   `/things/places` and an invalid URL behave correctly on `olayinka.xyz`.
+4. Confirm that `/`, `/nato`, `/things/vinyls` and an invalid URL behave
+   correctly on `olayinka.xyz`, and that `/things/books` and `/things/places`
+   redirect to the vinyls wall.
