@@ -203,7 +203,7 @@
 }
 
 .nt-word {
-  font-family: var(--serif);
+  font-family: var(--hand);
   font-size: 26px;
   line-height: 1.1;
 }
@@ -230,7 +230,7 @@
 
 .nt-result {
   margin: 0;
-  font-family: var(--serif);
+  font-family: var(--hand);
   font-size: clamp(40px, 5vw, 64px);
   line-height: 1;
   letter-spacing: 0.04em;
