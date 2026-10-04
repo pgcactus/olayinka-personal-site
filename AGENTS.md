@@ -132,6 +132,12 @@ no-break space before `:`. The French has not had a native-speaker review.
 
 ## Gotchas
 
+- Share images: each page's `og:image` is a screenshot of the page itself,
+  made by `node scripts/make-og-images.mjs` after `pnpm build` (writes
+  `client/public/og-*.png`; commit them). Re-run it when a page's look
+  changes. It skips the vinyl wall if the covers can't load, keeping the old
+  image, so run it somewhere with internet to refresh that one. Pages pass
+  their image to `PageMeta` via `image`, and `test:build` checks each one.
 - If the app crashes, `components/ErrorBoundary.tsx` shows a calm page in the
   site's style. Never render error details or stack traces to visitors.
 - The CSP is `script-src 'self'`, so no inline scripts.
