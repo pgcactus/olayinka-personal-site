@@ -365,7 +365,7 @@ export default function Nato() {
         path="/nato"
         image="/og-nato.png"
       />
-      <SiteHeader />
+      <SiteHeader back="things" />
 
       <main className="nt">
         <div className="nt-heading">

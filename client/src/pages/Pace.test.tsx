@@ -20,6 +20,13 @@ describe("Pace", () => {
     expect(document.querySelectorAll(".pc-splits li")).toHaveLength(5);
   });
 
+  it("goes back to the small things list", () => {
+    render(<Pace />);
+    expect(
+      screen.getByRole("link", { name: "← small things" }).getAttribute("href")
+    ).toBe("/small-things");
+  });
+
   it("turns a pace into a marathon finish time", async () => {
     const user = userEvent.setup();
     render(<Pace />);

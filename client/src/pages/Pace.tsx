@@ -103,7 +103,7 @@ export default function Pace() {
         description="Work out your running pace from a finish time, or your finish time from a pace, with splits for 5K, 10K, half and full marathons."
         path="/pace"
       />
-      <SiteHeader />
+      <SiteHeader back="things" />
       <main className="pc">
         <div className="pc-heading">
           <h1 className="pc-title">{t.title}</h1>
