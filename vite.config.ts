@@ -21,6 +21,7 @@ const SITEMAP_ROUTES = [
   "/small-things",
   "/nato",
   "/pace",
+  "/cards",
   "/things/vinyls",
 ];
 

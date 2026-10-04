@@ -1,0 +1,331 @@
+/* /cards. Colours and fonts come from the site tokens in index.css. */
+
+.kd {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: 760px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: max(120px, 14vh) 24px 96px;
+}
+
+.kd-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kd-title {
+  margin: 0;
+  font-family: var(--hand);
+  font-size: clamp(38px, 4.4vw, 60px);
+  font-weight: 400;
+  line-height: 1.02;
+}
+
+.kd-sub {
+  margin: 0;
+  font-size: 16px;
+  color: var(--muted);
+}
+
+/* The table: cards sit in slots and slide between them while shuffling. */
+.kd-table {
+  --kd-gap: clamp(10px, 1.6vw, 16px);
+  --kd-w: min(
+    104px,
+    calc(
+      (min(100vw, 760px) - 48px - (var(--kd-cols) - 1) * var(--kd-gap)) /
+        var(--kd-cols)
+    )
+  );
+  --kd-h: calc(var(--kd-w) * 1.4);
+  --kd-rows: calc(6 / var(--kd-cols));
+  position: relative;
+  width: calc(
+    var(--kd-cols) * var(--kd-w) + (var(--kd-cols) - 1) * var(--kd-gap)
+  );
+  height: calc(
+    var(--kd-rows) * var(--kd-h) + (var(--kd-rows) - 1) * var(--kd-gap)
+  );
+  margin-top: 8px;
+}
+
+.kd-slot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--kd-w);
+  height: var(--kd-h);
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  perspective: 700px;
+  transform: translate(
+    calc(var(--kd-col) * (var(--kd-w) + var(--kd-gap))),
+    calc(var(--kd-row) * (var(--kd-h) + var(--kd-gap)))
+  );
+  transition: transform var(--kd-move) cubic-bezier(0.45, 0, 0.2, 1);
+}
+
+.kd-slot[aria-disabled="true"] {
+  cursor: default;
+}
+
+.kd-slot--moving {
+  z-index: 2;
+}
+
+.kd-slot--moving .kd-card {
+  animation: kd-lift var(--kd-move) ease-in-out;
+}
+
+.kd-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.45s cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+
+.kd-card--down {
+  transform: rotateY(180deg);
+}
+
+.kd-side {
+  position: absolute;
+  inset: 0;
+  display: block;
+  backface-visibility: hidden;
+  border-radius: 8px;
+  box-shadow: 0 10px 22px -12px var(--shadow);
+}
+
+.kd-side--back {
+  transform: rotateY(180deg);
+}
+
+.kd-slot:not([aria-disabled="true"]):hover .kd-card {
+  translate: 0 -4px;
+}
+
+.kd-slot:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+/* Marks: your card, a correct find, a miss. */
+.kd-slot--yours .kd-side,
+.kd-slot--found .kd-side {
+  box-shadow:
+    0 0 0 3px var(--accent),
+    0 10px 22px -12px var(--shadow);
+}
+
+.kd-slot--miss .kd-side {
+  box-shadow:
+    0 0 0 3px var(--danger),
+    0 10px 22px -12px var(--shadow);
+}
+
+.kd-tag {
+  position: absolute;
+  left: 50%;
+  bottom: -26px;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  color: var(--accent);
+}
+
+/* Faces: cream paper with a chunky ink border, like a pixel sprite. */
+.kd-face,
+.kd-back {
+  position: absolute;
+  inset: 0;
+  display: block;
+  box-sizing: border-box;
+  border: 3px solid var(--card-ink);
+  border-radius: 8px;
+}
+
+.kd-face {
+  color: var(--card-ink);
+  background: var(--card-paper);
+}
+
+.kd-face--red {
+  color: var(--card-red);
+}
+
+.kd-index {
+  position: absolute;
+  top: 6%;
+  left: 9%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--font-mono);
+  font-size: calc(var(--kd-w) * 0.17);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.kd-index--flip {
+  top: auto;
+  left: auto;
+  right: 9%;
+  bottom: 6%;
+  transform: rotate(180deg);
+}
+
+.kd-pip {
+  width: calc(var(--kd-w) * 0.12);
+  height: auto;
+}
+
+.kd-big {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 42%;
+  height: auto;
+  transform: translate(-50%, -50%);
+}
+
+.kd-joker-word {
+  position: absolute;
+  top: 6%;
+  left: 7%;
+  font-family: var(--font-mono);
+  font-size: calc(var(--kd-w) * 0.12);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: 0;
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  color: var(--card-ink);
+}
+
+.kd-face--joker .kd-joker-word {
+  color: var(--card-red);
+}
+
+.kd-face--jokerDark .kd-joker-word {
+  color: var(--card-ink);
+}
+
+.kd-joker-word--flip {
+  top: auto;
+  left: auto;
+  right: 7%;
+  bottom: 6%;
+  transform: rotate(180deg);
+}
+
+.kd-joker {
+  position: absolute;
+  top: 50%;
+  left: 54%;
+  width: 52%;
+  height: auto;
+  transform: translate(-50%, -50%);
+}
+
+/* Back: ink with a gold diamond lattice. */
+.kd-back {
+  background:
+    linear-gradient(
+        45deg,
+        transparent 46%,
+        color-mix(in srgb, var(--card-gold) 55%, transparent) 46% 54%,
+        transparent 54%
+      )
+      0 0 / 14px 14px,
+    linear-gradient(
+        -45deg,
+        transparent 46%,
+        color-mix(in srgb, var(--card-gold) 55%, transparent) 46% 54%,
+        transparent 54%
+      )
+      0 0 / 14px 14px,
+    var(--card-ink);
+  box-shadow:
+    inset 0 0 0 4px var(--card-ink),
+    inset 0 0 0 6px var(--card-gold);
+}
+
+.kd-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px 22px;
+  /* Room for the "your card" label under the cards. */
+  margin-top: 16px;
+}
+
+.kd-status {
+  flex: 1 1 100%;
+  margin: 0;
+  font-family: var(--hand);
+  font-size: clamp(24px, 2.6vw, 32px);
+  line-height: 1.2;
+}
+
+.kd-status span {
+  color: var(--muted);
+}
+
+.kd-score {
+  display: flex;
+  gap: 16px;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.kd-again {
+  min-height: 36px;
+  padding: 0 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  background: var(--pill);
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.kd-again:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* Uses translate and scale, not transform, so a face-down card stays down. */
+@keyframes kd-lift {
+  50% {
+    translate: 0 -14px;
+    scale: 1.04;
+  }
+}
+
+/* The slide is the game, so it stays; the flip and lift become instant. */
+@media (prefers-reduced-motion: reduce) {
+  .kd-card {
+    transition: none;
+  }
+  .kd-slot--moving .kd-card {
+    animation: none;
+  }
+}

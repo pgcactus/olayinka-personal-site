@@ -61,6 +61,7 @@ describe("hydration", () => {
     "/",
     "/nato",
     "/pace",
+    "/cards",
     "/small-things",
     "/things/vinyls",
     "/missing",

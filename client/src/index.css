@@ -41,6 +41,12 @@
   --danger: #ffd9d5;
   --panel: rgba(20, 24, 44, 0.42);
   --pill: rgba(17, 21, 36, 0.78);
+  /* Playing cards on /cards: cream paper, ink outlines, red and gold. */
+  --card-paper: #f6f0de;
+  --card-ink: #2b2140;
+  --card-red: #df3b33;
+  --card-grey: #6d6878;
+  --card-gold: #e8b23a;
   --hand: "Gochi Hand", "Bradley Hand", "Segoe Print", cursive;
   --sans:
     "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;

@@ -18,6 +18,10 @@ and then hydrated.
 - `/pace`: running pace calculator. One input (finish time); shows pace,
   speed, splits and the same pace over the other distances.
   The maths lives in `client/src/lib/pace.ts`.
+- `/cards`: find the card. Pick one of six pixel cards, watch them shuffle,
+  find it again; each find makes the next shuffle longer and faster. Logic in
+  `client/src/lib/cards.ts`, card art in `components/PixelCard.tsx`, card
+  colours are the `--card-*` tokens.
 - `/things/vinyls`: the record wall, with a "pick one for me" button.
   `/things/vinyls?pick` picks a record on arrival.
 - Anything else: the 404 page, with its own drawing.

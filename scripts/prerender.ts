@@ -32,6 +32,7 @@ const PRERENDER_ROUTES = [
   "/small-things",
   "/nato",
   "/pace",
+  "/cards",
   "/things/vinyls",
   "/404",
 ];
