@@ -10,8 +10,6 @@ export const DISTANCES = {
 } as const;
 export type DistanceKey = keyof typeof DISTANCES;
 
-export const KM_PER_MILE = 1.609344;
-
 /**
  * Reads "25:00", "1:52:30" or "25" (minutes) as seconds. Returns null for
  * anything else, including zero.

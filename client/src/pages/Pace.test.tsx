@@ -16,8 +16,8 @@ describe("Pace", () => {
     expect(
       (screen.getByLabelText("Finish time") as HTMLInputElement).value
     ).toBe("25:00");
-    expect(results()).toEqual(["5:00/km", "8:03/mile", "12.0km/h"]);
-    expect(document.querySelectorAll(".pc-splits li")).toHaveLength(5);
+    expect(results()).toEqual(["5:00/km", "12.0km/h"]);
+    expect(document.querySelectorAll("ol.pc-rows li")).toHaveLength(5);
   });
 
   it("goes back to the small things list", () => {
@@ -27,12 +27,19 @@ describe("Pace", () => {
     ).toBe("/small-things");
   });
 
-  it("turns a pace into a marathon finish time", async () => {
+  it("shows what the same pace means over the other distances", async () => {
     const user = userEvent.setup();
     render(<Pace />);
+    const rows = () =>
+      [...document.querySelectorAll(".pc-rows--wide li")].map(
+        li => li.textContent
+      );
+    expect(rows()).toEqual(["10K50:00", "Half1:45:29", "Marathon3:30:59"]);
     await user.click(screen.getByRole("button", { name: "Marathon" }));
-    await user.click(screen.getByRole("button", { name: "pace → time" }));
-    expect(results()[0]).toBe("3:30:59");
+    fireEvent.change(screen.getByLabelText("Finish time"), {
+      target: { value: "3:30:59" },
+    });
+    expect(rows()[0]).toBe("5K25:00");
   });
 
   it("explains a time it can't read", () => {

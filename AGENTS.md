@@ -13,8 +13,10 @@ and then hydrated.
   highlighted phrases in the copy change the drawing.
 - `/small-things`: a list of the little tools; the home page's "small
   things" card links here.
-- `/nato`: NATO phonetic alphabet speller, with a listen button.
-- `/pace`: running pace calculator (time to pace, pace to time, splits).
+- `/nato`: NATO phonetic alphabet speller (word to NATO only), with copy,
+  share and listen.
+- `/pace`: running pace calculator. One input (finish time); shows pace,
+  speed, splits and the same pace over the other distances.
   The maths lives in `client/src/lib/pace.ts`.
 - `/things/vinyls`: the record wall, with a "pick one for me" button.
   `/things/vinyls?pick` picks a record on arrival.

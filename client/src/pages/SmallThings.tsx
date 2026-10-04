@@ -22,7 +22,7 @@ const STRINGS = {
       {
         href: "/pace",
         name: "Pace calculator",
-        line: "Finish time to pace, or pace to finish time, with splits.",
+        line: "Type a finish time, get your pace, splits and what you’d run at other distances.",
       },
       {
         href: "/things/vinyls?pick",
@@ -44,7 +44,7 @@ const STRINGS = {
       {
         href: "/pace",
         name: "Calculateur d’allure",
-        line: "Du temps à l’allure, ou de l’allure au temps, avec les passages.",
+        line: "Tapez un temps, obtenez l’allure, les passages et vos temps sur d’autres distances.",
       },
       {
         href: "/things/vinyls?pick",
