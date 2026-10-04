@@ -1,0 +1,96 @@
+/* /small-things. Colours and fonts come from the site tokens in index.css. */
+
+.st {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 760px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: max(120px, 14vh) 24px 96px;
+}
+
+.st-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.st-title {
+  margin: 0;
+  font-family: var(--hand);
+  font-size: clamp(38px, 4.4vw, 60px);
+  font-weight: 400;
+  line-height: 1.02;
+}
+
+.st-sub {
+  margin: 0;
+  font-size: 16px;
+  color: var(--muted);
+}
+
+.st-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.st-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 18px 18px 16px;
+  color: var(--ink);
+  text-decoration: none;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.st-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+}
+
+.st-card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.st-name {
+  font-family: var(--hand);
+  font-size: 26px;
+  line-height: 1.1;
+}
+
+.st-line {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.st-open {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .st-card {
+    transition: none;
+  }
+  .st-card:hover {
+    transform: none;
+  }
+}

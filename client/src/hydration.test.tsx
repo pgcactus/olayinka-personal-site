@@ -57,13 +57,17 @@ describe("hydration", () => {
     window.localStorage.clear();
   });
 
-  it.each(["/", "/nato", "/things/vinyls", "/missing"])(
-    "hydrates %s without a mismatch",
-    async route => {
-      const { errors } = await hydrateRoute(route);
-      expect(errors).toEqual([]);
-    }
-  );
+  it.each([
+    "/",
+    "/nato",
+    "/pace",
+    "/small-things",
+    "/things/vinyls",
+    "/missing",
+  ])("hydrates %s without a mismatch", async route => {
+    const { errors } = await hydrateRoute(route);
+    expect(errors).toEqual([]);
+  });
 
   it("shows a shared NATO value after hydrating", async () => {
     const { container, errors } = await hydrateRoute("/nato?q=abc");

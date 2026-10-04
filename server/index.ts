@@ -9,6 +9,8 @@ const __dirname = path.dirname(__filename);
 const HTML_ROUTES = new Map([
   ["/", "index.html"],
   ["/nato", "nato/index.html"],
+  ["/pace", "pace/index.html"],
+  ["/small-things", "small-things/index.html"],
   ["/things/vinyls", "things/vinyls/index.html"],
 ]);
 

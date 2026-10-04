@@ -27,7 +27,14 @@ const ROOT =
 const DIST = join(ROOT, "dist", "public");
 
 // "/404" matches no route, so it renders the NotFound page into 404.html.
-const PRERENDER_ROUTES = ["/", "/things/vinyls", "/nato", "/404"];
+const PRERENDER_ROUTES = [
+  "/",
+  "/small-things",
+  "/nato",
+  "/pace",
+  "/things/vinyls",
+  "/404",
+];
 
 // Block external fetch during prerender (no network in deployment)
 globalThis.fetch = async (url: RequestInfo | URL) => {

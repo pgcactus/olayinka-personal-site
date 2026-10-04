@@ -11,18 +11,29 @@ and then hydrated.
 
 - `/` home: a one-screen intro. A line drawing sits above the title, and the
   highlighted phrases in the copy change the drawing.
-- `/nato`: NATO phonetic alphabet speller.
-- `/things/vinyls`: the record wall.
+- `/small-things`: a list of the little tools; the home page's "small
+  things" card links here.
+- `/nato`: NATO phonetic alphabet speller, with a listen button.
+- `/pace`: running pace calculator (time to pace, pace to time, splits).
+  The maths lives in `client/src/lib/pace.ts`.
+- `/things/vinyls`: the record wall, with a "pick one for me" button.
+  `/things/vinyls?pick` picks a record on arrival.
 - Anything else: the 404 page, with its own drawing.
 
 `/things/books` and `/things/places` are retired and redirect (308) to
 `/things/vinyls`. Their code and data were removed; git history has them.
 
+New tools go in `STRINGS.items` in `client/src/pages/SmallThings.tsx`, and
+any new route also needs adding to `App.tsx`, `server/index.ts`,
+`scripts/prerender.ts`, `SITEMAP_ROUTES` in `vite.config.ts`,
+`scripts/validate-build.mjs`, `scripts/check-ui.mjs` and the hydration test.
+
 ## How it ships
 
 The owner deploys with Manus, which syncs from `main` on GitHub and
 republishes. Merging to `main` is effectively releasing. Work happens on a
-branch, goes up as a PR, and is merged only when the owner says so.
+branch, goes up as a PR, and is merged only when the owner says so. Claude
+works on `claude/site-updates`.
 
 ## Commands
 
