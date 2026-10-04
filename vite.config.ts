@@ -16,7 +16,13 @@ const PROJECT_ROOT = import.meta.dirname;
 // =============================================================================
 
 const SITE_URL = "https://olayinka.xyz";
-const SITEMAP_ROUTES = ["/", "/things/vinyls", "/nato"];
+const SITEMAP_ROUTES = [
+  "/",
+  "/small-things",
+  "/nato",
+  "/pace",
+  "/things/vinyls",
+];
 
 function vitePluginSitemapRobots(): Plugin {
   return {

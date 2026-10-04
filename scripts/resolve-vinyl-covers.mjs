@@ -1,15 +1,18 @@
 /**
- * Build-time script: resolve Apple Music cover URLs for all vinyls.
- * Run with: node scripts/resolve-vinyl-covers.mjs
+ * Build-time script: resolve Apple Music cover URLs and one preview clip per
+ * vinyl. Run with: node scripts/resolve-vinyl-covers.mjs
  * Outputs: client/src/data/vinyls-resolved.json
  *
  * Behaviour:
- *  - If vinyls-resolved.json already exists AND contains all current album IDs,
- *    the script exits immediately (no network calls). This makes CI/deployment
- *    builds fast even when outbound internet is unavailable.
- *  - Each iTunes API request has a 5-second AbortController timeout so a
- *    blocked network fails quickly instead of hanging indefinitely.
- *  - Run `node scripts/resolve-vinyl-covers.mjs --force` to refresh covers.
+ *  - Only fetches what is missing: a record already holding a cover and a
+ *    preview is left alone, so builds without internet stay fast.
+ *  - A value that fails to fetch never replaces one already known.
+ *  - Once one request fails (no internet), the rest are skipped.
+ *  - Each request has a 5-second timeout.
+ *  - `--force` refetches everything (keeping old values if a fetch fails).
+ *
+ * previewTrack is the owner's favourite track where there is one, otherwise
+ * the album's best-known single. It must be a track on that album.
  */
 
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "fs";
@@ -27,6 +30,7 @@ const VINYLS = [
     artist: "Tems",
     year: 2020,
     appleMusicId: "1532252592",
+    previewTrack: "Free Mind",
   },
   {
     id: "untitled-unmastered",
@@ -34,6 +38,7 @@ const VINYLS = [
     artist: "Kendrick Lamar",
     year: 2016,
     appleMusicId: "1440844834",
+    previewTrack: "untitled 07",
   },
   {
     id: "gnx",
@@ -41,6 +46,7 @@ const VINYLS = [
     artist: "Kendrick Lamar",
     year: 2024,
     appleMusicId: "1781270319",
+    previewTrack: "wacced out murals",
   },
   {
     id: "iyrtitl",
@@ -48,6 +54,7 @@ const VINYLS = [
     artist: "Drake",
     year: 2015,
     appleMusicId: "1440839718",
+    previewTrack: "Know Yourself",
   },
   {
     id: "african-giant",
@@ -55,6 +62,7 @@ const VINYLS = [
     artist: "Burna Boy",
     year: 2019,
     appleMusicId: "1471446047",
+    previewTrack: "On the Low",
   },
   {
     id: "i-told-them",
@@ -62,6 +70,7 @@ const VINYLS = [
     artist: "Burna Boy",
     year: 2023,
     appleMusicId: "1699611123",
+    previewTrack: "City Boys",
   },
   {
     id: "lungu-boy",
@@ -69,6 +78,7 @@ const VINYLS = [
     artist: "Asake",
     year: 2024,
     appleMusicId: "1760853689",
+    previewTrack: "Active",
   },
   {
     id: "wattba",
@@ -76,6 +86,7 @@ const VINYLS = [
     artist: "Future & Drake",
     year: 2015,
     appleMusicId: "1440842320",
+    previewTrack: "Jumpman",
   },
   {
     id: "the-blueprint",
@@ -83,6 +94,7 @@ const VINYLS = [
     artist: "Jay-Z",
     year: 2001,
     appleMusicId: "1440757381",
+    previewTrack: "Izzo (H.O.V.A.)",
   },
   {
     id: "let-god-sort-em-out",
@@ -90,6 +102,7 @@ const VINYLS = [
     artist: "Clipse",
     year: 2025,
     appleMusicId: "1816313639",
+    previewTrack: "Ace Trumpets",
   },
   {
     id: "mbdtf",
@@ -97,6 +110,7 @@ const VINYLS = [
     artist: "Kanye West",
     year: 2010,
     appleMusicId: "1440621197",
+    previewTrack: "Runaway",
   },
 ];
 
@@ -104,69 +118,123 @@ const outDir = join(__dirname, "../client/src/data");
 const outPath = join(outDir, "vinyls-resolved.json");
 
 // ---------------------------------------------------------------------------
-// Skip-if-up-to-date guard
+// Existing values, kept unless refreshed successfully
 // ---------------------------------------------------------------------------
-if (!FORCE && existsSync(outPath)) {
+let existing = new Map();
+if (existsSync(outPath)) {
   try {
-    const existing = JSON.parse(readFileSync(outPath, "utf8"));
-    const existingIds = new Set(existing.map(v => v.id));
-    const allPresent = VINYLS.every(v => existingIds.has(v.id));
-    if (allPresent && existing.length === VINYLS.length) {
-      console.log(
-        "vinyls-resolved.json is up to date — skipping Apple Music fetch.\n" +
-          "(Run with --force to refresh cover URLs.)"
-      );
-      process.exit(0);
-    }
+    existing = new Map(
+      JSON.parse(readFileSync(outPath, "utf8")).map(v => [v.id, v])
+    );
   } catch {
-    // Corrupt JSON — fall through and regenerate
+    // Corrupt JSON: rebuild from scratch.
   }
+}
+
+const needsWork = vinyl => {
+  const known = existing.get(vinyl.id);
+  return FORCE || !known || !known.coverUrl || !("preview" in known);
+};
+
+if (!VINYLS.some(needsWork) && existing.size === VINYLS.length) {
+  console.log(
+    "vinyls-resolved.json is up to date, skipping Apple Music.\n" +
+      "(Run with --force to refresh covers and previews.)"
+  );
+  process.exit(0);
 }
 
 // ---------------------------------------------------------------------------
 // Fetch helpers
 // ---------------------------------------------------------------------------
-async function fetchCoverUrl(appleMusicId) {
+let offline = false;
+
+async function lookup(query) {
+  if (offline) return null;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
-    const res = await fetch(
-      `https://itunes.apple.com/lookup?id=${appleMusicId}&country=gb`,
-      { signal: controller.signal }
-    );
-    const data = await res.json();
-    if (data.results?.length > 0 && data.results[0].artworkUrl100) {
-      return data.results[0].artworkUrl100.replace("100x100bb", "600x600bb");
-    }
-    return null;
+    const res = await fetch(`https://itunes.apple.com/lookup?${query}`, {
+      signal: controller.signal,
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return (await res.json()).results ?? [];
   } catch (e) {
     const reason = e.name === "AbortError" ? "timed out" : e.message;
-    console.error(`  Failed to fetch cover for ${appleMusicId}: ${reason}`);
+    console.error(
+      `  Apple Music lookup failed (${reason}); skipping the rest.`
+    );
+    offline = true;
     return null;
   } finally {
     clearTimeout(timer);
   }
 }
 
+// "Runaway (feat. Pusha T)" and "untitled 07 | levitate" should match
+// "Runaway" and "untitled 07".
+const normalise = name =>
+  name
+    .toLowerCase()
+    .replace(/\s*[([](feat|with)\.?[^)\]]*[)\]]/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+
+async function fetchAlbum(vinyl) {
+  const results = await lookup(
+    `id=${vinyl.appleMusicId}&entity=song&country=gb`
+  );
+  if (!results) return null;
+  const album = results.find(r => r.wrapperType === "collection");
+  const want = normalise(vinyl.previewTrack);
+  const track = results.find(
+    r =>
+      r.wrapperType === "track" &&
+      r.previewUrl &&
+      normalise(r.trackName).startsWith(want)
+  );
+  return {
+    coverUrl: album?.artworkUrl100?.replace("100x100bb", "600x600bb") ?? null,
+    preview: track
+      ? {
+          track: vinyl.previewTrack,
+          url: track.previewUrl,
+          link: track.trackViewUrl,
+        }
+      : null,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
 async function main() {
-  console.log("Resolving vinyl covers from Apple Music...");
+  console.log("Resolving vinyl covers and previews from Apple Music...");
 
   const resolved = [];
   for (const vinyl of VINYLS) {
-    process.stdout.write(
-      `  ${vinyl.artist} - ${vinyl.title} (${vinyl.appleMusicId})... `
-    );
-    const coverUrl = await fetchCoverUrl(vinyl.appleMusicId);
-    console.log(coverUrl ? "OK" : "FAILED (will use fallback tile)");
+    const known = existing.get(vinyl.id);
+    let coverUrl = known?.coverUrl ?? null;
+    let preview = known?.preview ?? null;
+    if (needsWork(vinyl)) {
+      process.stdout.write(`  ${vinyl.artist} - ${vinyl.title}... `);
+      const found = await fetchAlbum(vinyl);
+      coverUrl = found?.coverUrl ?? coverUrl;
+      preview = found?.preview ?? preview;
+      console.log(
+        found
+          ? `cover ${coverUrl ? "OK" : "missing"}, preview ${preview ? "OK" : "not found"}`
+          : "kept existing values"
+      );
+    }
     resolved.push({
       id: vinyl.id,
       title: vinyl.title,
       artist: vinyl.artist,
       year: vinyl.year,
-      coverUrl: coverUrl ?? null,
+      coverUrl,
+      // Written only once a lookup has run, so an offline build retries.
+      ...(preview || !offline ? { preview } : {}),
     });
   }
 
@@ -174,12 +242,10 @@ async function main() {
   writeFileSync(outPath, JSON.stringify(resolved, null, 2) + "\n");
   console.log(`\nWrote ${resolved.length} entries to ${outPath}`);
 
-  const missing = resolved.filter(v => !v.coverUrl).length;
-  if (missing > 0) {
-    console.warn(
-      `Warning: ${missing} album(s) have no cover and will show the fallback tile.`
-    );
-  }
+  const noCover = resolved.filter(v => !v.coverUrl).length;
+  const noPreview = resolved.filter(v => !v.preview).length;
+  if (noCover) console.warn(`Warning: ${noCover} album(s) have no cover.`);
+  if (noPreview) console.warn(`Note: ${noPreview} album(s) have no preview.`);
 }
 
 main();

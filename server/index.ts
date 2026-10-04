@@ -9,6 +9,8 @@ const __dirname = path.dirname(__filename);
 const HTML_ROUTES = new Map([
   ["/", "index.html"],
   ["/nato", "nato/index.html"],
+  ["/pace", "pace/index.html"],
+  ["/small-things", "small-things/index.html"],
   ["/things/vinyls", "things/vinyls/index.html"],
 ]);
 
@@ -32,6 +34,8 @@ const SECURITY_POLICY = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com",
   "img-src 'self' data: https://is1-ssl.mzstatic.com",
+  // Album previews from Apple Music.
+  "media-src https://audio-ssl.itunes.apple.com",
   `connect-src 'self' ${ANALYTICS_ORIGIN}`.trim(),
   "upgrade-insecure-requests",
 ].join("; ");

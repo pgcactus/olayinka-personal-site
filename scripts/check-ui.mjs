@@ -30,7 +30,14 @@ const VIEWPORTS = [
   [375, 667],
   [320, 568],
 ];
-const PAGES = ["/", "/nato", "/things/vinyls", "/missing"];
+const PAGES = [
+  "/",
+  "/small-things",
+  "/nato",
+  "/pace",
+  "/things/vinyls",
+  "/missing",
+];
 const CARDS = ["flatiron", "things", "records"];
 // The home page may scroll on screens shorter than this.
 const MIN_ONE_SCREEN_HEIGHT = 667;

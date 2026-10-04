@@ -49,10 +49,14 @@ const COPY = {
       "Healthtech putting real-world data to work on cancer research and care.",
       "See how we do that here:",
     ],
-    things: ["small things", "A NATO alphabet speller."],
+    things: [
+      "small things",
+      "A NATO speller, a pace calculator and a record picker.",
+    ],
     typeMe: "type me",
     tryLabel: "Type anything",
     full: "the full tool →",
+    allThings: "all small things →",
     records: [
       "on the shelf",
       `${VINYLS.length} records, one at a time`,
@@ -72,10 +76,14 @@ const COPY = {
       "Une healthtech qui met les données de vie réelle au service de la recherche et des soins contre le cancer.",
       "Découvrez comment ici :",
     ],
-    things: ["petites choses", "Un outil d’épellation OTAN."],
+    things: [
+      "petites choses",
+      "Un épeleur OTAN, un calculateur d’allure et un choix de disque.",
+    ],
     typeMe: "écrivez-moi",
     tryLabel: "Tapez n’importe quoi",
     full: "l’outil complet →",
+    allThings: "toutes les petites choses →",
     records: [
       "sur l’étagère",
       `${VINYLS.length} disques, un par un`,
@@ -358,7 +366,10 @@ export default function Home() {
           />
           <output htmlFor="hm-try">{toPhonetic(tryValue) || "…"}</output>
         </div>
-        <Link href="/nato">{c.full}</Link>
+        <span className="hm-row">
+          <Link href="/nato">{c.full}</Link>
+          <Link href="/small-things">{c.allThings}</Link>
+        </span>
       </>
     );
   else if (shown === "things")

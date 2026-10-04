@@ -7,6 +7,8 @@ const root = process.cwd();
 const pages = [
   ["dist/public/index.html", "Right now, I lead product work at"],
   ["dist/public/nato/index.html", "NATO Phonetic Alphabet"],
+  ["dist/public/pace/index.html", "Pace calculator"],
+  ["dist/public/small-things/index.html", "Small things"],
   ["dist/public/things/vinyls/index.html", "For Broken Ears"],
 ];
 
@@ -96,6 +98,8 @@ try {
   const routeChecks = [
     ["/", 200, "Right now, I lead product work at"],
     ["/nato", 200, "NATO Phonetic Alphabet"],
+    ["/pace", 200, "Pace calculator"],
+    ["/small-things", 200, "Small things"],
     ["/things/books", 308, ""],
     ["/things/vinyls/", 200, "For Broken Ears"],
     ["/things/places", 308, ""],
@@ -132,6 +136,11 @@ try {
   assert.match(
     home.headers.get("content-security-policy") ?? "",
     /frame-ancestors 'none'/
+  );
+  assert.match(
+    home.headers.get("content-security-policy") ?? "",
+    /media-src https:\/\/audio-ssl\.itunes\.apple\.com/,
+    "CSP allows Apple Music previews"
   );
   assert.equal(home.headers.get("x-content-type-options"), "nosniff");
 } finally {

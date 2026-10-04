@@ -12,6 +12,8 @@ export interface Vinyl {
   artist: string;
   year: number;
   coverUrl: string | null;
+  /** A short Apple Music clip, resolved at build time when the network allows. */
+  preview?: { track: string; url: string; link: string } | null;
   favouriteTrack?: string;
   /** Shown in the detail panel. Blank lines separate paragraphs. */
   note?: string;

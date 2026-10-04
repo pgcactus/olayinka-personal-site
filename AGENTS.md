@@ -11,18 +11,31 @@ and then hydrated.
 
 - `/` home: a one-screen intro. A line drawing sits above the title, and the
   highlighted phrases in the copy change the drawing.
-- `/nato`: NATO phonetic alphabet speller.
-- `/things/vinyls`: the record wall.
+- `/small-things`: a list of the little tools; the home page's "small
+  things" card links here.
+- `/nato`: NATO phonetic alphabet speller (word to NATO only), with copy,
+  share and listen.
+- `/pace`: running pace calculator. One input (finish time); shows pace,
+  speed, splits and the same pace over the other distances.
+  The maths lives in `client/src/lib/pace.ts`.
+- `/things/vinyls`: the record wall, with a "pick one for me" button.
+  `/things/vinyls?pick` picks a record on arrival.
 - Anything else: the 404 page, with its own drawing.
 
 `/things/books` and `/things/places` are retired and redirect (308) to
 `/things/vinyls`. Their code and data were removed; git history has them.
 
+New tools go in `STRINGS.items` in `client/src/pages/SmallThings.tsx`, and
+any new route also needs adding to `App.tsx`, `server/index.ts`,
+`scripts/prerender.ts`, `SITEMAP_ROUTES` in `vite.config.ts`,
+`scripts/validate-build.mjs`, `scripts/check-ui.mjs` and the hydration test.
+
 ## How it ships
 
 The owner deploys with Manus, which syncs from `main` on GitHub and
 republishes. Merging to `main` is effectively releasing. Work happens on a
-branch, goes up as a PR, and is merged only when the owner says so.
+branch, goes up as a PR, and is merged only when the owner says so. Claude
+works on `claude/site-updates`.
 
 ## Commands
 
@@ -119,9 +132,14 @@ no-break space before `:`. The French has not had a native-speaker review.
   site's style. Never render error details or stack traces to visitors.
 - The CSP is `script-src 'self'`, so no inline scripts.
   `public/lang-init.js` is external for that reason.
-- Album covers come from Apple's mzstatic CDN, resolved at build time into
-  `client/src/data/vinyls-resolved.json`. Favourite tracks and notes live in
-  `client/src/data/vinyls.ts`.
+- Album covers and one Apple Music preview clip per record are resolved at
+  build time by `scripts/resolve-vinyl-covers.mjs` into
+  `client/src/data/vinyls-resolved.json`. It only fetches what's missing,
+  never replaces a known value with a failed fetch, and gives up quickly
+  offline. `previewTrack` there is the favourite track, or the album's
+  best-known single where there's no favourite. Favourite tracks and notes
+  live in `client/src/data/vinyls.ts`. Previews never autoplay; the CSP
+  allows them via `media-src https://audio-ssl.itunes.apple.com`.
 - Anything random or time-based (the "now listening to" footer) must be set
   after hydration in an effect, or prerendered HTML won't match.
 - The home layout uses `min-height: 100dvh`. Grid `fr` rows with an

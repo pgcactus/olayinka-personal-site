@@ -4,6 +4,8 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import ScrollReset from "./components/ScrollReset";
 import Home from "./pages/Home";
 import Nato from "./pages/Nato";
+import Pace from "./pages/Pace";
+import SmallThings from "./pages/SmallThings";
 import Vinyls from "./pages/Vinyls";
 
 function Router() {
@@ -22,6 +24,8 @@ function Router() {
       </Route>
       <Route path="/things/vinyls" component={Vinyls} />
       <Route path="/nato" component={Nato} />
+      <Route path="/pace" component={Pace} />
+      <Route path="/small-things" component={SmallThings} />
       <Route component={NotFound} />
     </Switch>
   );

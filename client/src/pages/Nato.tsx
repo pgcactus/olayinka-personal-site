@@ -1,12 +1,10 @@
 /**
  * /nato — NATO phonetic alphabet tool.
  *
- * - Word → NATO: each letter becomes a tile (letter above, code word below).
- *   New tiles pop in as you type; hovering, focusing or tapping a tile shows
- *   where its word comes from.
- * - NATO → word: type code words, get the word back, with a note on the
- *   first word it doesn't recognise.
- * - Copy the output or share a link; a shared ?q= is read after hydration so
+ * - Each letter becomes a tile (letter above, code word below). New tiles pop
+ *   in as you type; hovering, focusing or tapping a tile shows where its word
+ *   comes from.
+ * - Copy the output, share a link or hear it read aloud; a shared ?q= is read after hydration so
  *   the first client render matches the prerendered HTML.
  */
 
@@ -14,15 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import PageMeta from "@/components/PageMeta";
 import SiteHeader from "@/components/SiteHeader";
 import { useLang } from "@/lib/lang";
-import {
-  NATO_MAP,
-  STARTER_WORD,
-  fromPhonetic,
-  getFirstInvalidWord,
-  sanitise,
-  sanitiseReverse,
-  toPhonetic,
-} from "@/lib/nato";
+import { NATO_MAP, STARTER_WORD, sanitise, toPhonetic } from "@/lib/nato";
 import "./nato.css";
 
 const WORD_ORIGINS: Record<string, string> = {
@@ -150,18 +140,12 @@ const STRINGS = {
   en: {
     title: "NATO Phonetic Alphabet",
     sub: "Never say ‘B as in Boy’ again.",
-    mode: "Conversion mode",
-    forward: "word → NATO",
-    reverse: "NATO → word",
     typeAnything: "Type anything",
-    typeWords: "Type NATO words, separated by spaces",
     clear: "clear",
     tileLabel: (letter: string, word: string) => `${letter} for ${word}`,
     hint: "hover or tap a word for its story",
     fallback:
       "A word chosen for its clear, unambiguous pronunciation in radio communications.",
-    invalid: (w: string) =>
-      `‘${w}’ isn’t a NATO word. Try Alfa, Bravo or Charlie.`,
     copy: "copy",
     share: "share",
     listen: "listen",
@@ -175,18 +159,12 @@ const STRINGS = {
   fr: {
     title: "Alphabet phonétique OTAN",
     sub: "Ne dites plus jamais « B comme Bateau ».",
-    mode: "Sens de conversion",
-    forward: "mot → OTAN",
-    reverse: "OTAN → mot",
     typeAnything: "Tapez n’importe quoi",
-    typeWords: "Tapez des mots OTAN, séparés par des espaces",
     clear: "effacer",
     tileLabel: (letter: string, word: string) => `${letter} pour ${word}`,
     hint: "survolez ou touchez un mot pour son histoire",
     fallback:
       "Un mot choisi pour sa prononciation claire et sans ambiguïté à la radio.",
-    invalid: (w: string) =>
-      `« ${w} » n’est pas un mot OTAN. Essayez Alfa, Bravo ou Charlie.`,
     copy: "copier",
     share: "partager",
     listen: "écouter",
@@ -198,8 +176,6 @@ const STRINGS = {
     origins: WORD_ORIGINS_FR,
   },
 };
-
-type Mode = "forward" | "reverse";
 
 function getSharedInput(): string | null {
   try {
@@ -226,10 +202,8 @@ function toTiles(value: string) {
 }
 
 export default function Nato() {
-  const [mode, setMode] = useState<Mode>("forward");
   const t = STRINGS[useLang()];
   const [input, setInput] = useState(STARTER_WORD);
-  const [reverseInput, setReverseInput] = useState("");
   const [picked, setPicked] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -299,33 +273,18 @@ export default function Nato() {
     toastTimer.current = setTimeout(() => setToast(null), 2200);
   }
 
-  function switchMode(next: Mode) {
-    setMode(next);
-    setPicked(null);
-    inputRef.current?.focus();
-  }
-
-  const forward = mode === "forward";
-  const value = forward ? input : reverseInput;
-  const output = forward ? toPhonetic(input) : fromPhonetic(reverseInput);
-  const tiles = forward ? toTiles(input) : [];
-  const invalid =
-    !forward && reverseInput.trim() ? getFirstInvalidWord(reverseInput) : null;
+  const output = toPhonetic(input);
+  const tiles = toTiles(input);
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-    if (forward) {
-      if (speaking) stopSpeaking();
-      setInput(sanitise(event.target.value));
-      setPicked(null);
-    } else {
-      setReverseInput(sanitiseReverse(event.target.value));
-    }
+    if (speaking) stopSpeaking();
+    setInput(sanitise(event.target.value));
+    setPicked(null);
   }
 
   function handleClear() {
     if (speaking) stopSpeaking();
-    if (forward) setInput("");
-    else setReverseInput("");
+    setInput("");
     setPicked(null);
     inputRef.current?.focus();
   }
@@ -365,7 +324,7 @@ export default function Nato() {
         path="/nato"
         image="/og-nato.png"
       />
-      <SiteHeader />
+      <SiteHeader back="things" />
 
       <main className="nt">
         <div className="nt-heading">
@@ -373,47 +332,25 @@ export default function Nato() {
           <p className="nt-sub">{t.sub}</p>
         </div>
 
-        <div
-          className={`nt-modes nt-modes--${mode}`}
-          role="group"
-          aria-label={t.mode}
-        >
-          <span className="nt-thumb" aria-hidden="true" />
-          <button
-            type="button"
-            aria-pressed={forward}
-            onClick={() => switchMode("forward")}
-          >
-            {t.forward}
-          </button>
-          <button
-            type="button"
-            aria-pressed={!forward}
-            onClick={() => switchMode("reverse")}
-          >
-            {t.reverse}
-          </button>
-        </div>
-
         <div className="nt-field">
           <label htmlFor="nato-input" className="nt-label">
-            {forward ? t.typeAnything : t.typeWords}
+            {t.typeAnything}
           </label>
           <div className="nt-inputrow">
             <input
               id="nato-input"
               ref={inputRef}
-              className={`nt-input nt-input--${mode}`}
+              className="nt-input"
               type="text"
-              value={value}
+              value={input}
               onChange={handleChange}
-              placeholder={forward ? STARTER_WORD : "Alfa Bravo Charlie"}
+              placeholder={STARTER_WORD}
               spellCheck={false}
               autoComplete="off"
               autoCorrect="off"
-              autoCapitalize={forward ? "characters" : "off"}
+              autoCapitalize="characters"
             />
-            {value && (
+            {input && (
               <button type="button" className="nt-clear" onClick={handleClear}>
                 {t.clear}
               </button>
@@ -421,7 +358,7 @@ export default function Nato() {
           </div>
         </div>
 
-        {forward && tiles.length > 0 && (
+        {tiles.length > 0 && (
           <>
             <div className="nt-tiles">
               {tiles.map(group => (
@@ -480,24 +417,6 @@ export default function Nato() {
               )}
             </p>
           </>
-        )}
-
-        {!forward && output && (
-          <>
-            <p className="nt-result" aria-live="polite">
-              {output}
-            </p>
-            <div className="nt-actions">
-              <button type="button" className="nt-link" onClick={handleCopy}>
-                {t.copy}
-              </button>
-            </div>
-          </>
-        )}
-        {invalid && (
-          <p className="nt-error" role="alert">
-            {t.invalid(invalid)}
-          </p>
         )}
       </main>
 

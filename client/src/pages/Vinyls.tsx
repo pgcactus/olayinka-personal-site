@@ -81,18 +81,28 @@ const STRINGS = {
   en: {
     title: "Vinyls",
     count: (n: number) => `${n} records, one at a time`,
+    pick: "pick one for me",
     collection: "Record collection",
     by: (title: string, artist: string) => `${title} by ${artist}`,
     released: (year: number) => `Released ${year}.`,
     favourite: (track: string) => `Favourite track: ${track}.`,
+    play: (track: string) => `play ${track}`,
+    pause: "pause",
+    playLabel: (track: string) => `Play a preview of ${track}`,
+    appleMusic: "on Apple Music ↗",
   },
   fr: {
     title: "Vinyles",
     count: (n: number) => `${n} disques, un par un`,
+    pick: "choisis pour moi",
     collection: "Collection de disques",
     by: (title: string, artist: string) => `${title}, de ${artist}`,
     released: (year: number) => `Sorti en ${year}.`,
     favourite: (track: string) => `Morceau préféré : ${track}.`,
+    play: (track: string) => `écouter ${track}`,
+    pause: "pause",
+    playLabel: (track: string) => `Écouter un extrait de ${track}`,
+    appleMusic: "sur Apple Music ↗",
   },
 };
 type Strings = (typeof STRINGS)["en"];
@@ -111,11 +121,35 @@ export default function Vinyls() {
   const flightLayerRef = useRef<HTMLDivElement>(null);
   const coverRefs = useRef(new Map<string, HTMLImageElement>());
   const flyers = useRef(new Map<string, HTMLImageElement>());
+  // One audio element for previews: only one clip ever plays.
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [playing, setPlaying] = useState(false);
 
   // The panel keeps showing the last record while it fades out.
   const [shownId, setShownId] = useState<string | null>(null);
   const selected = VINYLS.find(v => v.id === selectedId) ?? null;
   const shown = selected ?? VINYLS.find(v => v.id === shownId) ?? null;
+
+  // Any change of record, or closing the panel, stops the clip.
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    // Pausing fires onPause, which clears the playing state.
+    audio.pause();
+    audio.currentTime = 0;
+  }, [selectedId]);
+
+  const togglePreview = async (url: string) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (!audio.paused) return audio.pause();
+    if (audio.src !== url) audio.src = url;
+    try {
+      await audio.play();
+    } catch {
+      setPlaying(false);
+    }
+  };
 
   // Keep the eye line a third of the way down the viewport, so shelves
   // foreshorten as they scroll past, like a fixed camera.
@@ -215,6 +249,24 @@ export default function Vinyls() {
     setShownId(id);
   };
 
+  // "Pick one for me": opens a random record other than the one showing.
+  const pickOne = () => {
+    const pool = VINYLS.filter(v => v.id !== selectedId);
+    choose(pool[Math.floor(Math.random() * pool.length)].id);
+  };
+  const pickRef = useRef(pickOne);
+  useEffect(() => {
+    pickRef.current = pickOne;
+  });
+
+  // /things/vinyls?pick (from the small things page) picks on arrival.
+  useEffect(() => {
+    if (!new URLSearchParams(window.location.search).has("pick")) return;
+    window.history.replaceState(null, "", window.location.pathname);
+    const t = window.setTimeout(() => pickRef.current(), 400);
+    return () => window.clearTimeout(t);
+  }, []);
+
   useEffect(() => {
     if (!selectedId) return;
     const onKey = (event: KeyboardEvent) => {
@@ -249,7 +301,21 @@ export default function Vinyls() {
 
       <main className={`vx-stage${selected ? " vx-stage--open" : ""}`}>
         <div className="vx-heading">
-          <h1 className="vx-title">{t.title}</h1>
+          {/* The pick button sits by the title, which the desktop detail
+              panel never covers, so you can keep picking. */}
+          <span className="vx-titlerow">
+            <h1 className="vx-title">{t.title}</h1>
+            <button
+              type="button"
+              className="vx-pick"
+              onClick={event => {
+                event.stopPropagation();
+                pickOne();
+              }}
+            >
+              {t.pick}
+            </button>
+          </span>
           <span className="vx-count">{t.count(VINYLS.length)}</span>
         </div>
         <div className="vx-wall" ref={wallRef}>
@@ -342,8 +408,38 @@ export default function Vinyls() {
               <p className="vx-panel-artist">{shown.artist}</p>
             </div>
             <p className="vx-panel-note">{detailLines(shown, t)}</p>
+            {shown.preview && (
+              <p className="vx-preview">
+                <button
+                  type="button"
+                  className="vx-play"
+                  aria-label={
+                    playing ? t.pause : t.playLabel(shown.preview.track)
+                  }
+                  aria-pressed={playing}
+                  onClick={() => togglePreview(shown.preview!.url)}
+                >
+                  <span aria-hidden="true">{playing ? "❚❚" : "▶"}</span>
+                  {playing ? t.pause : t.play(shown.preview.track)}
+                </button>
+                <a
+                  href={shown.preview.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t.appleMusic}
+                </a>
+              </p>
+            )}
           </div>
         )}
+        <audio
+          ref={audioRef}
+          preload="none"
+          onPlay={() => setPlaying(true)}
+          onPause={() => setPlaying(false)}
+          onEnded={() => setPlaying(false)}
+        />
       </aside>
     </div>
   );

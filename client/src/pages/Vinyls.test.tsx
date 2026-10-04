@@ -21,6 +21,22 @@ function detail() {
 }
 
 describe("Vinyls", () => {
+  it("picks a record when asked, never the one already showing", async () => {
+    const user = userEvent.setup();
+    renderVinyls();
+    const pick = screen.getByRole("button", { name: "pick one for me" });
+    const openRecord = () =>
+      screen
+        .getAllByRole("button", { name: / by / })
+        .filter(b => b.getAttribute("aria-expanded") === "true");
+    await user.click(pick);
+    expect(openRecord()).toHaveLength(1);
+    const first = openRecord()[0];
+    await user.click(pick);
+    expect(openRecord()).toHaveLength(1);
+    expect(openRecord()[0]).not.toBe(first);
+  });
+
   it("renders every record as a button", () => {
     renderVinyls();
     expect(
