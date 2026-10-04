@@ -73,6 +73,7 @@ export default function SmallThings() {
         title="Small things — Olayinka Titilola"
         description="Little tools by Olayinka: a NATO alphabet speller, a running pace calculator, a card game and a record picker."
         path="/small-things"
+        image="/og-small-things.png"
       />
       <SiteHeader />
       <main className="st">

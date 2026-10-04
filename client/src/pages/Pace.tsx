@@ -85,6 +85,7 @@ export default function Pace() {
         title="Pace calculator — Olayinka Titilola"
         description="Work out your running pace from a finish time, with splits and what that pace means for 5K, 10K, half and full marathons."
         path="/pace"
+        image="/og-pace.png"
       />
       <SiteHeader back="things" />
       <main className="pc">

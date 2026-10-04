@@ -204,6 +204,7 @@ export default function Cards() {
         title="Find the card — Olayinka Titilola"
         description="Pick a card, watch the shuffle, and try to find it again. Each find makes the next shuffle faster."
         path="/cards"
+        image="/og-cards.png"
       />
       <SiteHeader back="things" />
       <main className="kd">

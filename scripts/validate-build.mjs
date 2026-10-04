@@ -73,7 +73,10 @@ assert.doesNotMatch(sitemap, /things\/places/, "sitemap: places");
 // Each page shares its own preview image.
 for (const [page, image] of [
   ["dist/public/index.html", "/og.png"],
+  ["dist/public/small-things/index.html", "/og-small-things.png"],
   ["dist/public/nato/index.html", "/og-nato.png"],
+  ["dist/public/pace/index.html", "/og-pace.png"],
+  ["dist/public/cards/index.html", "/og-cards.png"],
   ["dist/public/things/vinyls/index.html", "/og-vinyls.png"],
 ]) {
   const html = await read(page);
