@@ -274,7 +274,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 4px;
   /* Screens taller than the content lift the words off the bottom, so the
      drawing and words sit nearer the middle. */
   padding-bottom: max(4vh, calc((100vh - 700px) * 0.5));
@@ -296,13 +296,13 @@
 }
 
 .hm-subtitle {
-  margin: -2px 0 0;
+  margin: 0;
   color: var(--muted);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.12em;
-  line-height: 1.4;
+  line-height: 1;
   text-transform: uppercase;
 }
 
@@ -422,7 +422,7 @@
     padding-block: max(20px, env(safe-area-inset-top)) 18px;
   }
   .hm-main {
-    gap: 12px;
+    gap: 4px;
     padding-bottom: max(2vh, calc((100vh - 700px) * 0.5));
   }
   .hm-title {
