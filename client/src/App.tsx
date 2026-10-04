@@ -3,6 +3,7 @@ import { Route, Switch, Redirect } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ScrollReset from "./components/ScrollReset";
 import Home from "./pages/Home";
+import Cards from "./pages/Cards";
 import Nato from "./pages/Nato";
 import Pace from "./pages/Pace";
 import SmallThings from "./pages/SmallThings";
@@ -25,6 +26,7 @@ function Router() {
       <Route path="/things/vinyls" component={Vinyls} />
       <Route path="/nato" component={Nato} />
       <Route path="/pace" component={Pace} />
+      <Route path="/cards" component={Cards} />
       <Route path="/small-things" component={SmallThings} />
       <Route component={NotFound} />
     </Switch>

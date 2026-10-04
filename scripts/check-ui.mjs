@@ -35,6 +35,7 @@ const PAGES = [
   "/small-things",
   "/nato",
   "/pace",
+  "/cards",
   "/things/vinyls",
   "/missing",
 ];

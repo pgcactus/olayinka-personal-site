@@ -25,6 +25,11 @@ const STRINGS = {
         line: "Type a finish time, get your pace, splits and what you’d run at other distances.",
       },
       {
+        href: "/cards",
+        name: "Find the card",
+        line: "Pick a card, watch the shuffle, find it again. It gets faster.",
+      },
+      {
         href: "/things/vinyls?pick",
         name: "Record picker",
         line: "Can’t decide what to play? Let the shelf choose.",
@@ -47,6 +52,11 @@ const STRINGS = {
         line: "Tapez un temps, obtenez l’allure, les passages et vos temps sur d’autres distances.",
       },
       {
+        href: "/cards",
+        name: "Trouvez la carte",
+        line: "Choisissez une carte, suivez le mélange, retrouvez-la. Ça accélère.",
+      },
+      {
         href: "/things/vinyls?pick",
         name: "Choix de disque",
         line: "Vous hésitez sur quoi écouter ? Laissez l’étagère choisir.",
@@ -61,7 +71,7 @@ export default function SmallThings() {
     <div className="site-page">
       <PageMeta
         title="Small things — Olayinka Titilola"
-        description="Little tools by Olayinka: a NATO alphabet speller, a running pace calculator and a record picker."
+        description="Little tools by Olayinka: a NATO alphabet speller, a running pace calculator, a card game and a record picker."
         path="/small-things"
       />
       <SiteHeader />

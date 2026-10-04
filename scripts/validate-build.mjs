@@ -8,6 +8,7 @@ const pages = [
   ["dist/public/index.html", "Right now, I lead product work at"],
   ["dist/public/nato/index.html", "NATO Phonetic Alphabet"],
   ["dist/public/pace/index.html", "Pace calculator"],
+  ["dist/public/cards/index.html", "Find the card"],
   ["dist/public/small-things/index.html", "Small things"],
   ["dist/public/things/vinyls/index.html", "For Broken Ears"],
 ];
@@ -99,6 +100,7 @@ try {
     ["/", 200, "Right now, I lead product work at"],
     ["/nato", 200, "NATO Phonetic Alphabet"],
     ["/pace", 200, "Pace calculator"],
+    ["/cards", 200, "Find the card"],
     ["/small-things", 200, "Small things"],
     ["/things/books", 308, ""],
     ["/things/vinyls/", 200, "For Broken Ears"],
