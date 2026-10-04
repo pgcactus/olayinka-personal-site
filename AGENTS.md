@@ -132,9 +132,14 @@ no-break space before `:`. The French has not had a native-speaker review.
   site's style. Never render error details or stack traces to visitors.
 - The CSP is `script-src 'self'`, so no inline scripts.
   `public/lang-init.js` is external for that reason.
-- Album covers come from Apple's mzstatic CDN, resolved at build time into
-  `client/src/data/vinyls-resolved.json`. Favourite tracks and notes live in
-  `client/src/data/vinyls.ts`.
+- Album covers and one Apple Music preview clip per record are resolved at
+  build time by `scripts/resolve-vinyl-covers.mjs` into
+  `client/src/data/vinyls-resolved.json`. It only fetches what's missing,
+  never replaces a known value with a failed fetch, and gives up quickly
+  offline. `previewTrack` there is the favourite track, or the album's
+  best-known single where there's no favourite. Favourite tracks and notes
+  live in `client/src/data/vinyls.ts`. Previews never autoplay; the CSP
+  allows them via `media-src https://audio-ssl.itunes.apple.com`.
 - Anything random or time-based (the "now listening to" footer) must be set
   after hydration in an effect, or prerendered HTML won't match.
 - The home layout uses `min-height: 100dvh`. Grid `fr` rows with an

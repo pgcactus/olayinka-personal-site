@@ -86,6 +86,10 @@ const STRINGS = {
     by: (title: string, artist: string) => `${title} by ${artist}`,
     released: (year: number) => `Released ${year}.`,
     favourite: (track: string) => `Favourite track: ${track}.`,
+    play: (track: string) => `play ${track}`,
+    pause: "pause",
+    playLabel: (track: string) => `Play a preview of ${track}`,
+    appleMusic: "on Apple Music ↗",
   },
   fr: {
     title: "Vinyles",
@@ -95,6 +99,10 @@ const STRINGS = {
     by: (title: string, artist: string) => `${title}, de ${artist}`,
     released: (year: number) => `Sorti en ${year}.`,
     favourite: (track: string) => `Morceau préféré : ${track}.`,
+    play: (track: string) => `écouter ${track}`,
+    pause: "pause",
+    playLabel: (track: string) => `Écouter un extrait de ${track}`,
+    appleMusic: "sur Apple Music ↗",
   },
 };
 type Strings = (typeof STRINGS)["en"];
@@ -113,11 +121,35 @@ export default function Vinyls() {
   const flightLayerRef = useRef<HTMLDivElement>(null);
   const coverRefs = useRef(new Map<string, HTMLImageElement>());
   const flyers = useRef(new Map<string, HTMLImageElement>());
+  // One audio element for previews: only one clip ever plays.
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [playing, setPlaying] = useState(false);
 
   // The panel keeps showing the last record while it fades out.
   const [shownId, setShownId] = useState<string | null>(null);
   const selected = VINYLS.find(v => v.id === selectedId) ?? null;
   const shown = selected ?? VINYLS.find(v => v.id === shownId) ?? null;
+
+  // Any change of record, or closing the panel, stops the clip.
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    // Pausing fires onPause, which clears the playing state.
+    audio.pause();
+    audio.currentTime = 0;
+  }, [selectedId]);
+
+  const togglePreview = async (url: string) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (!audio.paused) return audio.pause();
+    if (audio.src !== url) audio.src = url;
+    try {
+      await audio.play();
+    } catch {
+      setPlaying(false);
+    }
+  };
 
   // Keep the eye line a third of the way down the viewport, so shelves
   // foreshorten as they scroll past, like a fixed camera.
@@ -376,8 +408,38 @@ export default function Vinyls() {
               <p className="vx-panel-artist">{shown.artist}</p>
             </div>
             <p className="vx-panel-note">{detailLines(shown, t)}</p>
+            {shown.preview && (
+              <p className="vx-preview">
+                <button
+                  type="button"
+                  className="vx-play"
+                  aria-label={
+                    playing ? t.pause : t.playLabel(shown.preview.track)
+                  }
+                  aria-pressed={playing}
+                  onClick={() => togglePreview(shown.preview!.url)}
+                >
+                  <span aria-hidden="true">{playing ? "❚❚" : "▶"}</span>
+                  {playing ? t.pause : t.play(shown.preview.track)}
+                </button>
+                <a
+                  href={shown.preview.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t.appleMusic}
+                </a>
+              </p>
+            )}
           </div>
         )}
+        <audio
+          ref={audioRef}
+          preload="none"
+          onPlay={() => setPlaying(true)}
+          onPause={() => setPlaying(false)}
+          onEnded={() => setPlaying(false)}
+        />
       </aside>
     </div>
   );

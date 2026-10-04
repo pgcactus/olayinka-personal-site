@@ -137,6 +137,11 @@ try {
     home.headers.get("content-security-policy") ?? "",
     /frame-ancestors 'none'/
   );
+  assert.match(
+    home.headers.get("content-security-policy") ?? "",
+    /media-src https:\/\/audio-ssl\.itunes\.apple\.com/,
+    "CSP allows Apple Music previews"
+  );
   assert.equal(home.headers.get("x-content-type-options"), "nosniff");
 } finally {
   server.kill("SIGTERM");
