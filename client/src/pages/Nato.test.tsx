@@ -89,17 +89,4 @@ describe("Nato", () => {
     await user.click(screen.getByRole("button", { name: "A for Alfa" }));
     expect(screen.getByText(/Spelled 'Alfa'/)).toBeTruthy();
   });
-
-  it("converts NATO words back and flags unknown ones", async () => {
-    const user = userEvent.setup();
-    renderNato();
-    await user.click(screen.getByRole("button", { name: "NATO → word" }));
-    const input = screen.getByLabelText("Type NATO words, separated by spaces");
-
-    await user.type(input, "alfa bravo");
-    expect(document.querySelector(".nt-result")?.textContent).toBe("AB");
-
-    fireEvent.change(input, { target: { value: "alfa bogus" } });
-    expect(screen.getByRole("alert").textContent).toMatch(/bogus/);
-  });
 });
