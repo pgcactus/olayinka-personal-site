@@ -39,6 +39,7 @@ const LEAVE_MS = 650;
 const COPY = {
   en: {
     title: "Hi, I’m Olayinka.",
+    seoHeading: "Product work, vinyls and small things",
     body: [
       "Right now, I lead product work at {flatiron|Flatiron Health}.",
       "Outside of work, I build {things|small things}, collect {records|vinyls} and battle to {plants|keep my plants alive}.",
@@ -66,6 +67,7 @@ const COPY = {
   },
   fr: {
     title: "Bonjour, je m’appelle Olayinka.",
+    seoHeading: "Travail produit, vinyles et petites choses",
     body: [
       "En ce moment, je dirige le travail produit chez {flatiron|Flatiron Health}.",
       "En dehors du travail, je crée de {things|petites choses}, je collectionne les {records|vinyles} et je me bats pour {plants|garder mes plantes en vie}.",
@@ -407,8 +409,14 @@ export default function Home() {
       className={`hm hm--${lang}${fading ? " hm--fading" : ""}${pinned === "things" ? " hm--typing" : ""}`}
     >
       <PageMeta
-        title="Olayinka Titilola"
+        title="Olayinka Titilola — Product Manager in London"
         description="Product manager in London. I lead product work at Flatiron Health, build small things, collect vinyls and try to keep my plants alive."
+        keywords={[
+          "product manager",
+          "small web tools",
+          "vinyl records",
+          "London",
+        ]}
         path="/"
         jsonLd={personJsonLd}
       />
@@ -476,6 +484,7 @@ export default function Home() {
         onClick={onClick}
       >
         <h1 className="hm-title">{c.title}</h1>
+        <h2 className="hm-subtitle">{c.seoHeading}</h2>
         <p className="hm-copy">
           {c.body.map((line, i) => (
             <span key={i}>

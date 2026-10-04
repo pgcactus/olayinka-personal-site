@@ -274,7 +274,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 4px;
   /* Screens taller than the content lift the words off the bottom, so the
      drawing and words sit nearer the middle. */
   padding-bottom: max(4vh, calc((100vh - 700px) * 0.5));
@@ -293,6 +293,17 @@
     0 2px 28px rgba(10, 14, 30, 0.55);
   text-wrap: balance;
   animation: hm-arrive 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.9s backwards;
+}
+
+.hm-subtitle {
+  margin: 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 /* The French greeting is longer; keep it to two lines clear of the drawing. */
@@ -411,7 +422,7 @@
     padding-block: max(20px, env(safe-area-inset-top)) 18px;
   }
   .hm-main {
-    gap: 12px;
+    gap: 4px;
     padding-bottom: max(2vh, calc((100vh - 700px) * 0.5));
   }
   .hm-title {
