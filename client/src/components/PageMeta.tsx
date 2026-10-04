@@ -10,6 +10,7 @@ const SITE_NAME = "Olayinka Titilola";
 interface PageMetaProps {
   title: string; // Full <title> string, e.g. "Olayinka Titilola" or "NATO alphabet — Olayinka Titilola"
   description: string;
+  keywords?: string[];
   path: string; // e.g. "/" or "/nato"
   noindex?: boolean;
   jsonLd?: object;
@@ -20,6 +21,7 @@ interface PageMetaProps {
 export default function PageMeta({
   title,
   description,
+  keywords,
   path,
   noindex,
   jsonLd,
@@ -31,6 +33,9 @@ export default function PageMeta({
     <>
       <title>{title}</title>
       <meta name="description" content={description} />
+      {keywords?.length ? (
+        <meta name="keywords" content={keywords.join(", ")} />
+      ) : null}
       {noindex && <meta name="robots" content="noindex" />}
 
       {/* Open Graph */}

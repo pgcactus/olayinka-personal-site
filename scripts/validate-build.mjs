@@ -41,6 +41,26 @@ for (const [relativePath, expectedContent] of pages) {
 // React does not hoist inline scripts, so the JSON-LD must stay inside #root
 // or hydration fails.
 const homeHtml = await read("dist/public/index.html");
+const homeTitle = homeHtml.match(/<title>([^<]+)<\/title>/)?.[1] ?? "";
+assert.ok(
+  homeTitle.length >= 30 && homeTitle.length <= 60,
+  `index.html: title length (${homeTitle.length})`
+);
+const homeKeywords =
+  homeHtml
+    .match(/<meta name="keywords" content="([^"]+)"/)?.[1]
+    .split(",")
+    .map(keyword => keyword.trim())
+    .filter(Boolean) ?? [];
+assert.ok(
+  homeKeywords.length >= 3 && homeKeywords.length <= 8,
+  `index.html: keyword count (${homeKeywords.length})`
+);
+assert.match(
+  homeHtml,
+  /<h2\b[^>]*>[^<]{1,80}<\/h2>/,
+  "index.html: descriptive H2"
+);
 assert.ok(
   homeHtml.indexOf("application/ld+json") > homeHtml.indexOf('id="root"'),
   "index.html: JSON-LD inside #root"
