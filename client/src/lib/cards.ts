@@ -47,7 +47,7 @@ export function applySwap<T>(order: T[], [a, b]: Swap): T[] {
 /** Each correct find makes the next shuffle longer and quicker. */
 export function difficulty(streak: number) {
   return {
-    swaps: Math.min(6 + streak * 2, 20),
-    ms: Math.max(170, 440 - streak * 45),
+    swaps: Math.min(7 + streak * 2, 22),
+    ms: Math.max(140, 300 - streak * 35),
   };
 }

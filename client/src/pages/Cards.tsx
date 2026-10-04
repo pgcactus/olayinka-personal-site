@@ -85,7 +85,7 @@ export default function Cards() {
   const [guess, setGuess] = useState<CardId | null>(null);
   const [faceUp, setFaceUp] = useState<Set<CardId>>(() => new Set(DECK));
   const [moving, setMoving] = useState<CardId[]>([]);
-  const [moveMs, setMoveMs] = useState(440);
+  const [moveMs, setMoveMs] = useState(300);
   const [streak, setStreak] = useState(0);
   const [best, setBest] = useState(0);
   const [cols, setCols] = useState(6);

@@ -17,8 +17,8 @@ describe("cards", () => {
   });
 
   it("gets longer and faster, up to a limit", () => {
-    expect(difficulty(0)).toEqual({ swaps: 6, ms: 440 });
-    expect(difficulty(3)).toEqual({ swaps: 12, ms: 305 });
-    expect(difficulty(20)).toEqual({ swaps: 20, ms: 170 });
+    expect(difficulty(0)).toEqual({ swaps: 7, ms: 300 });
+    expect(difficulty(3)).toEqual({ swaps: 13, ms: 195 });
+    expect(difficulty(20)).toEqual({ swaps: 22, ms: 140 });
   });
 });
