@@ -10,7 +10,12 @@
   --vx-u: min(14.5vw, 18.4vh);
   --vx-pitch: calc(var(--vx-u) * 1.205);
   --vx-row: calc(var(--vx-u) * 1.53);
-  --vx-wall-w: calc(var(--vx-cols) * var(--vx-pitch) + var(--vx-u) * 0.9);
+  /* The records' outer edges: the heading lines up with these. */
+  --vx-span: calc(
+    var(--vx-cols) * var(--vx-pitch) - var(--vx-pitch) + var(--vx-u)
+  );
+  /* The shelf runs a little past the records, equally on both sides. */
+  --vx-wall-w: calc(var(--vx-span) + var(--vx-u) * 0.4);
   --vx-ease: cubic-bezier(0.32, 0.72, 0, 1);
 
   position: relative;
@@ -45,9 +50,11 @@
 
 .vx-heading {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
-  width: var(--vx-wall-w);
+  gap: 4px 16px;
+  width: var(--vx-span);
   margin: 0 auto calc(var(--vx-u) * 0.5);
 }
 
